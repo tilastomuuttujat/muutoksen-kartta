@@ -97,3 +97,19 @@ describe("impulse wave", () => {
     expect(waveDelay("z", d, 100)).toBe(0);
   });
 });
+
+import { chainWeight as cw, chainDepths as cd } from "./system-map";
+describe("chainWeight", () => {
+  const edges = [{ from: "a", to: "b" }, { from: "b", to: "c" }, { from: "c", to: "d" }].map((e) => ({ ...e, type: "", rationale: "", pressure: false }));
+  const dp = cd("a", edges);
+  it("focus is full, direct important effect is full", () => { expect(cw("a", dp, 1)).toBe(1); expect(cw("b", dp, 5)).toBe(1); });
+  it("fades with distance and low importance", () => { expect(cw("c", dp, 5)).toBe(0.6); expect(cw("d", dp, 2)).toBe(0.15); expect(cw("b", dp, 2)).toBe(0.45); });
+});
+
+import { shouldLabel as sl } from "./system-map";
+describe("shouldLabel", () => {
+  const edges = [{ from: "a", to: "b" }, { from: "b", to: "c" }, { from: "c", to: "d" }].map((e) => ({ ...e, type: "", rationale: "", pressure: false }));
+  const dp = cd("a", edges);
+  it("small chain labels every member, even distant low-importance ones", () => { expect(sl("d", dp, 1, 3)).toBe(true); });
+  it("large chain keeps direct neighbours but drops distant minor ones", () => { expect(sl("b", dp, 1, 40)).toBe(true); expect(sl("d", dp, 1, 40)).toBe(false); });
+});

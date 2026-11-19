@@ -206,3 +206,21 @@ export function waveDelay(id: string, depths: ReturnType<typeof chainDepths>, st
   if (depths.down.has(id)) return maxUp * step * 0.5 + depths.down.get(id)! * step;
   return 0;
 }
+
+/** Emphasis 0..1 for a chain member: fades with hop distance and lower importance, so the main route stands out. */
+export function chainWeight(id: string, depths: ReturnType<typeof chainDepths>, importance: number) {
+  const d = Math.min(depths.up.get(id) ?? Infinity, depths.down.get(id) ?? Infinity);
+  if (d === 0) return 1;
+  if (!Number.isFinite(d)) return 0;
+  const hop = d === 1 ? 1 : d === 2 ? 0.6 : 0.3;
+  const imp = importance >= 4 ? 1 : importance === 3 ? 0.75 : 0.45;
+  return Math.max(0.15, hop * imp);
+}
+
+/** Whether a chain member gets a name label: small chains label everyone; large ones keep direct neighbours and the main route. */
+export function shouldLabel(id: string, depths: ReturnType<typeof chainDepths>, importance: number, chainSize: number, smallMax = 18) {
+  const d = Math.min(depths.up.get(id) ?? Infinity, depths.down.get(id) ?? Infinity);
+  if (!Number.isFinite(d)) return false;
+  if (chainSize <= smallMax || d <= 1) return true;
+  return chainWeight(id, depths, importance) >= 0.75;
+}

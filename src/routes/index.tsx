@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { systemMapQuery } from "@/lib/murros.functions";
-import { LANES, LANE_H, TOP, W, xOf, chainOf, isPressure, layout, layout3d, LAYERS, ISO_W, ISO_H, isoPoint, LENSES, applyLens, LAYER_MODELS, layerModel, searchNodes, resolveStarts, edgeReason, pushTrail, chainDepths, waveDelay, type MapEdge } from "@/lib/system-map";
+import { LANES, LANE_H, TOP, W, xOf, chainOf, isPressure, layout, layout3d, LAYERS, ISO_W, ISO_H, isoPoint, LENSES, applyLens, LAYER_MODELS, layerModel, searchNodes, resolveStarts, edgeReason, pushTrail, chainDepths, waveDelay, chainWeight, shouldLabel, laneOf, type MapEdge } from "@/lib/system-map";
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(systemMapQuery()),
@@ -60,7 +60,6 @@ function SystemMap() {
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
   }, []);
-  const [hover, setHover] = useState<string | null>(null);
   const [mode, setMode] = useState<"3d" | "2d">("3d");
   const [lensKey, setLensKey] = useState<string | null>(null);
   const lens = useMemo(() => (lensKey ? applyLens(lensKey, data.nodes, data.edges) : null), [lensKey, data.nodes, data.edges]);
@@ -96,13 +95,13 @@ function SystemMap() {
   const dragged = () => (drag.current?.moved ?? 0) > 5;
   const zoomBtn = (f: number) => zoomAt(VW / 2, VH / 2, view.k * f);
   const byId = useMemo(() => new Map(data.nodes.map((n) => [n.id, n])), [data.nodes]);
+  const byIdRef = useRef(byId); byIdRef.current = byId;
   const chain = useMemo(() => (sel ? chainOf(sel, data.edges) : null), [sel, data.edges]);
   const depths = useMemo(() => (sel ? chainDepths(sel, data.edges) : null), [sel, data.edges]);
   const [replay, setReplay] = useState(0);
   const dl = (id: string) => (depths ? waveDelay(id, depths) : 0);
+  const wt = (id: string) => (depths ? chainWeight(id, depths, byIdRef.current.get(id)?.importance ?? 2) : 1);
   const node = sel ? byId.get(sel) : null;
-  const tip = hover ? byId.get(hover) : null;
-  const tipPos = hover ? pos.get(hover) : null;
 
   const edgeClass = (e: MapEdge) => {
     if (!chain) return lens ? (lens.edges.has(e) ? "opacity-70" : "opacity-[0.03]") : "opacity-25";
@@ -111,6 +110,8 @@ function SystemMap() {
   };
   const role = (id: string) => (!chain ? (lens ? (lens.nodes.has(id) ? "lens" : "dim") : "rest") : id === sel ? "focus" : chain.up.has(id) ? "cause" : chain.down.has(id) ? "effect" : "dim");
   const fill = { rest: "var(--foreground)", lens: "var(--primary)", focus: "var(--primary)", cause: "var(--calm)", effect: "var(--tension)", dim: "var(--muted-foreground)" } as const;
+  const laneColor = (id: string) => `var(--lane-${LANES[laneOf(byIdRef.current.get(id)?.domains ?? [])]?.key ?? "yhteiso"})`;
+  const nodeFill = (id: string, r: keyof typeof fill) => (r === "cause" || r === "effect" ? laneColor(id) : fill[r]);
   const list = (s: Set<string>) => [...s].map((id) => byId.get(id)!).filter(Boolean).sort((a, b) => a.year - b.year);
 
   return (
@@ -203,9 +204,15 @@ function SystemMap() {
       </section>
 
       <div className="mb-3 flex flex-wrap gap-4 text-sm text-muted-foreground">
-        <span className="flex items-center gap-1.5"><i className="h-3 w-3 rounded-full bg-calm" />Syyt – mistä se kumpusi</span>
-        <span className="flex items-center gap-1.5"><i className="h-3 w-3 rounded-full bg-primary" />Valittu</span>
-        <span className="flex items-center gap-1.5"><i className="h-3 w-3 rounded-full bg-tension" />Seuraukset – mihin se johti</span>
+        {chain ? (<>
+          <span className="font-semibold text-foreground">Aalto osuu elämänalueisiin:</span>
+          {LANES.map((l) => <span key={l.key} className="flex items-center gap-1.5"><i className="h-3 w-3 rounded-full" style={{ background: `var(--lane-${l.key})` }} />{l.label}</span>)}
+          <span className="flex items-center gap-1.5"><i className="h-3 w-3 rounded-full bg-primary" />Valittu</span>
+        </>) : (<>
+          <span className="flex items-center gap-1.5"><i className="h-3 w-3 rounded-full bg-calm" />Syyt – mistä se kumpusi</span>
+          <span className="flex items-center gap-1.5"><i className="h-3 w-3 rounded-full bg-primary" />Valittu</span>
+          <span className="flex items-center gap-1.5"><i className="h-3 w-3 rounded-full bg-tension" />Seuraukset – mihin se johti</span>
+        </>)}
         <span className="flex items-center gap-1.5"><i className="h-0.5 w-5 border-t-2 border-dashed border-tension" />Paine</span>
       </div>
 
@@ -247,11 +254,12 @@ function SystemMap() {
               if (!a || !b || !shown(e.from) || !shown(e.to)) return null;
               const on = chain?.edges.has(e);
               const p = isPressure(e);
-              const anim = on ? { animation: `wave-in 600ms ease-out ${Math.max(dl(e.from), dl(e.to)) - 200}ms both` } : {};
+              const ew = on ? Math.min(wt(e.from), wt(e.to)) : 1;
+              const anim = on ? { animation: `wave-in 600ms ease-out ${Math.max(dl(e.from), dl(e.to)) - 200}ms both`, opacity: 0.15 + ew * 0.8 } : {};
               return (
                 <path key={on ? `${i}-${sel}-${replay}` : i} d={is3d ? curve3d(a, b) : curve(a, b)} className={`transition-opacity duration-500 ${edgeClass(e)}`}
-                  strokeWidth={on ? 2 : lens?.edges.has(e) && !chain ? 1.4 : 1} strokeDasharray={p ? "4 4" : undefined}
-                  style={{ stroke: on ? (chain!.up.has(e.to) || e.to === sel ? "var(--calm)" : "var(--tension)") : p ? "var(--tension)" : "var(--foreground)", ...anim }} />
+                  strokeWidth={on ? 0.6 + ew * 2.2 : lens?.edges.has(e) && !chain ? 1.4 : 1} strokeDasharray={p ? "4 4" : undefined}
+                  style={{ stroke: on ? laneColor(chain!.up.has(e.to) || e.to === sel ? e.from : e.to) : p ? "var(--tension)" : "var(--foreground)", ...anim }} />
               );
             })}
           </g>
@@ -260,13 +268,13 @@ function SystemMap() {
             const p = pos.get(n.id)!;
             const r = role(n.id);
             const rad = 2.5 + n.importance * 0.9 + (r === "focus" ? 3 : 0);
+            const w = chain && r !== "dim" ? wt(n.id) : 1;
             return (
-              <g key={n.id} className="cursor-pointer" onClick={(ev) => { ev.stopPropagation(); if (!dragged()) setSel(n.id === sel ? null : n.id); }}
-                onMouseEnter={() => setHover(n.id)} onMouseLeave={() => setHover(null)}>
+              <g key={n.id} className="cursor-pointer" onClick={(ev) => { ev.stopPropagation(); if (!dragged()) setSel(n.id === sel ? null : n.id); }}>
                 <circle cx={p.x} cy={p.y} r={rad + 6} fill="transparent" />
                 <circle key={chain && r !== "dim" ? `${sel}-${replay}` : "c"} cx={p.x} cy={p.y} r={rad} className="transition-all duration-500"
-                  style={{ fill: fill[r], opacity: r === "dim" ? (lens && !chain ? 0.07 : 0.12) : r === "lens" ? 0.9 : r === "rest" ? 0.55 : 1, stroke: "var(--card)", strokeWidth: 1.5, ...(chain && r !== "dim" ? { animation: `wave-pop 700ms ease-out ${dl(n.id)}ms both` } : {}) }} />
-                {(r === "focus" || ((r === "cause" || r === "effect") && n.importance >= 4)) && (
+                  style={{ fill: nodeFill(n.id, r), opacity: r === "dim" ? (lens && !chain ? 0.07 : 0.12) : r === "lens" ? 0.9 : r === "rest" ? 0.55 : 0.2 + w * 0.8, stroke: "var(--card)", strokeWidth: 1.5, ...(chain && r !== "dim" ? { animation: `wave-pop 700ms ease-out ${dl(n.id)}ms both` } : {}) }} />
+                {(r === "focus" || ((r === "cause" || r === "effect") && depths && shouldLabel(n.id, depths, n.importance, chain!.up.size + chain!.down.size))) && (
                   <text key={`${sel}-${replay}`} x={p.x} y={p.y - rad - 4} textAnchor="middle" className="pointer-events-none fill-foreground text-[11px] font-semibold"
                     style={{ paintOrder: "stroke", stroke: "var(--card)", strokeWidth: 3, animation: chain ? `wave-in 500ms ease-out ${dl(n.id) + 150}ms both` : undefined }}>{n.title.length > 34 ? n.title.slice(0, 32) + "…" : n.title}</text>
                 )}
@@ -280,12 +288,6 @@ function SystemMap() {
           <button aria-label="Loitonna" onClick={() => zoomBtn(1 / 1.5)} className="h-8 w-8 rounded-md border bg-card text-lg shadow-sm hover:bg-muted">−</button>
           {view.k > 1 && <button aria-label="Palauta näkymä" onClick={() => setView({ x: 0, y: 0, k: 1 })} className="h-8 w-8 rounded-md border bg-card text-xs shadow-sm hover:bg-muted">⤢</button>}
         </div>
-        {tip && tipPos && hover !== sel && (
-          <div className="pointer-events-none absolute z-10 max-w-60 rounded-md border bg-popover px-2.5 py-1.5 text-sm shadow-md"
-            style={{ left: `${(tipPos.x / VW) * 100}%`, top: `${(tipPos.y / VH) * 100}%`, transform: "translate(-50%, calc(-100% - 12px))" }}>
-            <b>{tip.title}</b> <span className="text-muted-foreground">{tip.year}</span>
-          </div>
-        )}
       </div>
 
       {trail.length > 1 && (

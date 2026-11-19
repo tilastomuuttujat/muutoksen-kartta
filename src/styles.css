@@ -160,6 +160,11 @@
   --tension: oklch(0.58 0.17 30);
   --calm: oklch(0.55 0.1 160);
   --neutral-line: oklch(0.6 0.03 70);
+  --lane-talous: oklch(0.58 0.14 250);
+  --lane-tyo: oklch(0.62 0.15 65);
+  --lane-hoiva: oklch(0.56 0.15 350);
+  --lane-valta: oklch(0.42 0.06 280);
+  --lane-yhteiso: oklch(0.55 0.11 150);
 }
 @theme inline {
   --color-tension: var(--tension);
