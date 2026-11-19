@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { atlasThemesQuery, type AtlasTheme } from "@/lib/murros.functions";
+import { atlasThemesQuery, type AtlasTheme } from "@/lib/murros-data";
 
 export const Route = createFileRoute("/teemat")({
   loader: ({ context }) => context.queryClient.ensureQueryData(atlasThemesQuery()),

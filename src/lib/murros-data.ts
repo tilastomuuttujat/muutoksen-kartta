@@ -5,6 +5,19 @@ import { queryOptions } from "@tanstack/react-query";
 import raw from "@/data/murros-data.json";
 import type { MapNode, MapEdge } from "./system-map";
 
+export type PathItem = {
+  id: string; title: string; year_start: number; year_end: number; type: string; problem: string;
+  mechanism: string; long_effect: string; current_relevance: string; importance: number;
+};
+export type AtlasTheme = { id: number; name: string; group: string; thesis: string; scores: number[]; labels: string[] };
+const extra = raw as unknown as { themes?: AtlasTheme[]; theme_paths?: Record<string, PathItem[]> };
+
+export const atlasThemesQuery = () =>
+  queryOptions({ queryKey: ["atlas-themes"], queryFn: () => Promise.resolve(extra.themes ?? []), staleTime: Infinity });
+
+export const themePathQuery = (theme: string) =>
+  queryOptions({ queryKey: ["theme-path", theme], queryFn: () => Promise.resolve(extra.theme_paths?.[theme] ?? []), staleTime: Infinity });
+
 type RawNode = {
   id: string; title: string; year: number; year_end: number | null; type: string;
   domains: string[]; importance: number; role: string | null;

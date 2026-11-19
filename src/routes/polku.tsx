@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Suspense, useState } from "react";
-import { themePathQuery, type PathItem } from "@/lib/murros.functions";
+import { themePathQuery, type PathItem } from "@/lib/murros-data";
 
 const THEMES = [
   { key: "koulutus", label: "Koulutus" },

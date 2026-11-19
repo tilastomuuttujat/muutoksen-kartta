@@ -13,6 +13,34 @@ def sb(table, cols):
 nodes = sb("painekartta_nodes", "item_id,item_title,year_start,year_end,item_type,domains,problem,mechanism,long_effect,importance,role,pressure,structural_in,structural_out")
 edges = sb("painekartta_edges", "from_item_id,to_item_id,relation_type,rel_class,confidence,rationale,pressure_signal,weight")
 
+THEMES = ["koulutus", "talous", "työ", "julkinen valta", "poliittinen osallistuminen", "oikeusvaltio", "kansalaisyhteiskunta"]
+def themes_and_paths():
+    themes = []
+    for r in sorted(sb("atlas_themes", "id,payload"), key=lambda r: r["id"]):
+        p = r.get("payload") or {}
+        themes.append({"id": r["id"], "name": str(p.get("name") or ""), "group": str(p.get("group") or "Muut"),
+                       "thesis": str(p.get("thesis") or ""), "scores": [float(x) for x in (p.get("scores") or [])],
+                       "labels": [str((st or {}).get("label") or "") for st in (p.get("steps") or [])]})
+    cols = "id,title,year_start,year_end,type,problem,mechanism,long_effect,current_relevance,importance"
+    paths = {}
+    for t in THEMES:
+        r = requests.get(f"{url}/rest/v1/items", headers=H, timeout=60, params={
+            "select": cols, "domains": "cs.{" + json.dumps(t, ensure_ascii=False) + "}", "unpublished": "eq.false",
+            "order": "importance.desc", "limit": "18"})
+        r.raise_for_status()
+        paths[t] = sorted(r.json(), key=lambda x: x["year_start"] or 0)
+    return themes, paths
+
+# Ilman argumenttia: päivitä vain teemat ja aikajanat olemassa olevaan tiedostoon.
+if len(sys.argv) < 2:
+    data = json.load(open("src/data/murros-data.json"))
+    data["themes"], data["theme_paths"] = themes_and_paths()
+    data["meta"]["sources"]["supabase"] = ["painekartta_nodes", "painekartta_edges", "atlas_themes", "items"]
+    for path in ("src/data/murros-data.json", "public/data/murros-data.json"):
+        json.dump(data, open(path, "w"), ensure_ascii=False, separators=(",", ":"))
+    print(len(data["themes"]), "themes", {k: len(v) for k, v in data["theme_paths"].items()})
+    sys.exit(0)
+
 raw = open(sys.argv[1]).read()
 neon = json.loads(raw[raw.index("{"):])["rows"][0]["data"]
 series = {s["key"]: s for s in neon["series"] if s.get("values")}
@@ -45,12 +73,15 @@ data = {
                          "neon": ["atlas_editing.conclusions", "atlas_reasoning.conclusion_series", "atlas_evidence.observations"]},
              "note": "Päätelmien kytkentä ilmiöihin on tekstivastaavuuteen perustuva ehdotus, ei tarkistettu. Tilastoarvot ovat vuosikeskiarvoja ryhmien yli."},
     "nodes": out_nodes,
+    "themes": None, "theme_paths": None,
     "edges": [{"from": e["from_item_id"], "to": e["to_item_id"], "type": e["relation_type"], "class": e["rel_class"],
                "confidence": e["confidence"], "rationale": e["rationale"], "pressure": e["pressure_signal"], "weight": float(e["weight"])} for e in edges],
     "conclusions": [{"id": c["id"], "title": c["title"], "claim": c["claim"], "kind": c["kind"], "status": c["status"],
                      "limitations": c["limitations"], "series": [k for k in (c.get("series") or []) if k in series]} for c in concl],
     "series": [{"key": k, "title": s["title"], "unit": s["unit"], "source": s["source"], "values": s["values"]} for k, s in series.items() if k in used],
 }
+data["themes"], data["theme_paths"] = themes_and_paths()
+data["meta"]["sources"]["supabase"] += ["atlas_themes", "items"]
 for path in ("src/data/murros-data.json", "public/data/murros-data.json"):
     json.dump(data, open(path, "w"), ensure_ascii=False, separators=(",", ":"))
 linked = sum(1 for n in out_nodes if n["conclusion_ids"])
