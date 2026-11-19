@@ -1,1 +1,99 @@
-aW1wb3J0IHsgZGVzY3JpYmUsIGV4cGVjdCwgaXQgfSBmcm9tICJ2aXRlc3QiOwppbXBvcnQgeyBjaGFpbk9mLCBpc1ByZXNzdXJlLCBsYW5lT2YsIHR5cGUgTWFwRWRnZSB9IGZyb20gIi4vc3lzdGVtLW1hcCI7Cgpjb25zdCBlID0gKGZyb206IHN0cmluZywgdG86IHN0cmluZywgdHlwZSA9ICJlbmFibGVkIik6IE1hcEVkZ2UgPT4gKHsgZnJvbSwgdG8sIHR5cGUsIHJhdGlvbmFsZTogIiIsIHByZXNzdXJlOiBmYWxzZSB9KTsKCmRlc2NyaWJlKCJzeXN0ZW0gbWFwIiwgKCkgPT4gewogIGl0KCJjbGlja2luZyBhIG5vZGUgbGlnaHRzIHVwIGl0cyBjYXVzZXMgYW5kIGVmZmVjdHMgYnV0IG5vdCBzaWRlIGJyYW5jaGVzIiwgKCkgPT4gewogICAgY29uc3QgZWRnZXMgPSBbZSgiYSIsICJiIiksIGUoImIiLCAiYyIpLCBlKCJjIiwgImQiKSwgZSgieCIsICJjIiksIGUoImIiLCAieSIpXTsKICAgIGNvbnN0IGNoID0gY2hhaW5PZigiYyIsIGVkZ2VzKTsKICAgIGV4cGVjdChbLi4uY2gudXBdLnNvcnQoKSkudG9FcXVhbChbImEiLCAiYiIsICJ4Il0pOwogICAgZXhwZWN0KFsuLi5jaC5kb3duXSkudG9FcXVhbChbImQiXSk7CiAgICBleHBlY3QoY2gubm9kZXMuaGFzKCJ5IikpLnRvQmUoZmFsc2UpOwogIH0pOwogIGl0KCJwcmVzc3VyZSBsaW5rcyBhcmUgcmVjb2duaXNlZCIsICgpID0+IHsKICAgIGV4cGVjdChpc1ByZXNzdXJlKGUoImEiLCAiYiIsICJjcmVhdGVkX3ByZXNzdXJlX2ZvciIpKSkudG9CZSh0cnVlKTsKICAgIGV4cGVjdChpc1ByZXNzdXJlKGUoImEiLCAiYiIsICJlbmFibGVkIikpKS50b0JlKGZhbHNlKTsKICB9KTsKICBpdCgidW5rbm93biBkb21haW5zIGZhbGwgdG8gdGhlIGxhc3QgbGFuZSIsICgpID0+IHsKICAgIGV4cGVjdChsYW5lT2YoWyJ0ecO2Il0pKS50b0JlKDEpOwogICAgZXhwZWN0KGxhbmVPZihbImt1bHR0dXVyaSJdKSkudG9CZSg0KTsKICB9KTsKfSk7CgppbXBvcnQgeyBsYXllck9mLCBsYXlvdXQzZCB9IGZyb20gIi4vc3lzdGVtLW1hcCI7CmRlc2NyaWJlKCJsYXllcmVkIDIuNUQgdmlldyIsICgpID0+IHsKICBpdCgiY3Jpc2VzIHNpdCBvbiB0aGUgc3VyZmFjZSwgcmVmb3JtcyBpbiB0aGUgbWlkZGxlLCBzdHJ1Y3R1cmFsIGNoYW5nZSBhdCB0aGUgYm90dG9tIiwgKCkgPT4gewogICAgZXhwZWN0KGxheWVyT2YoImtyaWlzaSIpKS50b0JlKDApOwogICAgZXhwZWN0KGxheWVyT2YoInV1ZGlzdHVzIikpLnRvQmUoMSk7CiAgICBleHBlY3QobGF5ZXJPZigicmFrZW5uZW11dXRvcyIpKS50b0JlKDIpOwogIH0pOwogIGl0KCJkZWVwZXIgbGF5ZXJzIGFyZSBkcmF3biBsb3dlciBvbiBzY3JlZW4iLCAoKSA9PiB7CiAgICBjb25zdCBuID0gKGlkOiBzdHJpbmcsIHR5cGU6IHN0cmluZykgPT4gKHsgaWQsIHRpdGxlOiBpZCwgeWVhcjogMTk1MCwgdHlwZSwgZG9tYWluczogWyJ0ecO2Il0sIGltcG9ydGFuY2U6IDMsIHByb2JsZW06ICIiLCBlZmZlY3Q6ICIiIH0pOwogICAgY29uc3QgcCA9IGxheW91dDNkKFtuKCJhIiwgImtyaWlzaSIpLCBuKCJiIiwgInJha2VubmVtdXV0b3MiKV0pOwogICAgZXhwZWN0KHAuZ2V0KCJiIikhLnkpLnRvQmVHcmVhdGVyVGhhbihwLmdldCgiYSIpIS55KTsKICB9KTsKfSk7CgppbXBvcnQgeyBhcHBseUxlbnMgfSBmcm9tICIuL3N5c3RlbS1tYXAiOwpkZXNjcmliZSgiYXBwbHlMZW5zIiwgKCkgPT4gewogIGNvbnN0IG1rID0gKGlkOiBzdHJpbmcsIHR5cGU6IHN0cmluZywgcm9sZSA9ICIiKSA9PiAoeyBpZCwgdGl0bGU6IGlkLCB5ZWFyOiAxOTAwLCB0eXBlLCBkb21haW5zOiBbXSwgaW1wb3J0YW5jZTogMiwgcHJvYmxlbTogIiIsIGVmZmVjdDogIiIsIHJvbGUgfSk7CiAgY29uc3QgbnMgPSBbbWsoImEiLCAia3JpaXNpIiksIG1rKCJiIiwgInV1ZGlzdHVzIiksIG1rKCJjIiwgImtyaWlzaSIsICJ0b2ltZWVucGFub2x1a2tvIildOwogIGNvbnN0IGVzID0gW3sgZnJvbTogImEiLCB0bzogImMiLCB0eXBlOiAieCIsIHJhdGlvbmFsZTogIiIsIHByZXNzdXJlOiBmYWxzZSB9LCB7IGZyb206ICJhIiwgdG86ICJiIiwgdHlwZTogIngiLCByYXRpb25hbGU6ICIiLCBwcmVzc3VyZTogdHJ1ZSB9XTsKICBpdCgiY3Jpc2lzIGxlbnMga2VlcHMgb25seSBjcmlzZXMgYW5kIGVkZ2VzIGJldHdlZW4gdGhlbSIsICgpID0+IHsKICAgIGNvbnN0IHIgPSBhcHBseUxlbnMoImtyaWlzaXQiLCBucywgZXMpITsKICAgIGV4cGVjdChbLi4uci5ub2Rlc10uc29ydCgpKS50b0VxdWFsKFsiYSIsICJjIl0pOwogICAgZXhwZWN0KHIuZWRnZXMuc2l6ZSkudG9CZSgxKTsKICB9KTsKICBpdCgibG9jayBsZW5zIHVzZXMgcm9sZSIsICgpID0+IGV4cGVjdChhcHBseUxlbnMoImx1a290IiwgbnMsIGVzKSEubm9kZXMuaGFzKCJjIikpLnRvQmUodHJ1ZSkpOwogIGl0KCJwcmVzc3VyZSBsZW5zIGtlZXBzIHByZXNzdXJlIGVkZ2VzIGFuZCB0aGVpciBlbmRwb2ludHMiLCAoKSA9PiBleHBlY3QoWy4uLmFwcGx5TGVucygibHVrb3QiLCBucywgZXMpIS5ub2Rlc10uc29ydCgpKS50b0VxdWFsKFsiYSIsICJiIiwgImMiXSkpOwp9KTsKZGVzY3JpYmUoImh1YiBsZW5zIiwgKCkgPT4gewogIGl0KCJwaWNrcyB0aGUgbW9zdCBjb25uZWN0ZWQgbm9kZXMiLCAoKSA9PiB7CiAgICBjb25zdCBlcyA9IEFycmF5LmZyb20oeyBsZW5ndGg6IDMwIH0sIChfLCBpKSA9PiAoeyBmcm9tOiAiaHViIiwgdG86IGBuJHtpfWAsIHR5cGU6ICJ4IiwgcmF0aW9uYWxlOiAiIiwgcHJlc3N1cmU6IGZhbHNlIH0pKTsKICAgIGV4cGVjdChhcHBseUxlbnMoImthbnRhdmF0IiwgW10sIGVzKSEubm9kZXMuaGFzKCJodWIiKSkudG9CZSh0cnVlKTsKICB9KTsKfSk7CgppbXBvcnQgeyBsYXllck1vZGVsIH0gZnJvbSAiLi9zeXN0ZW0tbWFwIjsKZGVzY3JpYmUoImxheWVyIG1vZGVscyIsICgpID0+IHsKICBjb25zdCBuID0gKHR5cGU6IHN0cmluZywgZG9tYWluczogc3RyaW5nW10sIHJvbGUgPSAiIikgPT4gKHsgaWQ6ICJ4IiwgdGl0bGU6ICJ4IiwgeWVhcjogMTk1MCwgdHlwZSwgZG9tYWlucywgaW1wb3J0YW5jZTogMSwgcHJvYmxlbTogIiIsIGVmZmVjdDogIiIsIHJvbGUgfSk7CiAgaXQoImV2ZXJ5ZGF5IHZzIGVuZ2luZSByb29tIHB1dHMgc2Nob29saW5nIG9uIHRvcCBhbmQgZXhwb3J0cyBhdCB0aGUgYm90dG9tIiwgKCkgPT4gewogICAgZXhwZWN0KGxheWVyTW9kZWwoImFya2kiKS5vZihuKCJ1dWRpc3R1cyIsIFsia291bHV0dXMiXSkpKS50b0JlKDApOwogICAgZXhwZWN0KGxheWVyTW9kZWwoImFya2kiKS5vZihuKCJ1dWRpc3R1cyIsIFsidmllbnRpIl0pKSkudG9CZSgyKTsKICAgIGV4cGVjdChsYXllck1vZGVsKCJhcmtpIikub2YobigidXVkaXN0dXMiLCBbIm9pa2V1c3ZhbHRpbyJdKSkpLnRvQmUoMSk7CiAgfSk7CiAgaXQoImRlY2lzaW9uIGFyYzogY3Jpc2VzIGFyZSBwcmVzc3VyZXMsIHJlZm9ybXMgc29sdXRpb25zLCBsb2NrLWlucyBjb25zZXF1ZW5jZXMiLCAoKSA9PiB7CiAgICBleHBlY3QobGF5ZXJNb2RlbCgia2FhcmkiKS5vZihuKCJrcmlpc2kiLCBbXSkpKS50b0JlKDApOwogICAgZXhwZWN0KGxheWVyTW9kZWwoImthYXJpIikub2YobigidXVkaXN0dXMiLCBbXSkpKS50b0JlKDEpOwogICAgZXhwZWN0KGxheWVyTW9kZWwoImthYXJpIikub2YobigidXVkaXN0dXMiLCBbXSwgInRvaW1lZW5wYW5vbHVra28iKSkpLnRvQmUoMik7CiAgfSk7Cn0pOwoKaW1wb3J0IHsgc2VhcmNoTm9kZXMsIHB1c2hUcmFpbCwgZWRnZVJlYXNvbiB9IGZyb20gIi4vc3lzdGVtLW1hcCI7CmRlc2NyaWJlKCJ1c2FiaWxpdHkgaGVscGVycyIsICgpID0+IHsKICBjb25zdCBtayA9IChpZDogc3RyaW5nLCB0aXRsZTogc3RyaW5nLCB5ZWFyOiBudW1iZXIsIGltcG9ydGFuY2UgPSAxKSA9PiAoeyBpZCwgdGl0bGUsIHllYXIsIHR5cGU6ICJrcmlpc2kiLCBkb21haW5zOiBbXSwgaW1wb3J0YW5jZSwgcHJvYmxlbTogIiIsIGVmZmVjdDogIiIgfSk7CiAgY29uc3QgbnMgPSBbbWsoImEiLCAiMTk5MC1sdXZ1biBsYW1hIiwgMTk5MSwgNSksIG1rKCJiIiwgIlBlcnVza291bHUtdXVkaXN0dXMiLCAxOTY4LCA0KSwgbWsoImMiLCAiU3V1cmkgbGFtYSIsIDE5MzAsIDMpXTsKICBpdCgic2VhcmNoIG1hdGNoZXMgdGl0bGUgc3RhcnQgZmlyc3QiLCAoKSA9PiBleHBlY3Qoc2VhcmNoTm9kZXMoImxhbWEiLCBucykubWFwKChuKSA9PiBuLmlkKSkudG9FcXVhbChbImEiLCAiYyJdKSk7CiAgaXQoInNlYXJjaCBieSB5ZWFyIGZpbmRzIG5lYXJieSBldmVudHMiLCAoKSA9PiBleHBlY3Qoc2VhcmNoTm9kZXMoIjE5NzAiLCBucylbMF0hLmlkKS50b0JlKCJiIikpOwogIGl0KCJ0cmFpbCBjdXRzIGJhY2sgd2hlbiByZXZpc2l0aW5nIiwgKCkgPT4gZXhwZWN0KHB1c2hUcmFpbChbImEiLCAiYiIsICJjIl0sICJiIikpLnRvRXF1YWwoWyJhIiwgImIiXSkpOwogIGl0KCJlZGdlIHJlYXNvbiB3b3JrcyBib3RoIGRpcmVjdGlvbnMiLCAoKSA9PiBleHBlY3QoZWRnZVJlYXNvbigieSIsICJ4IiwgW3sgZnJvbTogIngiLCB0bzogInkiLCB0eXBlOiAiIiwgcmF0aW9uYWxlOiAic3l5IiwgcHJlc3N1cmU6IGZhbHNlIH1dKSkudG9CZSgic3l5IikpOwp9KTsKaW1wb3J0IHsgcmVzb2x2ZVN0YXJ0cyB9IGZyb20gIi4vc3lzdGVtLW1hcCI7Cml0KCIxOTkwcyBkZXByZXNzaW9uIHN0YXJ0IHNraXBzIHRoZSAxOTMwcyBvbmUiLCAoKSA9PiB7CiAgY29uc3QgbWsgPSAoaWQ6IHN0cmluZywgdGl0bGU6IHN0cmluZywgeWVhcjogbnVtYmVyKSA9PiAoeyBpZCwgdGl0bGUsIHllYXIsIHR5cGU6ICIiLCBkb21haW5zOiBbXSwgaW1wb3J0YW5jZTogNSwgcHJvYmxlbTogIiIsIGVmZmVjdDogIiIgfSk7CiAgZXhwZWN0KHJlc29sdmVTdGFydHMoW21rKCJhIiwgIjE5MzAtbHV2dW4gbGFtYSIsIDE5MzApLCBtaygiYiIsICJMYW1hIGphIHBhbmtraWtyaWlzaSIsIDE5OTEpXSlbMF0hLm5vZGUhLmlkKS50b0JlKCJiIik7Cn0pOwoKaW1wb3J0IHsgY2hhaW5EZXB0aHMsIHdhdmVEZWxheSB9IGZyb20gIi4vc3lzdGVtLW1hcCI7CmRlc2NyaWJlKCJpbXB1bHNlIHdhdmUiLCAoKSA9PiB7CiAgY29uc3QgRSA9IFt7IGZyb206ICJhIiwgdG86ICJiIiB9LCB7IGZyb206ICJiIiwgdG86ICJjIiB9LCB7IGZyb206ICJ6IiwgdG86ICJhIiB9XSBhcyBhbnk7CiAgaXQoImVmZmVjdHMgbGlnaHQgdXAgaW4gaG9wIG9yZGVyIGFmdGVyIHRoZSBmb2N1cyIsICgpID0+IHsKICAgIGNvbnN0IGQgPSBjaGFpbkRlcHRocygiYSIsIEUpOwogICAgZXhwZWN0KGQuZG93bi5nZXQoImMiKSkudG9CZSgyKTsKICAgIGV4cGVjdCh3YXZlRGVsYXkoImEiLCBkLCAxMDApKS50b0JlKDUwKTsKICAgIGV4cGVjdCh3YXZlRGVsYXkoImIiLCBkLCAxMDApKS50b0JlKDE1MCk7CiAgICBleHBlY3Qod2F2ZURlbGF5KCJjIiwgZCwgMTAwKSkudG9CZSgyNTApOwogICAgZXhwZWN0KHdhdmVEZWxheSgieiIsIGQsIDEwMCkpLnRvQmUoMCk7CiAgfSk7Cn0pOwo=
+import { describe, expect, it } from "vitest";
+import { chainOf, isPressure, laneOf, type MapEdge } from "./system-map";
+
+const e = (from: string, to: string, type = "enabled"): MapEdge => ({ from, to, type, rationale: "", pressure: false });
+
+describe("system map", () => {
+  it("clicking a node lights up its causes and effects but not side branches", () => {
+    const edges = [e("a", "b"), e("b", "c"), e("c", "d"), e("x", "c"), e("b", "y")];
+    const ch = chainOf("c", edges);
+    expect([...ch.up].sort()).toEqual(["a", "b", "x"]);
+    expect([...ch.down]).toEqual(["d"]);
+    expect(ch.nodes.has("y")).toBe(false);
+  });
+  it("pressure links are recognised", () => {
+    expect(isPressure(e("a", "b", "created_pressure_for"))).toBe(true);
+    expect(isPressure(e("a", "b", "enabled"))).toBe(false);
+  });
+  it("unknown domains fall to the last lane", () => {
+    expect(laneOf(["työ"])).toBe(1);
+    expect(laneOf(["kulttuuri"])).toBe(4);
+  });
+});
+
+import { layerOf, layout3d } from "./system-map";
+describe("layered 2.5D view", () => {
+  it("crises sit on the surface, reforms in the middle, structural change at the bottom", () => {
+    expect(layerOf("kriisi")).toBe(0);
+    expect(layerOf("uudistus")).toBe(1);
+    expect(layerOf("rakennemuutos")).toBe(2);
+  });
+  it("deeper layers are drawn lower on screen", () => {
+    const n = (id: string, type: string) => ({ id, title: id, year: 1950, type, domains: ["työ"], importance: 3, problem: "", effect: "" });
+    const p = layout3d([n("a", "kriisi"), n("b", "rakennemuutos")]);
+    expect(p.get("b")!.y).toBeGreaterThan(p.get("a")!.y);
+  });
+});
+
+import { applyLens } from "./system-map";
+describe("applyLens", () => {
+  const mk = (id: string, type: string, role = "") => ({ id, title: id, year: 1900, type, domains: [], importance: 2, problem: "", effect: "", role });
+  const ns = [mk("a", "kriisi"), mk("b", "uudistus"), mk("c", "kriisi", "toimeenpanolukko")];
+  const es = [{ from: "a", to: "c", type: "x", rationale: "", pressure: false }, { from: "a", to: "b", type: "x", rationale: "", pressure: true }];
+  it("crisis lens keeps only crises and edges between them", () => {
+    const r = applyLens("kriisit", ns, es)!;
+    expect([...r.nodes].sort()).toEqual(["a", "c"]);
+    expect(r.edges.size).toBe(1);
+  });
+  it("lock lens uses role", () => expect(applyLens("lukot", ns, es)!.nodes.has("c")).toBe(true));
+  it("pressure lens keeps pressure edges and their endpoints", () => expect([...applyLens("lukot", ns, es)!.nodes].sort()).toEqual(["a", "b", "c"]));
+});
+describe("hub lens", () => {
+  it("picks the most connected nodes", () => {
+    const es = Array.from({ length: 30 }, (_, i) => ({ from: "hub", to: `n${i}`, type: "x", rationale: "", pressure: false }));
+    expect(applyLens("kantavat", [], es)!.nodes.has("hub")).toBe(true);
+  });
+});
+
+import { layerModel } from "./system-map";
+describe("layer models", () => {
+  const n = (type: string, domains: string[], role = "") => ({ id: "x", title: "x", year: 1950, type, domains, importance: 1, problem: "", effect: "", role });
+  it("everyday vs engine room puts schooling on top and exports at the bottom", () => {
+    expect(layerModel("arki").of(n("uudistus", ["koulutus"]))).toBe(0);
+    expect(layerModel("arki").of(n("uudistus", ["vienti"]))).toBe(2);
+    expect(layerModel("arki").of(n("uudistus", ["oikeusvaltio"]))).toBe(1);
+  });
+  it("decision arc: crises are pressures, reforms solutions, lock-ins consequences", () => {
+    expect(layerModel("kaari").of(n("kriisi", []))).toBe(0);
+    expect(layerModel("kaari").of(n("uudistus", []))).toBe(1);
+    expect(layerModel("kaari").of(n("uudistus", [], "toimeenpanolukko"))).toBe(2);
+  });
+});
+
+import { searchNodes, pushTrail, edgeReason } from "./system-map";
+describe("usability helpers", () => {
+  const mk = (id: string, title: string, year: number, importance = 1) => ({ id, title, year, type: "kriisi", domains: [], importance, problem: "", effect: "" });
+  const ns = [mk("a", "1990-luvun lama", 1991, 5), mk("b", "Peruskoulu-uudistus", 1968, 4), mk("c", "Suuri lama", 1930, 3)];
+  it("search matches title start first", () => expect(searchNodes("lama", ns).map((n) => n.id)).toEqual(["a", "c"]));
+  it("search by year finds nearby events", () => expect(searchNodes("1970", ns)[0]!.id).toBe("b"));
+  it("trail cuts back when revisiting", () => expect(pushTrail(["a", "b", "c"], "b")).toEqual(["a", "b"]));
+  it("edge reason works both directions", () => expect(edgeReason("y", "x", [{ from: "x", to: "y", type: "", rationale: "syy", pressure: false }])).toBe("syy"));
+});
+import { resolveStarts } from "./system-map";
+it("1990s depression start skips the 1930s one", () => {
+  const mk = (id: string, title: string, year: number) => ({ id, title, year, type: "", domains: [], importance: 5, problem: "", effect: "" });
+  expect(resolveStarts([mk("a", "1930-luvun lama", 1930), mk("b", "Lama ja pankkikriisi", 1991)])[0]!.node!.id).toBe("b");
+});
+
+import { chainDepths, waveDelay } from "./system-map";
+describe("impulse wave", () => {
+  const E = [{ from: "a", to: "b" }, { from: "b", to: "c" }, { from: "z", to: "a" }] as any;
+  it("effects light up in hop order after the focus", () => {
+    const d = chainDepths("a", E);
+    expect(d.down.get("c")).toBe(2);
+    expect(waveDelay("a", d, 100)).toBe(50);
+    expect(waveDelay("b", d, 100)).toBe(150);
+    expect(waveDelay("c", d, 100)).toBe(250);
+    expect(waveDelay("z", d, 100)).toBe(0);
+  });
+});

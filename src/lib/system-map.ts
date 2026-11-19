@@ -1,1 +1,208 @@
-Ly8gUHVyZSBsYXlvdXQgKyBjaGFpbiBsb2dpYyBmb3IgdGhlIHN5c3RlbSBtYXAgKGJyb3dzZXItc2FmZSwgdGVzdGFibGUpLgpleHBvcnQgdHlwZSBNYXBOb2RlID0geyBpZDogc3RyaW5nOyB0aXRsZTogc3RyaW5nOyB5ZWFyOiBudW1iZXI7IHR5cGU6IHN0cmluZzsgZG9tYWluczogc3RyaW5nW107IGltcG9ydGFuY2U6IG51bWJlcjsgcHJvYmxlbTogc3RyaW5nOyBlZmZlY3Q6IHN0cmluZzsgcm9sZT86IHN0cmluZyB9OwpleHBvcnQgdHlwZSBNYXBFZGdlID0geyBmcm9tOiBzdHJpbmc7IHRvOiBzdHJpbmc7IHR5cGU6IHN0cmluZzsgcmF0aW9uYWxlOiBzdHJpbmc7IHByZXNzdXJlOiBib29sZWFuOyBjbHM/OiBzdHJpbmcgfTsKCmV4cG9ydCBjb25zdCBMQU5FUyA9IFsKICB7IGtleTogInRhbG91cyIsIGxhYmVsOiAiVGFsb3VzIGphIHR1b3RhbnRvIiwgd29yZHM6IFsidGFsb3VzIiwgInRlb2xsaXN1dXMiLCAiZW5lcmdpYSIsICJtYWF0YWxvdXMiLCAibWV0c8OkdGFsb3VzIiwgInJhaG9pdHVzIiwgInJhaGFwb2xpdGlpa2thIiwgImV1cm8iLCAiRVUiLCAibGlpa2VubmUiLCAidGVrbm9sb2dpYSIsICJkaWdpdGFsaXNhYXRpbyIsICJ0ZWtvw6RseSIsICJqdWxraW5lbiB0YWxvdXMiXSB9LAogIHsga2V5OiAidHlvIiwgbGFiZWw6ICJUecO2IGphIHRvaW1lZW50dWxvIiwgd29yZHM6IFsidHnDtiIsICJ0ecO2bGxpc3l5cyIsICJzb3NpYWFsaXR1cnZhIiwgImVsw6RrZSIsICJlbMOka2tlZXQiLCAiYXN1bWluZW4iLCAidHnDtnR0w7ZteXlzIl0gfSwKICB7IGtleTogImhvaXZhIiwgbGFiZWw6ICJIeXZpbnZvaW50aSBqYSBob2l2YSIsIHdvcmRzOiBbInRlcnZleXMiLCAiaG9pdmEiLCAicGVyaGUiLCAicGVyaGVldCIsICJsYXBzZXQiLCAidmFtbWFpc3V1cyIsICJzb3NpYWFsaWh1b2x0byIsICJ2w6Rlc3TDtiIsICJrb3VsdXR1cyJdIH0sCiAgeyBrZXk6ICJ2YWx0YSIsIGxhYmVsOiAiVmFsdGEgamEgaGFsbGludG8iLCB3b3JkczogWyJoYWxsaW50byIsICJ2YWx0aW8iLCAiZGVtb2tyYXRpYSIsICJ0dXJ2YWxsaXN1dXMiLCAicHVvbHVzdHVzIiwgInBlcnVzb2lrZXVkZXQiLCAib2lrZXVzdmFsdGlvIiwgImt1bnRhIl0gfSwKICB7IGtleTogInlodGVpc28iLCBsYWJlbDogIkt1bHR0dXVyaSBqYSB5aHRlaXPDtnQiLCB3b3JkczogW10gYXMgc3RyaW5nW10gfSwKXSBhcyBjb25zdDsKCmV4cG9ydCBmdW5jdGlvbiBsYW5lT2YoZG9tYWluczogc3RyaW5nW10pOiBudW1iZXIgewogIGZvciAoY29uc3QgZCBvZiBkb21haW5zKSB7CiAgICBjb25zdCBpID0gTEFORVMuZmluZEluZGV4KChsKSA9PiAobC53b3JkcyBhcyByZWFkb25seSBzdHJpbmdbXSkuaW5jbHVkZXMoZCkpOwogICAgaWYgKGkgPj0gMCkgcmV0dXJuIGk7CiAgfQogIHJldHVybiBMQU5FUy5sZW5ndGggLSAxOwp9CgpleHBvcnQgY29uc3QgUFJFU1NVUkVfUkUgPSAvcHJlc3N1cmV8Y29uc3RyYWlufHdlYWtlbnx2dWxuZXJhYnxleHBvc2VkfGRlbGF5ZWR8Y291bnRlcnJlYWN0aW9ufHJldmVyc2VkLzsKZXhwb3J0IGNvbnN0IGlzUHJlc3N1cmUgPSAoZTogUGljazxNYXBFZGdlLCAidHlwZSIgfCAicHJlc3N1cmUiPikgPT4gZS5wcmVzc3VyZSB8fCBQUkVTU1VSRV9SRS50ZXN0KGUudHlwZSk7CgpleHBvcnQgY29uc3QgVyA9IDE0MDAsIExBTkVfSCA9IDE1MCwgVE9QID0gMzAsIFkwID0gMTg1MCwgWTEgPSAyMDMwOwpleHBvcnQgY29uc3QgeE9mID0gKHllYXI6IG51bWJlcikgPT4gNjAgKyAoKE1hdGgubWluKFkxLCBNYXRoLm1heChZMCwgeWVhcikpIC0gWTApIC8gKFkxIC0gWTApKSAqIChXIC0gMTAwKTsKCmV4cG9ydCBmdW5jdGlvbiBsYXlvdXQobm9kZXM6IE1hcE5vZGVbXSkgewogIGNvbnN0IHBvcyA9IG5ldyBNYXA8c3RyaW5nLCB7IHg6IG51bWJlcjsgeTogbnVtYmVyOyBsYW5lOiBudW1iZXIgfT4oKTsKICBMQU5FUy5mb3JFYWNoKChfLCBsYW5lKSA9PiB7CiAgICBjb25zdCByb3dzOiBudW1iZXJbXSA9IFtdOwogICAgY29uc3Qgc3ViID0gNzsKICAgIG5vZGVzLmZpbHRlcigobikgPT4gbGFuZU9mKG4uZG9tYWlucykgPT09IGxhbmUpLnNvcnQoKGEsIGIpID0+IGEueWVhciAtIGIueWVhcikuZm9yRWFjaCgobikgPT4gewogICAgICBjb25zdCB4ID0geE9mKG4ueWVhcik7CiAgICAgIGxldCByID0gcm93cy5maW5kSW5kZXgoKGxhc3QpID0+IHggLSBsYXN0ID4gMTQpOwogICAgICBpZiAociA8IDApIHIgPSByb3dzLmxlbmd0aCA8IHN1YiA/IHJvd3MubGVuZ3RoIDogcm93cy5pbmRleE9mKE1hdGgubWluKC4uLnJvd3MpKTsKICAgICAgcm93c1tyXSA9IHg7CiAgICAgIGNvbnN0IG9yZGVyID0gWzMsIDIsIDQsIDEsIDUsIDAsIDZdW3JdID8/IDM7CiAgICAgIHBvcy5zZXQobi5pZCwgeyB4LCB5OiBUT1AgKyBsYW5lICogTEFORV9IICsgMTggKyBvcmRlciAqICgoTEFORV9IIC0gMzYpIC8gKHN1YiAtIDEpKSwgbGFuZSB9KTsKICAgIH0pOwogIH0pOwogIHJldHVybiBwb3M7Cn0KCi8qKiBFdmVyeXRoaW5nIHJlYWNoYWJsZSB1cHN0cmVhbSAoY2F1c2VzKSBhbmQgZG93bnN0cmVhbSAoZWZmZWN0cykgb2YgYGlkYC4gKi8KZXhwb3J0IGZ1bmN0aW9uIGNoYWluT2YoaWQ6IHN0cmluZywgZWRnZXM6IE1hcEVkZ2VbXSkgewogIGNvbnN0IHdhbGsgPSAoZGlyOiAidXAiIHwgImRvd24iKSA9PiB7CiAgICBjb25zdCBzZWVuID0gbmV3IFNldDxzdHJpbmc+KFtpZF0pOwogICAgY29uc3QgcSA9IFtpZF07CiAgICB3aGlsZSAocS5sZW5ndGgpIHsKICAgICAgY29uc3QgY3VyID0gcS5zaGlmdCgpITsKICAgICAgZm9yIChjb25zdCBlIG9mIGVkZ2VzKSB7CiAgICAgICAgY29uc3QgbmV4dCA9IGRpciA9PT0gImRvd24iID8gKGUuZnJvbSA9PT0gY3VyID8gZS50byA6IG51bGwpIDogZS50byA9PT0gY3VyID8gZS5mcm9tIDogbnVsbDsKICAgICAgICBpZiAobmV4dCAmJiAhc2Vlbi5oYXMobmV4dCkpIHsgc2Vlbi5hZGQobmV4dCk7IHEucHVzaChuZXh0KTsgfQogICAgICB9CiAgICB9CiAgICBzZWVuLmRlbGV0ZShpZCk7CiAgICByZXR1cm4gc2VlbjsKICB9OwogIGNvbnN0IHVwID0gd2FsaygidXAiKSwgZG93biA9IHdhbGsoImRvd24iKTsKICBjb25zdCBub2RlcyA9IG5ldyBTZXQ8c3RyaW5nPihbaWQsIC4uLnVwLCAuLi5kb3duXSk7CiAgY29uc3Qgb25DaGFpbiA9IChlOiBNYXBFZGdlKSA9PiAoZS50byA9PT0gaWQgfHwgdXAuaGFzKGUudG8pKSAmJiAoZS5mcm9tID09PSBpZCB8fCB1cC5oYXMoZS5mcm9tKSkgfHwgKGUuZnJvbSA9PT0gaWQgfHwgZG93bi5oYXMoZS5mcm9tKSkgJiYgKGUudG8gPT09IGlkIHx8IGRvd24uaGFzKGUudG8pKTsKICByZXR1cm4geyB1cCwgZG93biwgbm9kZXMsIGVkZ2VzOiBuZXcgU2V0KGVkZ2VzLmZpbHRlcihvbkNoYWluKSkgfTsKfQoKLy8gLS0tLSAyLjVEIGxheWVyZWQgdmlldzogZmFzdCBzdXJmYWNlIGV2ZW50cyBhYm92ZSwgc2xvdyBkZWVwIHN0cnVjdHVyZXMgYmVsb3cgLS0tLQpleHBvcnQgY29uc3QgTEFZRVJTID0gWwogIHsga2V5OiAicGludGEiLCBsYWJlbDogIlBpbnRhIOKAkyBrcmlpc2l0IGphIGvDpMOkbnRlZXQiLCBoaW50OiAibm9wZWF0IiwgdHlwZXM6IFsia3JpaXNpIiwgInRhcGFodHVtYSIsICJ0ZWtub2xvZ2luZW4gbXVycm9zIiwgIm9ubmlzdHVtaW5lbiIsICJ0dWxldmFpc3V1c3NrZW5hYXJpbyJdIH0sCiAgeyBrZXk6ICJzYWFubm90IiwgbGFiZWw6ICJTw6TDpG5uw7Z0IOKAkyB1dWRpc3R1a3NldCBqYSBpbnN0aXR1dXRpb3QiLCBoaW50OiAidnVvc2lreW1tZW5ldCIsIHR5cGVzOiBbInV1ZGlzdHVzIiwgImluc3RpdHV1dGlvIl0gfSwKICB7IGtleTogInBvaGphIiwgbGFiZWw6ICJQb2hqYSDigJMgaGl0YWF0IHJha2VudGVldCIsIGhpbnQ6ICJzdWt1cG9sdmV0IiwgdHlwZXM6IFsicmFrZW5uZW11dXRvcyIsICJwaXRrw6Qga2FhcmkiLCAidsOkZXN0w7ZtdXV0b3MiLCAiYW5hbHl5dHRpbmVuIGtlaHlzIl0gfSwKXSBhcyBjb25zdDsKCmV4cG9ydCBmdW5jdGlvbiBsYXllck9mKHR5cGU6IHN0cmluZyk6IG51bWJlciB7CiAgY29uc3QgaSA9IExBWUVSUy5maW5kSW5kZXgoKGwpID0+IChsLnR5cGVzIGFzIHJlYWRvbmx5IHN0cmluZ1tdKS5pbmNsdWRlcyh0eXBlKSk7CiAgcmV0dXJuIGkgPj0gMCA/IGkgOiAwOwp9CgpleHBvcnQgY29uc3QgSVNPID0geyBza2V3OiAxNTAsIGRlcHRoOiAxNTAsIGdhcDogMjE1LCB0b3A6IDQwLCBzY2FsZTogMC44NiB9OwpleHBvcnQgY29uc3QgSVNPX1cgPSA2MCArIFcgKiBJU08uc2NhbGUgKyBJU08uc2tldyArIDIwOwpleHBvcnQgY29uc3QgSVNPX0ggPSBJU08udG9wICsgKExBWUVSUy5sZW5ndGggLSAxKSAqIElTTy5nYXAgKyBJU08uZGVwdGggKyA1MDsKCi8qKiBQcm9qZWN0IGEgcG9pbnQgb24gbGF5ZXIgYGxheWVyYCAoeCBpbiBmbGF0LW1hcCB1bml0cywgZCA9IGRlcHRoIDAuLjEpIHRvIHNjcmVlbi4gKi8KZXhwb3J0IGZ1bmN0aW9uIGlzb1BvaW50KHg6IG51bWJlciwgZDogbnVtYmVyLCBsYXllcjogbnVtYmVyKSB7CiAgcmV0dXJuIHsgeDogNDAgKyB4ICogSVNPLnNjYWxlICsgZCAqIElTTy5za2V3LCB5OiBJU08udG9wICsgbGF5ZXIgKiBJU08uZ2FwICsgZCAqIElTTy5kZXB0aCB9Owp9CgovLyBBbHRlcm5hdGl2ZSBsYXllciBtb2RlbHM6IHRoZSByZWFkZXIgcGlja3MgaG93IHRoZSB0aHJlZSBzbGFicyBzbGljZSB0aGUgd2hvbGUuCnR5cGUgTGF5ZXJNb2RlbCA9IHsga2V5OiBzdHJpbmc7IGxhYmVsOiBzdHJpbmc7IGxheWVyczogeyBsYWJlbDogc3RyaW5nOyBoaW50OiBzdHJpbmcgfVtdOyBvZjogKG46IE1hcE5vZGUpID0+IG51bWJlciB9Owpjb25zdCBBUktJID0gWyJrb3VsdXR1cyIsICJ0ZXJ2ZXlzIiwgImhvaXZhIiwgInBlcmhlIiwgInBlcmhlZXQiLCAibGFwc2V0IiwgIm51b3JldCIsICJhc3VtaW5lbiIsICJ0b2ltZWVudHVsbyIsICJzb3NpYWFsaXR1cnZhIiwgInR5w7YiLCAidHnDtmxsaXN5eXMiLCAiZWzDpGtlIiwgImVsw6Rra2VldCIsICJtaWVsZW50ZXJ2ZXlzIiwgInZhbW1haXN1dXMiLCAib3Bpc2tlbGlqYXQiLCAidHnDtnR0w7ZteXlzIl07CmNvbnN0IFJFU1VSU1NJID0gWyJ0YWxvdXMiLCAidmllbnRpIiwgInRlb2xsaXN1dXMiLCAianVsa2luZW4gdGFsb3VzIiwgInZlbGthIiwgInZlcm90dXMiLCAidHVvdHRhdnV1cyIsICJpbnZlc3RvaW5uaXQiLCAiZW5lcmdpYSIsICJodW9sdG92YXJtdXVzIiwgInJhaG9pdHVzIiwgInJhaGFwb2xpdGlpa2thIiwgImV1cm8iLCAibWFhdGFsb3VzIiwgIm1ldHPDpHRhbG91cyJdOwpleHBvcnQgY29uc3QgTEFZRVJfTU9ERUxTOiBMYXllck1vZGVsW10gPSBbCiAgeyBrZXk6ICJ0YWh0aSIsIGxhYmVsOiAiTXV1dG9rc2VuIHRhaHRpIiwgbGF5ZXJzOiBMQVlFUlMubWFwKChsKSA9PiAoeyBsYWJlbDogbC5sYWJlbCwgaGludDogbC5oaW50IH0pKSwgb2Y6IChuKSA9PiBsYXllck9mKG4udHlwZSkgfSwKICB7IGtleTogImFya2kiLCBsYWJlbDogIkFya2kgamEga29uZWh1b25lIiwgbGF5ZXJzOiBbCiAgICB7IGxhYmVsOiAiQXJraSDigJMgZWzDpG3DpG5rYWFyaSIsIGhpbnQ6ICJrb3VsdSwgaG9pdmEsIGtvdGksIHR5w7YiIH0sCiAgICB7IGxhYmVsOiAiS29uZWh1b25lIOKAkyBoYWxsaW50byBqYSBzw6TDpG5uw7Z0IiwgaGludDogImxhaXQsIGt1bm5hdCwgb2lrZXVzIiB9LAogICAgeyBsYWJlbDogIlJlc3Vyc3NpcG9oamEg4oCTIHRhbG91cyIsIGhpbnQ6ICJ2aWVudGksIHZlcm90LCB2ZWxrYSIgfSwKICBdLCBvZjogKG4pID0+IChuLmRvbWFpbnMuc29tZSgoZCkgPT4gQVJLSS5pbmNsdWRlcyhkKSkgPyAwIDogbi5kb21haW5zLnNvbWUoKGQpID0+IFJFU1VSU1NJLmluY2x1ZGVzKGQpKSA/IDIgOiAxKSB9LAogIHsga2V5OiAia2FhcmkiLCBsYWJlbDogIlDDpMOkdMO2c3RlbiBrYWFyaSIsIGxheWVyczogWwogICAgeyBsYWJlbDogIlBhaW5lZXQg4oCTIG1pa8OkIHBha290dGkgdG9pbWltYWFuIiwgaGludDogImtyaWlzaXQsIHB1dXR0ZWV0IiB9LAogICAgeyBsYWJlbDogIlJhdGthaXN1dCDigJMgbWl0w6QgcMOkw6R0ZXR0aWluIiwgaGludDogInV1ZGlzdHVrc2V0LCBpbnN0aXR1dXRpb3QiIH0sCiAgICB7IGxhYmVsOiAiU2V1cmF1a3NldCDigJMgbWl0w6QgasOkaSBweXN5dsOka3NpIiwgaGludDogImx1a290LCBwaXRrw6R0IGrDpGxqZXQiIH0sCiAgXSwgb2Y6IChuKSA9PiAobi5yb2xlID09PSAidG9pbWVlbnBhbm9sdWtrbyIgPyAyIDogWyJ1dWRpc3R1cyIsICJpbnN0aXR1dXRpbyJdLmluY2x1ZGVzKG4udHlwZSkgPyAxIDogWyJyYWtlbm5lbXV1dG9zIiwgInBpdGvDpCBrYWFyaSIsICJhbmFseXl0dGluZW4ga2VoeXMiLCAib25uaXN0dW1pbmVuIl0uaW5jbHVkZXMobi50eXBlKSA/IDIgOiAwKSB9LApdOwpleHBvcnQgY29uc3QgbGF5ZXJNb2RlbCA9IChrZXk6IHN0cmluZykgPT4gTEFZRVJfTU9ERUxTLmZpbmQoKG0pID0+IG0ua2V5ID09PSBrZXkpID8/IExBWUVSX01PREVMU1swXSE7CgpleHBvcnQgZnVuY3Rpb24gbGF5b3V0M2Qobm9kZXM6IE1hcE5vZGVbXSwgbW9kZWxLZXkgPSAidGFodGkiKSB7CiAgY29uc3QgbW9kZWwgPSBsYXllck1vZGVsKG1vZGVsS2V5KTsKICBjb25zdCBmbGF0ID0gbGF5b3V0KG5vZGVzKTsKICBjb25zdCBzcGFuID0gTEFORVMubGVuZ3RoICogTEFORV9IOwogIGNvbnN0IHBvcyA9IG5ldyBNYXA8c3RyaW5nLCB7IHg6IG51bWJlcjsgeTogbnVtYmVyOyBsYW5lOiBudW1iZXI7IGxheWVyOiBudW1iZXIgfT4oKTsKICBmb3IgKGNvbnN0IG4gb2Ygbm9kZXMpIHsKICAgIGNvbnN0IHAgPSBmbGF0LmdldChuLmlkKSE7CiAgICBjb25zdCBsYXllciA9IG1vZGVsLm9mKG4pOwogICAgcG9zLnNldChuLmlkLCB7IC4uLmlzb1BvaW50KHAueCwgKHAueSAtIFRPUCkgLyBzcGFuLCBsYXllciksIGxhbmU6IHAubGFuZSwgbGF5ZXIgfSk7CiAgfQogIHJldHVybiBwb3M7Cn0KCi8vIC0tLS0gTGVuc2VzOiBzbWFydCBmaWx0ZXJzIHRoYXQgaGlnaGxpZ2h0IG9uZSBhc3BlY3Qgb2YgdGhlIHdob2xlIC0tLS0KdHlwZSBMZW5zRGVmID0geyBrZXk6IHN0cmluZzsgbGFiZWw6IHN0cmluZzsgaGludDogc3RyaW5nOyBub2RlPzogKG46IE1hcE5vZGUpID0+IGJvb2xlYW47IGVkZ2U/OiAoZTogTWFwRWRnZSkgPT4gYm9vbGVhbjsgaHVicz86IG51bWJlciB9Owpjb25zdCBoYXNBbnkgPSAobjogTWFwTm9kZSwgd29yZHM6IHN0cmluZ1tdKSA9PiBuLmRvbWFpbnMuc29tZSgoZCkgPT4gd29yZHMuaW5jbHVkZXMoZCkpOwpleHBvcnQgY29uc3QgTEVOU0VTOiBMZW5zRGVmW10gPSBbCiAgeyBrZXk6ICJrcmlpc2l0IiwgbGFiZWw6ICJLw6TDpG5uZWtvaGRhdCIsIGhpbnQ6ICJNaWvDpCByaWtrb2kgdmFuaGFuIHBvbHVuIiwgbm9kZTogKG4pID0+IG4udHlwZSA9PT0gImtyaWlzaSIgfHwgbi50eXBlID09PSAidGFwYWh0dW1hIiB9LAogIHsga2V5OiAia2FudGF2YXQiLCBsYWJlbDogIlBlcnVzcGlsYXJpdCIsIGhpbnQ6ICJNaW5rw6QgdmFyYWFuIHZha2F1cyByYWtlbm5ldHRpaW4iLCBodWJzOiAyMCB9LAogIHsga2V5OiAicG9oamF2aXJyYXQiLCBsYWJlbDogIkhpdGFhdCBwb2hqYXZpcnJhdCIsIGhpbnQ6ICJIaXRhYXQgdm9pbWF0LCBqb3RrYSBtdXV0dGF2YXQgcG9oamFhIGh1b21hYW1hdHRhIiwgbm9kZTogKG4pID0+IFsicmFrZW5uZW11dXRvcyIsICJwaXRrw6Qga2FhcmkiLCAidsOkZXN0w7ZtdXV0b3MiXS5pbmNsdWRlcyhuLnR5cGUpIH0sCiAgeyBrZXk6ICJsdWtvdCIsIGxhYmVsOiAiTnlreWlzZXQgbHVrb3QiLCBoaW50OiAiTWlrc2kga29uZWlzdG8ganVtaXR0YWEgdMOkbsOkw6RuIiwgbm9kZTogKG4pID0+IG4ucm9sZSA9PT0gInRvaW1lZW5wYW5vbHVra28iLCBlZGdlOiAoZSkgPT4gaXNQcmVzc3VyZShlKSB9LAogIHsga2V5OiAic3VrdXBvbHZldCIsIGxhYmVsOiAiU3VrdXBvbHZpa2V0anUiLCBoaW50OiAiTWl0w6QgcmFrZW5uZXR0aWluIOKAkyBtaXTDpCBqw6TDpCBudW9ydGVuIGvDpHRlZW4iLCBub2RlOiAobikgPT4gaGFzQW55KG4sIFsibnVvcmV0IiwgImxhcHNldCIsICJrb3VsdXR1cyIsICJvcGlza2VsaWphdCIsICJhc3VtaW5lbiIsICJhc3VudG9tYXJra2luYXQiLCAidHnDtnVyYXQiLCAiZWzDpGtlIiwgImVsw6Rra2VldCIsICJpa8Okw6RudHltaW5lbiIsICJ2YW5odXNwYWx2ZWx1dCIsICJodW9sdG9zdWhkZSIsICJ2w6Rlc3TDtiIsICJwZXJoZWV0IiwgInBlcmhlIl0pIH0sCl07CgovKiogTm9kZXMgYW5kIGVkZ2VzIGEgbGVucyBrZWVwcyB2aXNpYmxlLiBFZGdlIGxlbnNlcyBhbHNvIGtlZXAgdGhlaXIgZW5kcG9pbnRzLiAqLwpleHBvcnQgZnVuY3Rpb24gYXBwbHlMZW5zKGtleTogc3RyaW5nLCBub2RlczogTWFwTm9kZVtdLCBlZGdlczogTWFwRWRnZVtdKSB7CiAgY29uc3QgbGVucyA9IExFTlNFUy5maW5kKChsKSA9PiBsLmtleSA9PT0ga2V5KTsKICBpZiAoIWxlbnMpIHJldHVybiBudWxsOwogIGxldCBucyA9IG5ldyBTZXQobm9kZXMuZmlsdGVyKChuKSA9PiBsZW5zLm5vZGU/LihuKSkubWFwKChuKSA9PiBuLmlkKSk7CiAgaWYgKGxlbnMuaHVicykgewogICAgY29uc3QgZGVnID0gbmV3IE1hcDxzdHJpbmcsIG51bWJlcj4oKTsKICAgIGZvciAoY29uc3QgZSBvZiBlZGdlcykgeyBkZWcuc2V0KGUuZnJvbSwgKGRlZy5nZXQoZS5mcm9tKSA/PyAwKSArIDEpOyBkZWcuc2V0KGUudG8sIChkZWcuZ2V0KGUudG8pID8/IDApICsgMSk7IH0KICAgIG5zID0gbmV3IFNldChbLi4uZGVnLmVudHJpZXMoKV0uc29ydCgoYSwgYikgPT4gYlsxXSAtIGFbMV0pLnNsaWNlKDAsIGxlbnMuaHVicykubWFwKChbaWRdKSA9PiBpZCkpOwogIH0KICBjb25zdCBlcyA9IG5ldyBTZXQ8TWFwRWRnZT4oKTsKICBmb3IgKGNvbnN0IGUgb2YgZWRnZXMpIHsKICAgIGlmIChsZW5zLmVkZ2UgPyBsZW5zLmVkZ2UoZSkgfHwgKG5zLmhhcyhlLmZyb20pICYmIG5zLmhhcyhlLnRvKSkgOiBucy5oYXMoZS5mcm9tKSAmJiBucy5oYXMoZS50bykpIHsgZXMuYWRkKGUpOyBpZiAobGVucy5lZGdlKSB7IG5zLmFkZChlLmZyb20pOyBucy5hZGQoZS50byk7IH0gfQogIH0KICByZXR1cm4geyBub2RlczogbnMsIGVkZ2VzOiBlcyB9Owp9CgovLyAtLS0gVXNhYmlsaXR5IGhlbHBlcnM6IHNlYXJjaCwgc3VnZ2VzdGVkIHN0YXJ0cywgZWRnZSByZWFzb25zLCB0cmFpbCAtLS0KY29uc3Qgbm9ybSA9IChzOiBzdHJpbmcpID0+IHMudG9Mb3dlckNhc2UoKS5ub3JtYWxpemUoIk5GS0QiKS5yZXBsYWNlKC9bXHUwMzAwLVx1MDM2Zl0vZywgIiIpOwpleHBvcnQgZnVuY3Rpb24gc2VhcmNoTm9kZXMocTogc3RyaW5nLCBub2RlczogTWFwTm9kZVtdLCBsaW1pdCA9IDgpOiBNYXBOb2RlW10gewogIGNvbnN0IHQgPSBub3JtKHEudHJpbSgpKTsKICBpZiAoIXQpIHJldHVybiBbXTsKICBpZiAoL15cZHs0fSQvLnRlc3QodCkpIHsKICAgIGNvbnN0IHkgPSBOdW1iZXIodCk7CiAgICByZXR1cm4gbm9kZXMuZmlsdGVyKChuKSA9PiBNYXRoLmFicyhuLnllYXIgLSB5KSA8PSAzKS5zb3J0KChhLCBiKSA9PiBNYXRoLmFicyhhLnllYXIgLSB5KSAtIE1hdGguYWJzKGIueWVhciAtIHkpIHx8IGIuaW1wb3J0YW5jZSAtIGEuaW1wb3J0YW5jZSkuc2xpY2UoMCwgbGltaXQpOwogIH0KICByZXR1cm4gbm9kZXMKICAgIC5tYXAoKG4pID0+ICh7IG4sIGk6IG5vcm0obi50aXRsZSkuaW5kZXhPZih0KSB9KSkKICAgIC5maWx0ZXIoKHIpID0+IHIuaSA+PSAwIHx8IHIubi5kb21haW5zLnNvbWUoKGQpID0+IG5vcm0oZCkgPT09IHQpKQogICAgLnNvcnQoKGEsIGIpID0+IChhLmkgPCAwID8gOTkgOiBhLmkgPT09IDAgPyAwIDogMSkgLSAoYi5pIDwgMCA/IDk5IDogYi5pID09PSAwID8gMCA6IDEpIHx8IGIubi5pbXBvcnRhbmNlIC0gYS5uLmltcG9ydGFuY2UpCiAgICAuc2xpY2UoMCwgbGltaXQpCiAgICAubWFwKChyKSA9PiByLm4pOwp9CgpleHBvcnQgY29uc3QgU1RBUlRTOiB7IGxhYmVsOiBzdHJpbmc7IHE6IHN0cmluZzsgaGludDogc3RyaW5nOyBmcm9tPzogbnVtYmVyIH1bXSA9IFsKICB7IGxhYmVsOiAiMTk5MC1sdXZ1biBsYW1hIiwgcTogImxhbWEiLCBmcm9tOiAxOTg4LCBoaW50OiAia3VpbmthIHN5dsOkbGxlIHNlIHVsb3R0dWk/IiB9LAogIHsgbGFiZWw6ICJQZXJ1c2tvdWx1IiwgcTogInBlcnVza291bHUiLCBoaW50OiAibWl0w6Qgc2lpdMOkIHNldXJhc2k/IiB9LAogIHsgbGFiZWw6ICJEaWdpdGFsaXNhYXRpbyIsIHE6ICJkaWdpIiwgaGludDogIm1pdGVuIHRla25vbG9naWEgbXV1dHRpIGFya2VhPyIgfSwKICB7IGxhYmVsOiAiVsOkZXN0w7ZuIGlrw6TDpG50eW1pbmVuIiwgcTogImlrw6TDpG50eSIsIGhpbnQ6ICJoaWRhcyBwb2hqYXZpcnRhIiB9LApdOwpleHBvcnQgZnVuY3Rpb24gcmVzb2x2ZVN0YXJ0cyhub2RlczogTWFwTm9kZVtdKSB7CiAgcmV0dXJuIFNUQVJUUy5tYXAoKHMpID0+ICh7IC4uLnMsIG5vZGU6IHNlYXJjaE5vZGVzKHMucSwgcy5mcm9tID8gbm9kZXMuZmlsdGVyKChuKSA9PiBuLnllYXIgPj0gcy5mcm9tISkgOiBub2RlcywgMSlbMF0gfSkpLmZpbHRlcigocykgPT4gcy5ub2RlKTsKfQoKZXhwb3J0IGZ1bmN0aW9uIGVkZ2VSZWFzb24oYTogc3RyaW5nLCBiOiBzdHJpbmcsIGVkZ2VzOiBNYXBFZGdlW10pOiBzdHJpbmcgewogIGNvbnN0IGUgPSBlZGdlcy5maW5kKCh4KSA9PiAoeC5mcm9tID09PSBhICYmIHgudG8gPT09IGIpIHx8ICh4LmZyb20gPT09IGIgJiYgeC50byA9PT0gYSkpOwogIHJldHVybiBlPy5yYXRpb25hbGU/LnRyaW0oKSA/PyAiIjsKfQoKLyoqIEV4cGxvcmF0aW9uIHRyYWlsOiByZXZpc2l0aW5nIGEgc3RlcCBjdXRzIHRoZSB0cmFpbCBiYWNrIHRvIGl0LiAqLwpleHBvcnQgZnVuY3Rpb24gcHVzaFRyYWlsKHRyYWlsOiBzdHJpbmdbXSwgaWQ6IHN0cmluZyk6IHN0cmluZ1tdIHsKICBjb25zdCBpID0gdHJhaWwuaW5kZXhPZihpZCk7CiAgcmV0dXJuIGkgPj0gMCA/IHRyYWlsLnNsaWNlKDAsIGkgKyAxKSA6IFsuLi50cmFpbCwgaWRdLnNsaWNlKC04KTsKfQoKLy8gLS0tLSBJbXB1bHNlIHdhdmU6IGhvcCBkaXN0YW5jZSBmcm9tIHRoZSBmb2N1c2VkIG5vZGUsIHVzZWQgdG8gc3RhZ2dlciB0aGUgY2hhaW4gbGlnaHRpbmcgdXAgLS0tLQpleHBvcnQgZnVuY3Rpb24gY2hhaW5EZXB0aHMoaWQ6IHN0cmluZywgZWRnZXM6IE1hcEVkZ2VbXSkgewogIGNvbnN0IHdhbGsgPSAoZGlyOiAidXAiIHwgImRvd24iKSA9PiB7CiAgICBjb25zdCBkID0gbmV3IE1hcDxzdHJpbmcsIG51bWJlcj4oW1tpZCwgMF1dKTsKICAgIGNvbnN0IHEgPSBbaWRdOwogICAgd2hpbGUgKHEubGVuZ3RoKSB7CiAgICAgIGNvbnN0IGN1ciA9IHEuc2hpZnQoKSE7CiAgICAgIGZvciAoY29uc3QgZSBvZiBlZGdlcykgewogICAgICAgIGNvbnN0IG5leHQgPSBkaXIgPT09ICJkb3duIiA/IChlLmZyb20gPT09IGN1ciA/IGUudG8gOiBudWxsKSA6IGUudG8gPT09IGN1ciA/IGUuZnJvbSA6IG51bGw7CiAgICAgICAgaWYgKG5leHQgJiYgIWQuaGFzKG5leHQpKSB7IGQuc2V0KG5leHQsIGQuZ2V0KGN1cikhICsgMSk7IHEucHVzaChuZXh0KTsgfQogICAgICB9CiAgICB9CiAgICByZXR1cm4gZDsKICB9OwogIHJldHVybiB7IHVwOiB3YWxrKCJ1cCIpLCBkb3duOiB3YWxrKCJkb3duIikgfTsKfQoKLyoqIERlbGF5IChtcykgYmVmb3JlIGEgbm9kZSBsaWdodHMgdXA6IGNhdXNlcyBnYXRoZXIgZmlyc3QgKGZ1cnRoZXN0IGZpcnN0KSwgdGhlbiBlZmZlY3RzIHJpcHBsZSBvdXR3YXJkLiAqLwpleHBvcnQgZnVuY3Rpb24gd2F2ZURlbGF5KGlkOiBzdHJpbmcsIGRlcHRoczogUmV0dXJuVHlwZTx0eXBlb2YgY2hhaW5EZXB0aHM+LCBzdGVwID0gMzgwKSB7CiAgY29uc3QgbWF4VXAgPSBNYXRoLm1heCgwLCAuLi5kZXB0aHMudXAudmFsdWVzKCkpOwogIGlmIChkZXB0aHMuZG93bi5nZXQoaWQpID09PSAwKSByZXR1cm4gbWF4VXAgKiBzdGVwICogMC41OwogIGlmIChkZXB0aHMudXAuaGFzKGlkKSkgcmV0dXJuIChtYXhVcCAtIGRlcHRocy51cC5nZXQoaWQpISkgKiBzdGVwICogMC41OwogIGlmIChkZXB0aHMuZG93bi5oYXMoaWQpKSByZXR1cm4gbWF4VXAgKiBzdGVwICogMC41ICsgZGVwdGhzLmRvd24uZ2V0KGlkKSEgKiBzdGVwOwogIHJldHVybiAwOwp9Cg==
+// Pure layout + chain logic for the system map (browser-safe, testable).
+export type MapNode = { id: string; title: string; year: number; type: string; domains: string[]; importance: number; problem: string; effect: string; role?: string };
+export type MapEdge = { from: string; to: string; type: string; rationale: string; pressure: boolean; cls?: string };
+
+export const LANES = [
+  { key: "talous", label: "Talous ja tuotanto", words: ["talous", "teollisuus", "energia", "maatalous", "metsätalous", "rahoitus", "rahapolitiikka", "euro", "EU", "liikenne", "teknologia", "digitalisaatio", "tekoäly", "julkinen talous"] },
+  { key: "tyo", label: "Työ ja toimeentulo", words: ["työ", "työllisyys", "sosiaaliturva", "eläke", "eläkkeet", "asuminen", "työttömyys"] },
+  { key: "hoiva", label: "Hyvinvointi ja hoiva", words: ["terveys", "hoiva", "perhe", "perheet", "lapset", "vammaisuus", "sosiaalihuolto", "väestö", "koulutus"] },
+  { key: "valta", label: "Valta ja hallinto", words: ["hallinto", "valtio", "demokratia", "turvallisuus", "puolustus", "perusoikeudet", "oikeusvaltio", "kunta"] },
+  { key: "yhteiso", label: "Kulttuuri ja yhteisöt", words: [] as string[] },
+] as const;
+
+export function laneOf(domains: string[]): number {
+  for (const d of domains) {
+    const i = LANES.findIndex((l) => (l.words as readonly string[]).includes(d));
+    if (i >= 0) return i;
+  }
+  return LANES.length - 1;
+}
+
+export const PRESSURE_RE = /pressure|constrain|weaken|vulnerab|exposed|delayed|counterreaction|reversed/;
+export const isPressure = (e: Pick<MapEdge, "type" | "pressure">) => e.pressure || PRESSURE_RE.test(e.type);
+
+export const W = 1400, LANE_H = 150, TOP = 30, Y0 = 1850, Y1 = 2030;
+export const xOf = (year: number) => 60 + ((Math.min(Y1, Math.max(Y0, year)) - Y0) / (Y1 - Y0)) * (W - 100);
+
+export function layout(nodes: MapNode[]) {
+  const pos = new Map<string, { x: number; y: number; lane: number }>();
+  LANES.forEach((_, lane) => {
+    const rows: number[] = [];
+    const sub = 7;
+    nodes.filter((n) => laneOf(n.domains) === lane).sort((a, b) => a.year - b.year).forEach((n) => {
+      const x = xOf(n.year);
+      let r = rows.findIndex((last) => x - last > 14);
+      if (r < 0) r = rows.length < sub ? rows.length : rows.indexOf(Math.min(...rows));
+      rows[r] = x;
+      const order = [3, 2, 4, 1, 5, 0, 6][r] ?? 3;
+      pos.set(n.id, { x, y: TOP + lane * LANE_H + 18 + order * ((LANE_H - 36) / (sub - 1)), lane });
+    });
+  });
+  return pos;
+}
+
+/** Everything reachable upstream (causes) and downstream (effects) of `id`. */
+export function chainOf(id: string, edges: MapEdge[]) {
+  const walk = (dir: "up" | "down") => {
+    const seen = new Set<string>([id]);
+    const q = [id];
+    while (q.length) {
+      const cur = q.shift()!;
+      for (const e of edges) {
+        const next = dir === "down" ? (e.from === cur ? e.to : null) : e.to === cur ? e.from : null;
+        if (next && !seen.has(next)) { seen.add(next); q.push(next); }
+      }
+    }
+    seen.delete(id);
+    return seen;
+  };
+  const up = walk("up"), down = walk("down");
+  const nodes = new Set<string>([id, ...up, ...down]);
+  const onChain = (e: MapEdge) => (e.to === id || up.has(e.to)) && (e.from === id || up.has(e.from)) || (e.from === id || down.has(e.from)) && (e.to === id || down.has(e.to));
+  return { up, down, nodes, edges: new Set(edges.filter(onChain)) };
+}
+
+// ---- 2.5D layered view: fast surface events above, slow deep structures below ----
+export const LAYERS = [
+  { key: "pinta", label: "Pinta – kriisit ja käänteet", hint: "nopeat", types: ["kriisi", "tapahtuma", "teknologinen murros", "onnistuminen", "tulevaisuusskenaario"] },
+  { key: "saannot", label: "Säännöt – uudistukset ja instituutiot", hint: "vuosikymmenet", types: ["uudistus", "instituutio"] },
+  { key: "pohja", label: "Pohja – hitaat rakenteet", hint: "sukupolvet", types: ["rakennemuutos", "pitkä kaari", "väestömuutos", "analyyttinen kehys"] },
+] as const;
+
+export function layerOf(type: string): number {
+  const i = LAYERS.findIndex((l) => (l.types as readonly string[]).includes(type));
+  return i >= 0 ? i : 0;
+}
+
+export const ISO = { skew: 150, depth: 150, gap: 215, top: 40, scale: 0.86 };
+export const ISO_W = 60 + W * ISO.scale + ISO.skew + 20;
+export const ISO_H = ISO.top + (LAYERS.length - 1) * ISO.gap + ISO.depth + 50;
+
+/** Project a point on layer `layer` (x in flat-map units, d = depth 0..1) to screen. */
+export function isoPoint(x: number, d: number, layer: number) {
+  return { x: 40 + x * ISO.scale + d * ISO.skew, y: ISO.top + layer * ISO.gap + d * ISO.depth };
+}
+
+// Alternative layer models: the reader picks how the three slabs slice the whole.
+type LayerModel = { key: string; label: string; layers: { label: string; hint: string }[]; of: (n: MapNode) => number };
+const ARKI = ["koulutus", "terveys", "hoiva", "perhe", "perheet", "lapset", "nuoret", "asuminen", "toimeentulo", "sosiaaliturva", "työ", "työllisyys", "eläke", "eläkkeet", "mielenterveys", "vammaisuus", "opiskelijat", "työttömyys"];
+const RESURSSI = ["talous", "vienti", "teollisuus", "julkinen talous", "velka", "verotus", "tuottavuus", "investoinnit", "energia", "huoltovarmuus", "rahoitus", "rahapolitiikka", "euro", "maatalous", "metsätalous"];
+export const LAYER_MODELS: LayerModel[] = [
+  { key: "tahti", label: "Muutoksen tahti", layers: LAYERS.map((l) => ({ label: l.label, hint: l.hint })), of: (n) => layerOf(n.type) },
+  { key: "arki", label: "Arki ja konehuone", layers: [
+    { label: "Arki – elämänkaari", hint: "koulu, hoiva, koti, työ" },
+    { label: "Konehuone – hallinto ja säännöt", hint: "lait, kunnat, oikeus" },
+    { label: "Resurssipohja – talous", hint: "vienti, verot, velka" },
+  ], of: (n) => (n.domains.some((d) => ARKI.includes(d)) ? 0 : n.domains.some((d) => RESURSSI.includes(d)) ? 2 : 1) },
+  { key: "kaari", label: "Päätösten kaari", layers: [
+    { label: "Paineet – mikä pakotti toimimaan", hint: "kriisit, puutteet" },
+    { label: "Ratkaisut – mitä päätettiin", hint: "uudistukset, instituutiot" },
+    { label: "Seuraukset – mitä jäi pysyväksi", hint: "lukot, pitkät jäljet" },
+  ], of: (n) => (n.role === "toimeenpanolukko" ? 2 : ["uudistus", "instituutio"].includes(n.type) ? 1 : ["rakennemuutos", "pitkä kaari", "analyyttinen kehys", "onnistuminen"].includes(n.type) ? 2 : 0) },
+];
+export const layerModel = (key: string) => LAYER_MODELS.find((m) => m.key === key) ?? LAYER_MODELS[0]!;
+
+export function layout3d(nodes: MapNode[], modelKey = "tahti") {
+  const model = layerModel(modelKey);
+  const flat = layout(nodes);
+  const span = LANES.length * LANE_H;
+  const pos = new Map<string, { x: number; y: number; lane: number; layer: number }>();
+  for (const n of nodes) {
+    const p = flat.get(n.id)!;
+    const layer = model.of(n);
+    pos.set(n.id, { ...isoPoint(p.x, (p.y - TOP) / span, layer), lane: p.lane, layer });
+  }
+  return pos;
+}
+
+// ---- Lenses: smart filters that highlight one aspect of the whole ----
+type LensDef = { key: string; label: string; hint: string; node?: (n: MapNode) => boolean; edge?: (e: MapEdge) => boolean; hubs?: number };
+const hasAny = (n: MapNode, words: string[]) => n.domains.some((d) => words.includes(d));
+export const LENSES: LensDef[] = [
+  { key: "kriisit", label: "Käännekohdat", hint: "Mikä rikkoi vanhan polun", node: (n) => n.type === "kriisi" || n.type === "tapahtuma" },
+  { key: "kantavat", label: "Peruspilarit", hint: "Minkä varaan vakaus rakennettiin", hubs: 20 },
+  { key: "pohjavirrat", label: "Hitaat pohjavirrat", hint: "Hitaat voimat, jotka muuttavat pohjaa huomaamatta", node: (n) => ["rakennemuutos", "pitkä kaari", "väestömuutos"].includes(n.type) },
+  { key: "lukot", label: "Nykyiset lukot", hint: "Miksi koneisto jumittaa tänään", node: (n) => n.role === "toimeenpanolukko", edge: (e) => isPressure(e) },
+  { key: "sukupolvet", label: "Sukupolviketju", hint: "Mitä rakennettiin – mitä jää nuorten käteen", node: (n) => hasAny(n, ["nuoret", "lapset", "koulutus", "opiskelijat", "asuminen", "asuntomarkkinat", "työurat", "eläke", "eläkkeet", "ikääntyminen", "vanhuspalvelut", "huoltosuhde", "väestö", "perheet", "perhe"]) },
+];
+
+/** Nodes and edges a lens keeps visible. Edge lenses also keep their endpoints. */
+export function applyLens(key: string, nodes: MapNode[], edges: MapEdge[]) {
+  const lens = LENSES.find((l) => l.key === key);
+  if (!lens) return null;
+  let ns = new Set(nodes.filter((n) => lens.node?.(n)).map((n) => n.id));
+  if (lens.hubs) {
+    const deg = new Map<string, number>();
+    for (const e of edges) { deg.set(e.from, (deg.get(e.from) ?? 0) + 1); deg.set(e.to, (deg.get(e.to) ?? 0) + 1); }
+    ns = new Set([...deg.entries()].sort((a, b) => b[1] - a[1]).slice(0, lens.hubs).map(([id]) => id));
+  }
+  const es = new Set<MapEdge>();
+  for (const e of edges) {
+    if (lens.edge ? lens.edge(e) || (ns.has(e.from) && ns.has(e.to)) : ns.has(e.from) && ns.has(e.to)) { es.add(e); if (lens.edge) { ns.add(e.from); ns.add(e.to); } }
+  }
+  return { nodes: ns, edges: es };
+}
+
+// --- Usability helpers: search, suggested starts, edge reasons, trail ---
+const norm = (s: string) => s.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
+export function searchNodes(q: string, nodes: MapNode[], limit = 8): MapNode[] {
+  const t = norm(q.trim());
+  if (!t) return [];
+  if (/^\d{4}$/.test(t)) {
+    const y = Number(t);
+    return nodes.filter((n) => Math.abs(n.year - y) <= 3).sort((a, b) => Math.abs(a.year - y) - Math.abs(b.year - y) || b.importance - a.importance).slice(0, limit);
+  }
+  return nodes
+    .map((n) => ({ n, i: norm(n.title).indexOf(t) }))
+    .filter((r) => r.i >= 0 || r.n.domains.some((d) => norm(d) === t))
+    .sort((a, b) => (a.i < 0 ? 99 : a.i === 0 ? 0 : 1) - (b.i < 0 ? 99 : b.i === 0 ? 0 : 1) || b.n.importance - a.n.importance)
+    .slice(0, limit)
+    .map((r) => r.n);
+}
+
+export const STARTS: { label: string; q: string; hint: string; from?: number }[] = [
+  { label: "1990-luvun lama", q: "lama", from: 1988, hint: "kuinka syvälle se ulottui?" },
+  { label: "Peruskoulu", q: "peruskoulu", hint: "mitä siitä seurasi?" },
+  { label: "Digitalisaatio", q: "digi", hint: "miten teknologia muutti arkea?" },
+  { label: "Väestön ikääntyminen", q: "ikäänty", hint: "hidas pohjavirta" },
+];
+export function resolveStarts(nodes: MapNode[]) {
+  return STARTS.map((s) => ({ ...s, node: searchNodes(s.q, s.from ? nodes.filter((n) => n.year >= s.from!) : nodes, 1)[0] })).filter((s) => s.node);
+}
+
+export function edgeReason(a: string, b: string, edges: MapEdge[]): string {
+  const e = edges.find((x) => (x.from === a && x.to === b) || (x.from === b && x.to === a));
+  return e?.rationale?.trim() ?? "";
+}
+
+/** Exploration trail: revisiting a step cuts the trail back to it. */
+export function pushTrail(trail: string[], id: string): string[] {
+  const i = trail.indexOf(id);
+  return i >= 0 ? trail.slice(0, i + 1) : [...trail, id].slice(-8);
+}
+
+// ---- Impulse wave: hop distance from the focused node, used to stagger the chain lighting up ----
+export function chainDepths(id: string, edges: MapEdge[]) {
+  const walk = (dir: "up" | "down") => {
+    const d = new Map<string, number>([[id, 0]]);
+    const q = [id];
+    while (q.length) {
+      const cur = q.shift()!;
+      for (const e of edges) {
+        const next = dir === "down" ? (e.from === cur ? e.to : null) : e.to === cur ? e.from : null;
+        if (next && !d.has(next)) { d.set(next, d.get(cur)! + 1); q.push(next); }
+      }
+    }
+    return d;
+  };
+  return { up: walk("up"), down: walk("down") };
+}
+
+/** Delay (ms) before a node lights up: causes gather first (furthest first), then effects ripple outward. */
+export function waveDelay(id: string, depths: ReturnType<typeof chainDepths>, step = 380) {
+  const maxUp = Math.max(0, ...depths.up.values());
+  if (depths.down.get(id) === 0) return maxUp * step * 0.5;
+  if (depths.up.has(id)) return (maxUp - depths.up.get(id)!) * step * 0.5;
+  if (depths.down.has(id)) return maxUp * step * 0.5 + depths.down.get(id)! * step;
+  return 0;
+}

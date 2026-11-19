@@ -1,1 +1,120 @@
-aW1wb3J0IHsgY3JlYXRlRmlsZVJvdXRlLCB1c2VOYXZpZ2F0ZSB9IGZyb20gIkB0YW5zdGFjay9yZWFjdC1yb3V0ZXIiOwppbXBvcnQgeyB1c2VTdXNwZW5zZVF1ZXJ5IH0gZnJvbSAiQHRhbnN0YWNrL3JlYWN0LXF1ZXJ5IjsKaW1wb3J0IHsgU3VzcGVuc2UsIHVzZVN0YXRlIH0gZnJvbSAicmVhY3QiOwppbXBvcnQgeyB0aGVtZVBhdGhRdWVyeSwgdHlwZSBQYXRoSXRlbSB9IGZyb20gIkAvbGliL211cnJvcy5mdW5jdGlvbnMiOwoKY29uc3QgVEhFTUVTID0gWwogIHsga2V5OiAia291bHV0dXMiLCBsYWJlbDogIktvdWx1dHVzIiB9LAogIHsga2V5OiAidGFsb3VzIiwgbGFiZWw6ICJUYWxvdXMiIH0sCiAgeyBrZXk6ICJ0ecO2IiwgbGFiZWw6ICJUecO2IiB9LAogIHsga2V5OiAianVsa2luZW4gdmFsdGEiLCBsYWJlbDogIkp1bGtpbmVuIHZhbHRhIiB9LAogIHsga2V5OiAicG9saWl0dGluZW4gb3NhbGxpc3R1bWluZW4iLCBsYWJlbDogIk9zYWxsaXN0dW1pbmVuIiB9LAogIHsga2V5OiAib2lrZXVzdmFsdGlvIiwgbGFiZWw6ICJPaWtldXN2YWx0aW8iIH0sCiAgeyBrZXk6ICJrYW5zYWxhaXN5aHRlaXNrdW50YSIsIGxhYmVsOiAiS2Fuc2FsYWlzeWh0ZWlza3VudGEiIH0sCl0gYXMgY29uc3Q7Cgp0eXBlIFNlYXJjaCA9IHsgdGVlbWE/OiBzdHJpbmcgfTsKCmV4cG9ydCBjb25zdCBSb3V0ZSA9IGNyZWF0ZUZpbGVSb3V0ZSgiL3BvbGt1IikoewogIHZhbGlkYXRlU2VhcmNoOiAoczogeyB0ZWVtYT86IHVua25vd24gfSk6IFNlYXJjaCA9PiB7CiAgICBjb25zdCB0ID0gdHlwZW9mIHMudGVlbWEgPT09ICJzdHJpbmciID8gcy50ZWVtYSA6ICIiOwogICAgcmV0dXJuIHsgdGVlbWE6IFRIRU1FUy5zb21lKCh4KSA9PiB4LmtleSA9PT0gdCkgPyB0IDogImtvdWx1dHVzIiB9OwogIH0sCiAgbG9hZGVyRGVwczogKHsgc2VhcmNoIH0pID0+ICh7IHRlZW1hOiBzZWFyY2gudGVlbWEgPz8gImtvdWx1dHVzIiB9KSwKICBsb2FkZXI6ICh7IGNvbnRleHQsIGRlcHMgfSkgPT4gY29udGV4dC5xdWVyeUNsaWVudC5lbnN1cmVRdWVyeURhdGEodGhlbWVQYXRoUXVlcnkoZGVwcy50ZWVtYSkpLAogIGhlYWQ6ICgpID0+ICh7CiAgICBtZXRhOiBbCiAgICAgIHsgdGl0bGU6ICJNdXJyb3NtYXRyaWlzaSDigJMgbWl0ZW4gdMOkaMOkbiBvbiB0dWx0dT8iIH0sCiAgICAgIHsgbmFtZTogImRlc2NyaXB0aW9uIiwgY29udGVudDogIlN1b21lbiB5aHRlaXNrdW5uYW4ga2VoaXR5cyBzZWxrZWluw6QgcG9sa3VpbmE6IG9uZ2VsbWEsIHJhdGthaXN1IGphIHNlbiBwaXRrw6QgdmFpa3V0dXMuIiB9LAogICAgICB7IHByb3BlcnR5OiAib2c6dGl0bGUiLCBjb250ZW50OiAiTXVycm9zbWF0cmlpc2kg4oCTIG1pdGVuIHTDpGjDpG4gb24gdHVsdHU/IiB9LAogICAgICB7IHByb3BlcnR5OiAib2c6ZGVzY3JpcHRpb24iLCBjb250ZW50OiAiVmFsaXRzZSB0ZWVtYSBqYSBrdWxqZSB5aHRlaXNrdW5uYW4gbXVycm9zdGVuIGzDpHBpIG55a3lww6RpdsOkw6RuLiIgfSwKICAgICAgeyBwcm9wZXJ0eTogIm9nOnR5cGUiLCBjb250ZW50OiAid2Vic2l0ZSIgfSwKICAgICAgeyBuYW1lOiAidHdpdHRlcjpjYXJkIiwgY29udGVudDogInN1bW1hcnkiIH0sCiAgICBdLAogIH0pLAogIGNvbXBvbmVudDogSW5kZXgsCn0pOwoKZnVuY3Rpb24gSW5kZXgoKSB7CiAgY29uc3QgdGVlbWEgPSBSb3V0ZS51c2VTZWFyY2goKS50ZWVtYSA/PyAia291bHV0dXMiOwogIGNvbnN0IG5hdmlnYXRlID0gdXNlTmF2aWdhdGUoeyBmcm9tOiAiL3BvbGt1IiB9KTsKICBjb25zdCBsYWJlbCA9IFRIRU1FUy5maW5kKCh0KSA9PiB0LmtleSA9PT0gdGVlbWEpPy5sYWJlbCA/PyB0ZWVtYTsKICByZXR1cm4gKAogICAgPG1haW4gY2xhc3NOYW1lPSJtaW4taC1zY3JlZW4gYmctYmFja2dyb3VuZCB0ZXh0LWZvcmVncm91bmQiPgogICAgICA8aGVhZGVyIGNsYXNzTmFtZT0ibXgtYXV0byBtYXgtdy0zeGwgcHgtNSBwdC0xNCBwYi04Ij4KICAgICAgICA8cCBjbGFzc05hbWU9InRleHQteHMgdXBwZXJjYXNlIHRyYWNraW5nLVswLjI1ZW1dIHRleHQtbXV0ZWQtZm9yZWdyb3VuZCI+TXVycm9zbWF0cmlpc2k8L3A+CiAgICAgICAgPGgxIGNsYXNzTmFtZT0ibXQtMyBmb250LWRpc3BsYXkgdGV4dC00eGwgbGVhZGluZy10aWdodCBtZDp0ZXh0LTZ4bCI+TWl0ZW4gdMOkaMOkbiBvbiB0dWx0dT88L2gxPgogICAgICAgIDxwIGNsYXNzTmFtZT0ibXQtNCBtYXgtdy14bCB0ZXh0LWxnIHRleHQtbXV0ZWQtZm9yZWdyb3VuZCI+CiAgICAgICAgICBKb2thaW5lbiB1dWRpc3R1cyByYXRrYWlzaSBqb25raW4gb25nZWxtYW4g4oCTIGphIG11b3Zhc2kgc2V1cmFhdmFuLiBWYWxpdHNlIHRlZW1hIGphIGt1bGplIGtlaGl0eXMgbMOkcGkgbnlreXDDpGl2w6TDpG4uCiAgICAgICAgPC9wPgogICAgICAgIDxuYXYgYXJpYS1sYWJlbD0iVGVlbWF0IiBjbGFzc05hbWU9Im10LTggZmxleCBmbGV4LXdyYXAgZ2FwLTIiPgogICAgICAgICAge1RIRU1FUy5tYXAoKHQpID0+ICgKICAgICAgICAgICAgPGJ1dHRvbgogICAgICAgICAgICAgIGtleT17dC5rZXl9CiAgICAgICAgICAgICAgb25DbGljaz17KCkgPT4gbmF2aWdhdGUoeyBzZWFyY2g6IHsgdGVlbWE6IHQua2V5IH0gfSl9CiAgICAgICAgICAgICAgYXJpYS1wcmVzc2VkPXt0LmtleSA9PT0gdGVlbWF9CiAgICAgICAgICAgICAgY2xhc3NOYW1lPXtgcm91bmRlZC1mdWxsIGJvcmRlciBweC00IHB5LTEuNSB0ZXh0LXNtIHRyYW5zaXRpb24tY29sb3JzICR7CiAgICAgICAgICAgICAgICB0LmtleSA9PT0gdGVlbWEgPyAiYm9yZGVyLXByaW1hcnkgYmctcHJpbWFyeSB0ZXh0LXByaW1hcnktZm9yZWdyb3VuZCIgOiAiYm9yZGVyLWJvcmRlciBob3ZlcjpiZy1hY2NlbnQiCiAgICAgICAgICAgICAgfWB9CiAgICAgICAgICAgID4KICAgICAgICAgICAgICB7dC5sYWJlbH0KICAgICAgICAgICAgPC9idXR0b24+CiAgICAgICAgICApKX0KICAgICAgICA8L25hdj4KICAgICAgPC9oZWFkZXI+CiAgICAgIDxzZWN0aW9uIGNsYXNzTmFtZT0ibXgtYXV0byBtYXgtdy0zeGwgcHgtNSBwYi0yNCI+CiAgICAgICAgPGgyIGNsYXNzTmFtZT0ic3Itb25seSI+VGVlbWFuIHtsYWJlbH0ga2VoaXR5c3BvbGt1PC9oMj4KICAgICAgICA8U3VzcGVuc2UgZmFsbGJhY2s9ezxwIGNsYXNzTmFtZT0idGV4dC1tdXRlZC1mb3JlZ3JvdW5kIj5MYWRhdGFhbuKApjwvcD59PgogICAgICAgICAgPFRpbWVsaW5lIHRlZW1hPXt0ZWVtYX0gLz4KICAgICAgICA8L1N1c3BlbnNlPgogICAgICA8L3NlY3Rpb24+CiAgICA8L21haW4+CiAgKTsKfQoKZnVuY3Rpb24gVGltZWxpbmUoeyB0ZWVtYSB9OiB7IHRlZW1hOiBzdHJpbmcgfSkgewogIGNvbnN0IHsgZGF0YSB9ID0gdXNlU3VzcGVuc2VRdWVyeSh0aGVtZVBhdGhRdWVyeSh0ZWVtYSkpOwogIGlmICghZGF0YS5sZW5ndGgpIHJldHVybiA8cCBjbGFzc05hbWU9InRleHQtbXV0ZWQtZm9yZWdyb3VuZCI+VMOkaMOkbiB0ZWVtYWFuIGVpIHZpZWzDpCBsw7Z5dHlueXQgYWluZWlzdG9hLjwvcD47CiAgcmV0dXJuICgKICAgIDxvbCBjbGFzc05hbWU9InJlbGF0aXZlIGJvcmRlci1sLTIgYm9yZGVyLWJvcmRlciBwbC04Ij4KICAgICAge2RhdGEubWFwKChpdCkgPT4gPFN0ZXAga2V5PXtpdC5pZH0gaXQ9e2l0fSAvPil9CiAgICAgIDxsaSBjbGFzc05hbWU9InJlbGF0aXZlIj4KICAgICAgICA8c3BhbiBjbGFzc05hbWU9ImFic29sdXRlIC1sZWZ0LVs0MXB4XSB0b3AtMSBoLTQgdy00IHJvdW5kZWQtZnVsbCBiZy1wcmltYXJ5IHJpbmctNCByaW5nLWJhY2tncm91bmQiIC8+CiAgICAgICAgPHAgY2xhc3NOYW1lPSJmb250LWRpc3BsYXkgdGV4dC0yeGwiPlTDpG7DpMOkbjwvcD4KICAgICAgPC9saT4KICAgIDwvb2w+CiAgKTsKfQoKZnVuY3Rpb24gU3RlcCh7IGl0IH06IHsgaXQ6IFBhdGhJdGVtIH0pIHsKICBjb25zdCBbb3Blbiwgc2V0T3Blbl0gPSB1c2VTdGF0ZShmYWxzZSk7CiAgY29uc3QgeWVhcnMgPSBpdC55ZWFyX3N0YXJ0ID09PSBpdC55ZWFyX2VuZCA/IGAke2l0LnllYXJfc3RhcnR9YCA6IGAke2l0LnllYXJfc3RhcnR94oCTJHtpdC55ZWFyX2VuZH1gOwogIHJldHVybiAoCiAgICA8bGkgY2xhc3NOYW1lPSJyZWxhdGl2ZSBtYi0xMCI+CiAgICAgIDxzcGFuIGNsYXNzTmFtZT0iYWJzb2x1dGUgLWxlZnQtWzM5cHhdIHRvcC0yIGgtMyB3LTMgcm91bmRlZC1mdWxsIGJvcmRlci0yIGJvcmRlci1wcmltYXJ5IGJnLWJhY2tncm91bmQiIC8+CiAgICAgIDxwIGNsYXNzTmFtZT0iZm9udC1kaXNwbGF5IHRleHQtc20gdGV4dC1wcmltYXJ5Ij57eWVhcnN9IMK3IHtpdC50eXBlfTwvcD4KICAgICAgPGJ1dHRvbiBvbkNsaWNrPXsoKSA9PiBzZXRPcGVuKCFvcGVuKX0gYXJpYS1leHBhbmRlZD17b3Blbn0gY2xhc3NOYW1lPSJtdC0xIHRleHQtbGVmdCI+CiAgICAgICAgPGgzIGNsYXNzTmFtZT0iZm9udC1kaXNwbGF5IHRleHQtMnhsIGxlYWRpbmctc251ZyBob3Zlcjp1bmRlcmxpbmUiPntpdC50aXRsZX08L2gzPgogICAgICA8L2J1dHRvbj4KICAgICAgPGRpdiBjbGFzc05hbWU9Im10LTMgZ3JpZCBnYXAtMyBtZDpncmlkLWNvbHMtMiI+CiAgICAgICAgPGRpdiBjbGFzc05hbWU9InJvdW5kZWQtbGcgYmctbXV0ZWQgcC00Ij4KICAgICAgICAgIDxwIGNsYXNzTmFtZT0idGV4dC14cyB1cHBlcmNhc2UgdHJhY2tpbmctd2lkZXIgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIj5PbmdlbG1hPC9wPgogICAgICAgICAgPHAgY2xhc3NOYW1lPSJtdC0xIj57aXQucHJvYmxlbX08L3A+CiAgICAgICAgPC9kaXY+CiAgICAgICAgPGRpdiBjbGFzc05hbWU9InJvdW5kZWQtbGcgYmctYWNjZW50IHAtNCI+CiAgICAgICAgICA8cCBjbGFzc05hbWU9InRleHQteHMgdXBwZXJjYXNlIHRyYWNraW5nLXdpZGVyIHRleHQtbXV0ZWQtZm9yZWdyb3VuZCI+TWl0w6Qgc2lpdMOkIHNldXJhc2k8L3A+CiAgICAgICAgICA8cCBjbGFzc05hbWU9Im10LTEiPntpdC5sb25nX2VmZmVjdH08L3A+CiAgICAgICAgPC9kaXY+CiAgICAgIDwvZGl2PgogICAgICB7b3BlbiAmJiAoCiAgICAgICAgPGRpdiBjbGFzc05hbWU9Im10LTMgc3BhY2UteS0yIHRleHQtbXV0ZWQtZm9yZWdyb3VuZCI+CiAgICAgICAgICB7aXQubWVjaGFuaXNtICYmIDxwPjxiIGNsYXNzTmFtZT0idGV4dC1mb3JlZ3JvdW5kIj5NaXRlbiBzZSB0b2ltaTo8L2I+IHtpdC5tZWNoYW5pc219PC9wPn0KICAgICAgICAgIHtpdC5jdXJyZW50X3JlbGV2YW5jZSAmJiA8cD48YiBjbGFzc05hbWU9InRleHQtZm9yZWdyb3VuZCI+TWlrc2kgc2lsbMOkIG9uIHbDpGxpw6Qgbnl0OjwvYj4ge2l0LmN1cnJlbnRfcmVsZXZhbmNlfTwvcD59CiAgICAgICAgPC9kaXY+CiAgICAgICl9CiAgICAgIHshb3BlbiAmJiAoaXQubWVjaGFuaXNtIHx8IGl0LmN1cnJlbnRfcmVsZXZhbmNlKSAmJiAoCiAgICAgICAgPGJ1dHRvbiBvbkNsaWNrPXsoKSA9PiBzZXRPcGVuKHRydWUpfSBjbGFzc05hbWU9Im10LTIgdGV4dC1zbSB0ZXh0LXByaW1hcnkgaG92ZXI6dW5kZXJsaW5lIj5MdWUgbGlzw6TDpCDihpI8L2J1dHRvbj4KICAgICAgKX0KICAgIDwvbGk+CiAgKTsKfQo=
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { Suspense, useState } from "react";
+import { themePathQuery, type PathItem } from "@/lib/murros.functions";
+
+const THEMES = [
+  { key: "koulutus", label: "Koulutus" },
+  { key: "talous", label: "Talous" },
+  { key: "työ", label: "Työ" },
+  { key: "julkinen valta", label: "Julkinen valta" },
+  { key: "poliittinen osallistuminen", label: "Osallistuminen" },
+  { key: "oikeusvaltio", label: "Oikeusvaltio" },
+  { key: "kansalaisyhteiskunta", label: "Kansalaisyhteiskunta" },
+] as const;
+
+type Search = { teema?: string };
+
+export const Route = createFileRoute("/polku")({
+  validateSearch: (s: { teema?: unknown }): Search => {
+    const t = typeof s.teema === "string" ? s.teema : "";
+    return { teema: THEMES.some((x) => x.key === t) ? t : "koulutus" };
+  },
+  loaderDeps: ({ search }) => ({ teema: search.teema ?? "koulutus" }),
+  loader: ({ context, deps }) => context.queryClient.ensureQueryData(themePathQuery(deps.teema)),
+  head: () => ({
+    meta: [
+      { title: "Murrosmatriisi – miten tähän on tultu?" },
+      { name: "description", content: "Suomen yhteiskunnan kehitys selkeinä polkuina: ongelma, ratkaisu ja sen pitkä vaikutus." },
+      { property: "og:title", content: "Murrosmatriisi – miten tähän on tultu?" },
+      { property: "og:description", content: "Valitse teema ja kulje yhteiskunnan murrosten läpi nykypäivään." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: Index,
+});
+
+function Index() {
+  const teema = Route.useSearch().teema ?? "koulutus";
+  const navigate = useNavigate({ from: "/polku" });
+  const label = THEMES.find((t) => t.key === teema)?.label ?? teema;
+  return (
+    <main className="min-h-screen bg-background text-foreground">
+      <header className="mx-auto max-w-3xl px-5 pt-14 pb-8">
+        <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Murrosmatriisi</p>
+        <h1 className="mt-3 font-display text-4xl leading-tight md:text-6xl">Miten tähän on tultu?</h1>
+        <p className="mt-4 max-w-xl text-lg text-muted-foreground">
+          Jokainen uudistus ratkaisi jonkin ongelman – ja muovasi seuraavan. Valitse teema ja kulje kehitys läpi nykypäivään.
+        </p>
+        <nav aria-label="Teemat" className="mt-8 flex flex-wrap gap-2">
+          {THEMES.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => navigate({ search: { teema: t.key } })}
+              aria-pressed={t.key === teema}
+              className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
+                t.key === teema ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-accent"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </nav>
+      </header>
+      <section className="mx-auto max-w-3xl px-5 pb-24">
+        <h2 className="sr-only">Teeman {label} kehityspolku</h2>
+        <Suspense fallback={<p className="text-muted-foreground">Ladataan…</p>}>
+          <Timeline teema={teema} />
+        </Suspense>
+      </section>
+    </main>
+  );
+}
+
+function Timeline({ teema }: { teema: string }) {
+  const { data } = useSuspenseQuery(themePathQuery(teema));
+  if (!data.length) return <p className="text-muted-foreground">Tähän teemaan ei vielä löytynyt aineistoa.</p>;
+  return (
+    <ol className="relative border-l-2 border-border pl-8">
+      {data.map((it) => <Step key={it.id} it={it} />)}
+      <li className="relative">
+        <span className="absolute -left-[41px] top-1 h-4 w-4 rounded-full bg-primary ring-4 ring-background" />
+        <p className="font-display text-2xl">Tänään</p>
+      </li>
+    </ol>
+  );
+}
+
+function Step({ it }: { it: PathItem }) {
+  const [open, setOpen] = useState(false);
+  const years = it.year_start === it.year_end ? `${it.year_start}` : `${it.year_start}–${it.year_end}`;
+  return (
+    <li className="relative mb-10">
+      <span className="absolute -left-[39px] top-2 h-3 w-3 rounded-full border-2 border-primary bg-background" />
+      <p className="font-display text-sm text-primary">{years} · {it.type}</p>
+      <button onClick={() => setOpen(!open)} aria-expanded={open} className="mt-1 text-left">
+        <h3 className="font-display text-2xl leading-snug hover:underline">{it.title}</h3>
+      </button>
+      <div className="mt-3 grid gap-3 md:grid-cols-2">
+        <div className="rounded-lg bg-muted p-4">
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">Ongelma</p>
+          <p className="mt-1">{it.problem}</p>
+        </div>
+        <div className="rounded-lg bg-accent p-4">
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">Mitä siitä seurasi</p>
+          <p className="mt-1">{it.long_effect}</p>
+        </div>
+      </div>
+      {open && (
+        <div className="mt-3 space-y-2 text-muted-foreground">
+          {it.mechanism && <p><b className="text-foreground">Miten se toimi:</b> {it.mechanism}</p>}
+          {it.current_relevance && <p><b className="text-foreground">Miksi sillä on väliä nyt:</b> {it.current_relevance}</p>}
+        </div>
+      )}
+      {!open && (it.mechanism || it.current_relevance) && (
+        <button onClick={() => setOpen(true)} className="mt-2 text-sm text-primary hover:underline">Lue lisää →</button>
+      )}
+    </li>
+  );
+}

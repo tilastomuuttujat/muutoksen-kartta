@@ -1,1 +1,105 @@
-aW1wb3J0IHsgY3JlYXRlRmlsZVJvdXRlLCBMaW5rIH0gZnJvbSAiQHRhbnN0YWNrL3JlYWN0LXJvdXRlciI7CmltcG9ydCB7IHVzZVN1c3BlbnNlUXVlcnkgfSBmcm9tICJAdGFuc3RhY2svcmVhY3QtcXVlcnkiOwppbXBvcnQgeyB1c2VTdGF0ZSB9IGZyb20gInJlYWN0IjsKaW1wb3J0IHsgYXRsYXNUaGVtZXNRdWVyeSwgdHlwZSBBdGxhc1RoZW1lIH0gZnJvbSAiQC9saWIvbXVycm9zLmZ1bmN0aW9ucyI7CgpleHBvcnQgY29uc3QgUm91dGUgPSBjcmVhdGVGaWxlUm91dGUoIi90ZWVtYXQiKSh7CiAgbG9hZGVyOiAoeyBjb250ZXh0IH0pID0+IGNvbnRleHQucXVlcnlDbGllbnQuZW5zdXJlUXVlcnlEYXRhKGF0bGFzVGhlbWVzUXVlcnkoKSksCiAgaGVhZDogKCkgPT4gKHsKICAgIG1ldGE6IFsKICAgICAgeyB0aXRsZTogIlRlZW1vamVuIGtlaGl0eXNrYWFyZXQg4oCTIE11cnJvc21hdHJpaXNpIiB9LAogICAgICB7IG5hbWU6ICJkZXNjcmlwdGlvbiIsIGNvbnRlbnQ6ICIzMiB5aHRlaXNrdW5uYW4gdGVlbWFhIGphIG5paWRlbiBrZWhpdHlza2FhcmkgeWhkZXNzw6Qga3V2YXNzYTogbWlzc8OkIG9uIG55dCBqw6Rubml0ZXR0w6QsIG1pc3PDpCB2YWthdXR0YS4iIH0sCiAgICAgIHsgcHJvcGVydHk6ICJvZzp0aXRsZSIsIGNvbnRlbnQ6ICJUZWVtb2plbiBrZWhpdHlza2FhcmV0IOKAkyBNdXJyb3NtYXRyaWlzaSIgfSwKICAgICAgeyBwcm9wZXJ0eTogIm9nOmRlc2NyaXB0aW9uIiwgY29udGVudDogIk7DpGUgeWhkZWxsw6Qgdmlsa2Fpc3VsbGEsIG1pc3PDpCB5aHRlaXNrdW5uYW4gdGVlbW9pc3NhIG9uIG55dCBqw6Rubml0ZXR0w6QuIiB9LAogICAgICB7IHByb3BlcnR5OiAib2c6dHlwZSIsIGNvbnRlbnQ6ICJ3ZWJzaXRlIiB9LAogICAgICB7IG5hbWU6ICJ0d2l0dGVyOmNhcmQiLCBjb250ZW50OiAic3VtbWFyeSIgfSwKICAgIF0sCiAgfSksCiAgY29tcG9uZW50OiBPdmVydmlldywKfSk7Cgpjb25zdCBTVEFHRVMgPSBbIk9uZ2VsbWEiLCAiUmF0a2Fpc3UiLCAiVmFrYXVzIiwgIk11dXRvcyIsICJSaXN0aXJpaXRhIiwgIktvcmphdXMiXTsKCmZ1bmN0aW9uIHRvbmUodDogQXRsYXNUaGVtZSkgewogIGNvbnN0IG5vdyA9IHQuc2NvcmVzWzRdID8/IDA7CiAgcmV0dXJuIG5vdyA8IC0wLjE1ID8gInRlbnNpb24iIDogbm93ID4gMC4xNSA/ICJjYWxtIiA6ICJuZXV0cmFsLWxpbmUiOwp9CgpmdW5jdGlvbiBTcGFyayh7IHNjb3JlcywgY29sb3IsIGJpZyB9OiB7IHNjb3JlczogbnVtYmVyW107IGNvbG9yOiBzdHJpbmc7IGJpZz86IGJvb2xlYW4gfSkgewogIGNvbnN0IHcgPSAxMjAsIGggPSA0NCwgcGFkID0gNDsKICBjb25zdCBwdHMgPSBzY29yZXMubWFwKChzLCBpKTogW251bWJlciwgbnVtYmVyXSA9PiBbcGFkICsgKGkgKiAodyAtIDIgKiBwYWQpKSAvIE1hdGgubWF4KDEsIHNjb3Jlcy5sZW5ndGggLSAxKSwgaCAvIDIgLSBzICogKGggLyAyIC0gcGFkKV0pOwogIGNvbnN0IGQgPSBwdHMubWFwKChwLCBpKSA9PiBgJHtpID8gIkwiIDogIk0ifSR7cFswXS50b0ZpeGVkKDEpfSwke3BbMV0udG9GaXhlZCgxKX1gKS5qb2luKCIgIik7CiAgY29uc3QgYXJlYSA9IGAke2R9IEwke3B0cy5hdCgtMSk/LlswXX0sJHtoIC8gMn0gTCR7cHRzWzBdPy5bMF19LCR7aCAvIDJ9IFpgOwogIHJldHVybiAoCiAgICA8c3ZnIHZpZXdCb3g9e2AwIDAgJHt3fSAke2h9YH0gY2xhc3NOYW1lPXtiaWcgPyAiaC0yNCB3LWZ1bGwiIDogImgtMTEgdy1mdWxsIn0gYXJpYS1oaWRkZW4+CiAgICAgIDxsaW5lIHgxPXswfSB4Mj17d30geTE9e2ggLyAyfSB5Mj17aCAvIDJ9IGNsYXNzTmFtZT0ic3Ryb2tlLWJvcmRlciIgc3Ryb2tlRGFzaGFycmF5PSIyIDMiIC8+CiAgICAgIDxwYXRoIGQ9e2FyZWF9IHN0eWxlPXt7IGZpbGw6IGB2YXIoLS0ke2NvbG9yfSlgLCBvcGFjaXR5OiAwLjE1IH19IC8+CiAgICAgIDxwYXRoIGQ9e2R9IGZpbGw9Im5vbmUiIHN0cm9rZVdpZHRoPXsyfSBzdHJva2VMaW5lam9pbj0icm91bmQiIHN0eWxlPXt7IHN0cm9rZTogYHZhcigtLSR7Y29sb3J9KWAgfX0gLz4KICAgICAge3B0c1s0XSAmJiA8Y2lyY2xlIGN4PXtwdHNbNF1bMF19IGN5PXtwdHNbNF1bMV19IHI9ezMuNX0gc3R5bGU9e3sgZmlsbDogYHZhcigtLSR7Y29sb3J9KWAgfX0gLz59CiAgICA8L3N2Zz4KICApOwp9CgpmdW5jdGlvbiBPdmVydmlldygpIHsKICBjb25zdCB7IGRhdGEgfSA9IHVzZVN1c3BlbnNlUXVlcnkoYXRsYXNUaGVtZXNRdWVyeSgpKTsKICBjb25zdCBbb3Blbiwgc2V0T3Blbl0gPSB1c2VTdGF0ZTxudW1iZXIgfCBudWxsPihudWxsKTsKICBjb25zdCBncm91cHMgPSBbLi4ubmV3IFNldChkYXRhLm1hcCgodCkgPT4gdC5ncm91cCkpXTsKICBjb25zdCB0ZW5zZSA9IGRhdGEuZmlsdGVyKCh0KSA9PiB0b25lKHQpID09PSAidGVuc2lvbiIpLmxlbmd0aDsKCiAgcmV0dXJuICgKICAgIDxtYWluIGNsYXNzTmFtZT0ibXgtYXV0byBtYXgtdy02eGwgcHgtNCBweS04IHNtOnB4LTYiPgogICAgICA8aGVhZGVyIGNsYXNzTmFtZT0ibWItNiBmbGV4IGZsZXgtd3JhcCBpdGVtcy1lbmQganVzdGlmeS1iZXR3ZWVuIGdhcC00Ij4KICAgICAgICA8ZGl2PgogICAgICAgICAgPGgxIGNsYXNzTmFtZT0iZm9udC1kaXNwbGF5IHRleHQtM3hsIHNtOnRleHQtNHhsIj5ZaHRlaXNrdW50YSB5aGRlbGzDpCBzaWxtw6R5a3NlbGzDpDwvaDE+CiAgICAgICAgICA8cCBjbGFzc05hbWU9Im10LTEgdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIj4KICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPSJmb250LXNlbWlib2xkIHRleHQtdGVuc2lvbiI+e3RlbnNlfTwvc3Bhbj4gLyB7ZGF0YS5sZW5ndGh9IHRlZW1hc3NhIG9uIG55dCBqw6Rubml0ZXR0w6QuCiAgICAgICAgICA8L3A+CiAgICAgICAgPC9kaXY+CiAgICAgICAgPGRpdiBjbGFzc05hbWU9ImZsZXggaXRlbXMtY2VudGVyIGdhcC00IHRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIj4KICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT0iZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTEuNSI+PGkgY2xhc3NOYW1lPSJoLTMgdy0zIHJvdW5kZWQtZnVsbCBiZy10ZW5zaW9uIiAvPkrDpG5uaXRlPC9zcGFuPgogICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPSJmbGV4IGl0ZW1zLWNlbnRlciBnYXAtMS41Ij48aSBjbGFzc05hbWU9ImgtMyB3LTMgcm91bmRlZC1mdWxsIGJnLW5ldXRyYWwtbGluZSIgLz5UYXNhcGFpbm88L3NwYW4+CiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9ImZsZXggaXRlbXMtY2VudGVyIGdhcC0xLjUiPjxpIGNsYXNzTmFtZT0iaC0zIHctMyByb3VuZGVkLWZ1bGwgYmctY2FsbSIgLz5WYWthYTwvc3Bhbj4KICAgICAgICAgIDxMaW5rIHRvPSIvcG9sa3UiIGNsYXNzTmFtZT0idW5kZXJsaW5lIj5BaWthamFuYSDihpI8L0xpbms+CiAgICAgICAgPC9kaXY+CiAgICAgIDwvaGVhZGVyPgoKICAgICAgPGRpdiBjbGFzc05hbWU9ImdyaWQgZ2FwLTQgbWQ6Z3JpZC1jb2xzLTIiPgogICAgICAgIHtncm91cHMubWFwKChnKSA9PiAoCiAgICAgICAgICA8c2VjdGlvbiBrZXk9e2d9IGNsYXNzTmFtZT0icm91bmRlZC14bCBib3JkZXIgYmctY2FyZCBwLTQiPgogICAgICAgICAgICA8aDIgY2xhc3NOYW1lPSJtYi0zIGZvbnQtZGlzcGxheSB0ZXh0LWxnIj57Z308L2gyPgogICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT0iZ3JpZCBncmlkLWNvbHMtMiBnYXAtMiBzbTpncmlkLWNvbHMtNCI+CiAgICAgICAgICAgICAge2RhdGEuZmlsdGVyKCh0KSA9PiB0Lmdyb3VwID09PSBnKS5tYXAoKHQpID0+IHsKICAgICAgICAgICAgICAgIGNvbnN0IGMgPSB0b25lKHQpOwogICAgICAgICAgICAgICAgY29uc3QgaXNPcGVuID0gb3BlbiA9PT0gdC5pZDsKICAgICAgICAgICAgICAgIHJldHVybiAoCiAgICAgICAgICAgICAgICAgIDxidXR0b24KICAgICAgICAgICAgICAgICAgICBrZXk9e3QuaWR9CiAgICAgICAgICAgICAgICAgICAgb25DbGljaz17KCkgPT4gc2V0T3Blbihpc09wZW4gPyBudWxsIDogdC5pZCl9CiAgICAgICAgICAgICAgICAgICAgY2xhc3NOYW1lPXtgcm91bmRlZC1sZyBib3JkZXIgcC0yIHRleHQtbGVmdCB0cmFuc2l0aW9uIGhvdmVyOmJnLW11dGVkICR7aXNPcGVuID8gInJpbmctMiByaW5nLXJpbmciIDogIiJ9YH0KICAgICAgICAgICAgICAgICAgICBzdHlsZT17eyBib3JkZXJMZWZ0OiBgNHB4IHNvbGlkIHZhcigtLSR7Y30pYCB9fQogICAgICAgICAgICAgICAgICA+CiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9ImxpbmUtY2xhbXAtMiBoLTkgb3ZlcmZsb3ctaGlkZGVuIHRleHQtc20gZm9udC1zZW1pYm9sZCBsZWFkaW5nLXRpZ2h0Ij57dC5uYW1lfTwvZGl2PgogICAgICAgICAgICAgICAgICAgIDxTcGFyayBzY29yZXM9e3Quc2NvcmVzfSBjb2xvcj17Y30gLz4KICAgICAgICAgICAgICAgICAgPC9idXR0b24+CiAgICAgICAgICAgICAgICApOwogICAgICAgICAgICAgIH0pfQogICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAge2RhdGEuZmlsdGVyKCh0KSA9PiB0Lmdyb3VwID09PSBnICYmIHQuaWQgPT09IG9wZW4pLm1hcCgodCkgPT4gKAogICAgICAgICAgICAgIDxkaXYga2V5PXt0LmlkfSBjbGFzc05hbWU9Im10LTMgcm91bmRlZC1sZyBiZy1tdXRlZCBwLTMiPgogICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9ImZvbnQtZGlzcGxheSB0ZXh0LWJhc2UiPnt0Lm5hbWV9PC9kaXY+CiAgICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9InRleHQtc20gdGV4dC1tdXRlZC1mb3JlZ3JvdW5kIj57dC50aGVzaXN9PC9wPgogICAgICAgICAgICAgICAgPFNwYXJrIHNjb3Jlcz17dC5zY29yZXN9IGNvbG9yPXt0b25lKHQpfSBiaWcgLz4KICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPSJncmlkIGdyaWQtY29scy02IHRleHQtY2VudGVyIHRleHQtWzEwcHhdIHRleHQtbXV0ZWQtZm9yZWdyb3VuZCBzbTp0ZXh0LXhzIj4KICAgICAgICAgICAgICAgICAge1NUQUdFUy5tYXAoKHMpID0+IDxzcGFuIGtleT17c30+e3N9PC9zcGFuPil9CiAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgKSl9CiAgICAgICAgICA8L3NlY3Rpb24+CiAgICAgICAgKSl9CiAgICAgIDwvZGl2PgogICAgICA8cCBjbGFzc05hbWU9Im10LTYgdGV4dC1jZW50ZXIgdGV4dC14cyB0ZXh0LW11dGVkLWZvcmVncm91bmQiPgogICAgICAgIEvDpHlyw6Q6IGt1bmtpbiB0ZWVtYW4ga2VoaXR5cyBvbmdlbG1hc3RhIGtvcmphdXNsaWlra2Vlc2Vlbi4gUGlzdGUgPSBueWt5dGlsYW5uZS4gVmlpdmFuIHlsw6RwdW9sZWxsYSA9IHRvaW1paSwgYWxhcHVvbGVsbGEgPSBraXRrYWEuCiAgICAgIDwvcD4KICAgIDwvbWFpbj4KICApOwp9Cg==
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { atlasThemesQuery, type AtlasTheme } from "@/lib/murros.functions";
+
+export const Route = createFileRoute("/teemat")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(atlasThemesQuery()),
+  head: () => ({
+    meta: [
+      { title: "Teemojen kehityskaaret – Murrosmatriisi" },
+      { name: "description", content: "32 yhteiskunnan teemaa ja niiden kehityskaari yhdessä kuvassa: missä on nyt jännitettä, missä vakautta." },
+      { property: "og:title", content: "Teemojen kehityskaaret – Murrosmatriisi" },
+      { property: "og:description", content: "Näe yhdellä vilkaisulla, missä yhteiskunnan teemoissa on nyt jännitettä." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
+  component: Overview,
+});
+
+const STAGES = ["Ongelma", "Ratkaisu", "Vakaus", "Muutos", "Ristiriita", "Korjaus"];
+
+function tone(t: AtlasTheme) {
+  const now = t.scores[4] ?? 0;
+  return now < -0.15 ? "tension" : now > 0.15 ? "calm" : "neutral-line";
+}
+
+function Spark({ scores, color, big }: { scores: number[]; color: string; big?: boolean }) {
+  const w = 120, h = 44, pad = 4;
+  const pts = scores.map((s, i): [number, number] => [pad + (i * (w - 2 * pad)) / Math.max(1, scores.length - 1), h / 2 - s * (h / 2 - pad)]);
+  const d = pts.map((p, i) => `${i ? "L" : "M"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
+  const area = `${d} L${pts.at(-1)?.[0]},${h / 2} L${pts[0]?.[0]},${h / 2} Z`;
+  return (
+    <svg viewBox={`0 0 ${w} ${h}`} className={big ? "h-24 w-full" : "h-11 w-full"} aria-hidden>
+      <line x1={0} x2={w} y1={h / 2} y2={h / 2} className="stroke-border" strokeDasharray="2 3" />
+      <path d={area} style={{ fill: `var(--${color})`, opacity: 0.15 }} />
+      <path d={d} fill="none" strokeWidth={2} strokeLinejoin="round" style={{ stroke: `var(--${color})` }} />
+      {pts[4] && <circle cx={pts[4][0]} cy={pts[4][1]} r={3.5} style={{ fill: `var(--${color})` }} />}
+    </svg>
+  );
+}
+
+function Overview() {
+  const { data } = useSuspenseQuery(atlasThemesQuery());
+  const [open, setOpen] = useState<number | null>(null);
+  const groups = [...new Set(data.map((t) => t.group))];
+  const tense = data.filter((t) => tone(t) === "tension").length;
+
+  return (
+    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="font-display text-3xl sm:text-4xl">Yhteiskunta yhdellä silmäyksellä</h1>
+          <p className="mt-1 text-muted-foreground">
+            <span className="font-semibold text-tension">{tense}</span> / {data.length} teemassa on nyt jännitettä.
+          </p>
+        </div>
+        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          <span className="flex items-center gap-1.5"><i className="h-3 w-3 rounded-full bg-tension" />Jännite</span>
+          <span className="flex items-center gap-1.5"><i className="h-3 w-3 rounded-full bg-neutral-line" />Tasapaino</span>
+          <span className="flex items-center gap-1.5"><i className="h-3 w-3 rounded-full bg-calm" />Vakaa</span>
+          <Link to="/polku" className="underline">Aikajana →</Link>
+        </div>
+      </header>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        {groups.map((g) => (
+          <section key={g} className="rounded-xl border bg-card p-4">
+            <h2 className="mb-3 font-display text-lg">{g}</h2>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {data.filter((t) => t.group === g).map((t) => {
+                const c = tone(t);
+                const isOpen = open === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => setOpen(isOpen ? null : t.id)}
+                    className={`rounded-lg border p-2 text-left transition hover:bg-muted ${isOpen ? "ring-2 ring-ring" : ""}`}
+                    style={{ borderLeft: `4px solid var(--${c})` }}
+                  >
+                    <div className="line-clamp-2 h-9 overflow-hidden text-sm font-semibold leading-tight">{t.name}</div>
+                    <Spark scores={t.scores} color={c} />
+                  </button>
+                );
+              })}
+            </div>
+            {data.filter((t) => t.group === g && t.id === open).map((t) => (
+              <div key={t.id} className="mt-3 rounded-lg bg-muted p-3">
+                <div className="font-display text-base">{t.name}</div>
+                <p className="text-sm text-muted-foreground">{t.thesis}</p>
+                <Spark scores={t.scores} color={tone(t)} big />
+                <div className="grid grid-cols-6 text-center text-[10px] text-muted-foreground sm:text-xs">
+                  {STAGES.map((s) => <span key={s}>{s}</span>)}
+                </div>
+              </div>
+            ))}
+          </section>
+        ))}
+      </div>
+      <p className="mt-6 text-center text-xs text-muted-foreground">
+        Käyrä: kunkin teeman kehitys ongelmasta korjausliikkeeseen. Piste = nykytilanne. Viivan yläpuolella = toimii, alapuolella = kitkaa.
+      </p>
+    </main>
+  );
+}
