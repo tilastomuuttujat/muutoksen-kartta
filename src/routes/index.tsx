@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { systemMapQuery } from "@/lib/murros.functions";
+import { murrosDataQuery } from "@/lib/murros-data";
 import { LANES, LANE_H, TOP, W, xOf, chainOf, isPressure, layout, layout3d, LAYERS, ISO_W, ISO_H, isoPoint, LENSES, applyLens, LAYER_MODELS, layerModel, searchNodes, resolveStarts, edgeReason, pushTrail, chainDepths, waveDelay, chainWeight, shouldLabel, laneOf, type MapEdge } from "@/lib/system-map";
 
 export const Route = createFileRoute("/")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(systemMapQuery()),
+  loader: ({ context }) => context.queryClient.ensureQueryData(murrosDataQuery()),
   head: () => ({
     meta: [
       { title: "Murrosmatriisi – Suomen muutoksen kartta" },
@@ -33,7 +33,7 @@ function curve3d(a: { x: number; y: number }, b: { x: number; y: number }) {
 const poly = (pts: { x: number; y: number }[]) => pts.map((p) => `${p.x},${p.y}`).join(" ");
 
 function SystemMap() {
-  const { data } = useSuspenseQuery(systemMapQuery());
+  const { data } = useSuspenseQuery(murrosDataQuery());
   const [sel, setSelRaw] = useState<string | null>(null);
   const [trail, setTrail] = useState<string[]>([]);
   const setSel = (id: string | null) => { setSelRaw(id); if (id) setTrail((t) => pushTrail(t, id)); else setTrail([]); };
