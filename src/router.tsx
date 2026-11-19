@@ -8,6 +8,8 @@ export const getRouter = () => {
 
   const router = createRouter({
     routeTree,
+    // GitHub Pages serves the app under a sub-path; keep the router in sync with the build base.
+    basepath: import.meta.env.BASE_URL.replace(/\/$/, ""),
     context: { queryClient },
     scrollRestoration: true,
     // Lets Query own freshness; set caching defaults on the QueryClient, not the router.
