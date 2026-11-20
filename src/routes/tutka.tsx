@@ -1,3 +1,4 @@
+import { spineOf } from "@/lib/star-path";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -31,6 +32,7 @@ function RadarPage() {
   const [focus, setFocus] = useState<string | null>(null);
   const [sensor, setSensor] = useState<SensorKey>("optinen");
   const [mainOnly, setMainOnly] = useState(true);
+  const [showSpine, setShowSpine] = useState(true);
   const [step, setStep] = useState(-100);
   const svgRef = useRef<SVGSVGElement>(null);
   const spin = useRef<{ a: number; acc: number; x: number; y: number; moved: boolean } | null>(null);
@@ -82,6 +84,7 @@ function RadarPage() {
           <Link to="/" className="underline-offset-4 hover:underline">← Kartta</Link>
           <Link to="/lampokartta" className="underline-offset-4 hover:underline">Lämpökartta →</Link>
           <Link to="/pallo" className="underline-offset-4 hover:underline">Pallo →</Link>
+          <Link to="/tahtikartta" className="underline-offset-4 hover:underline">Tähtikartta →</Link>
         </nav>
       </header>
 
@@ -93,6 +96,7 @@ function RadarPage() {
             {s.label} <span className="opacity-70">· {s.hint}</span>
           </button>
         ))}
+        <label className="flex items-center gap-1.5 text-sm"><input type="checkbox" checked={showSpine} onChange={(e) => setShowSpine(e.target.checked)} /> Tähtirata</label>
         {focus && <label className="ml-auto flex items-center gap-1.5 text-sm"><input type="checkbox" checked={mainOnly} onChange={(e) => setMainOnly(e.target.checked)} /> Vain päälinja</label>}
         {focus && <button onClick={() => setFocus(null)} className="rounded-full border bg-card px-3 py-1 text-sm hover:bg-muted">Palaa nykyhetkeen</button>}
       </div>
@@ -138,6 +142,10 @@ function RadarPage() {
                   <text x={bx * 0.88} y={by * 0.88 + 4} textAnchor="middle" fontSize={11} fontWeight={600} fill="var(--foreground)" stroke="var(--card)" strokeWidth={3} paintOrder="stroke" style={{ pointerEvents: "none" }}>{label}</text>
                 </g>
               );
+            })()}
+            {showSpine && (() => {
+              const pts = spineOf(data.nodes).map((n) => pos.get(n.id)!).filter((p) => !focus || p.hop != null);
+              return pts.length > 1 && <polyline points={pts.map((p) => `${p.x},${p.y}`).join(" ")} fill="none" stroke="var(--primary)" strokeOpacity={0.4} strokeWidth={2} strokeLinejoin="round" style={{ pointerEvents: "none" }} />;
             })()}
             {focus && <circle key={focus} r={R} fill="none" stroke="var(--primary)" strokeWidth={2} className="radar-ping" />}
             {focus && data.edges.map((e, i) => {

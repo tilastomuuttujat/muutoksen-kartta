@@ -3,6 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { murrosDataQuery } from "@/lib/murros-data";
 import { LANES } from "@/lib/system-map";
+import { spineOf, constellationOf, dockOf } from "@/lib/star-path";
 import { globePos, project, lerpAngle, MAX_LAT, OLDEST, NOW } from "@/lib/globe";
 
 export const Route = createFileRoute("/pallo")({
@@ -32,6 +33,8 @@ function GlobePage() {
   const suppress = useRef(false);
   const geo = useMemo(() => new Map(data.nodes.map((n) => [n.id, globePos(n)])), [data]);
   const byId = useMemo(() => new Map(data.nodes.map((n) => [n.id, n])), [data]);
+  const spine = useMemo(() => spineOf(data.nodes), [data]);
+  const [showSpine, setShowSpine] = useState(true);
 
   useEffect(() => {
     let raf = 0;
@@ -57,6 +60,7 @@ function GlobePage() {
   const causes = focus ? data.edges.filter((e) => e.to === focus).map((e) => e.from) : [];
   const effects = focus ? data.edges.filter((e) => e.from === focus).map((e) => e.to) : [];
   const linked = new Set([...causes, ...effects]);
+  const dock = focus && showSpine ? dockOf(focus, constellationOf(focus, data.edges), data.nodes, spine) : null;
 
   const pts = data.nodes.map((n) => { const g = geo.get(n.id)!; return { n, g, p: project(g.lat, g.lon, rot.lat, rot.lon) }; }).sort((a, b) => a.p.z - b.p.z);
   const P = new Map(pts.map((x) => [x.n.id, x.p]));
@@ -77,8 +81,10 @@ function GlobePage() {
         <nav className="flex gap-4 text-sm text-muted-foreground">
           <Link to="/" className="underline-offset-4 hover:underline">← Kartta</Link>
           <Link to="/tutka" className="underline-offset-4 hover:underline">Tutka →</Link>
+          <Link to="/tahtikartta" className="underline-offset-4 hover:underline">Tähtikartta →</Link>
         </nav>
       </header>
+      <label className="mb-3 flex items-center gap-1.5 text-sm"><input type="checkbox" checked={showSpine} onChange={(e) => setShowSpine(e.target.checked)} /> Näytä tähtirata (merkittävimmät käänteet)</label>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="rounded-xl border bg-card p-2">
           <svg viewBox={`${-RAD - 20} ${-RAD - 20} ${RAD * 2 + 40} ${RAD * 2 + 40}`} className="mx-auto block w-full max-w-[680px] select-none" style={{ touchAction: "none", cursor: "grab" }} role="img" aria-label="Muutoksen pallo"
@@ -120,6 +126,12 @@ function GlobePage() {
                 </g>
               );
             })}
+            {showSpine && (() => {
+              const pp = spine.flatMap((n, i) => { const a = geo.get(n.id)!, b = spine[i + 1] && geo.get(spine[i + 1]!.id); if (!b) return [P.get(n.id)!];
+                return Array.from({ length: 8 }, (_, k) => project(a.lat + (b.lat - a.lat) * k / 8, lerpAngle(a.lon, b.lon, k / 8), rot.lat, rot.lon)); });
+              return <path d={path(pp)} fill="none" stroke="var(--primary)" strokeOpacity={0.5} strokeWidth={2.5} strokeLinecap="round" style={{ pointerEvents: "none" }} />;
+            })()}
+            {dock && !dock.direct && (() => { const a = P.get(dock.key)!, b = P.get(dock.spine)!; return a.z > 0 && b.z > 0 && <line x1={a.x * RAD} y1={a.y * RAD} x2={b.x * RAD} y2={b.y * RAD} stroke="var(--primary)" strokeWidth={2} strokeDasharray="5 4" style={{ pointerEvents: "none" }} />; })()}
             {focus && [...linked].map((id) => {
               const a = P.get(focus)!, b = P.get(id); if (!b || b.z < 0) return null;
               return <line key={"e" + id} x1={a.x * RAD} y1={a.y * RAD} x2={b.x * RAD} y2={b.y * RAD} stroke={causes.includes(id) ? "var(--muted-foreground)" : "var(--primary)"} strokeOpacity={0.55} strokeWidth={1.5} />;
@@ -150,6 +162,7 @@ function GlobePage() {
               <p className="text-muted-foreground">{fn.year}</p>
               <h2 className="font-display text-xl">{fn.title}</h2>
               {fn.effect && <p className="mt-2">{fn.effect}</p>}
+              {dock && <p className="mt-2 text-muted-foreground">{dock.direct ? "Kuuluu tähtirataan." : `Kiinnittyy tähtirataan: ${byId.get(dock.key)!.title} → ${byId.get(dock.spine)!.title}`}</p>}
               {[["Syyt", causes], ["Seuraukset", effects]].map(([h, ids]) => (ids as string[]).length > 0 && (
                 <div key={h as string} className="mt-4">
                   <h3 className="font-semibold">{h as string} · {(ids as string[]).length}</h3>

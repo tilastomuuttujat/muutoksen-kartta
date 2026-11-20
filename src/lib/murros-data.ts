@@ -33,6 +33,7 @@ export type MurrosData = {
   edges: MapEdge[];
   conclusions: { id: string; title: string; claim: string; kind: string; status: string; limitations: string | null; series: string[] }[];
   series: { key: string; title: string; unit: string; source: string; values: unknown }[];
+  nodeConclusions: Record<string, string[]>;
 };
 
 export function loadMurrosData(): MurrosData {
@@ -45,10 +46,15 @@ export function loadMurrosData(): MurrosData {
   const edges: MapEdge[] = d.edges
     .filter((e) => ids.has(e.from) && ids.has(e.to) && e.from !== e.to)
     .map((e) => ({ from: e.from, to: e.to, type: e.type, rationale: e.rationale ?? "", pressure: !!e.pressure, cls: e.class ?? "" }));
-  return { nodes, edges, conclusions: d.conclusions ?? [], series: d.series ?? [] };
+  const nodeConclusions: Record<string, string[]> = {};
+  for (const n of d.nodes) if (n.conclusion_ids?.length) nodeConclusions[n.id] = n.conclusion_ids.map(String);
+  return { nodes, edges, conclusions: (d.conclusions ?? []).map((c) => ({ ...c, id: String(c.id) })), series: d.series ?? [], nodeConclusions };
 }
 
 export const murrosDataQuery = () =>
   queryOptions({ queryKey: ["murros-data"], queryFn: () => Promise.resolve(loadMurrosData()), staleTime: Infinity });
 
 
+
+/** All theme timelines (theme key → phenomena), used as explanation rails on the star map. */
+export const allThemePaths = (): Record<string, PathItem[]> => extra.theme_paths ?? {};

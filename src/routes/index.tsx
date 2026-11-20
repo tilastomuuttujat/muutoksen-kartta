@@ -147,6 +147,7 @@ function SystemMap() {
           </div>
           <Link to="/tutka" className="underline-offset-4 hover:underline">Tutka →</Link>
           <Link to="/pallo" className="underline-offset-4 hover:underline">Pallo →</Link>
+          <Link to="/tahtikartta" className="underline-offset-4 hover:underline">Tähtikartta →</Link>
           <Link to="/lampokartta" className="underline-offset-4 hover:underline">Lämpökartta →</Link>
           <Link to="/teemat" className="underline-offset-4 hover:underline">Teemat →</Link>
           <Link to="/polku" className="underline-offset-4 hover:underline">Aikajana →</Link>

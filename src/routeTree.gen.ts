@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LampokarttaRouteImport } from './routes/lampokartta'
 import { Route as PalloRouteImport } from './routes/pallo'
 import { Route as PolkuRouteImport } from './routes/polku'
+import { Route as TahtikarttaRouteImport } from './routes/tahtikartta'
 import { Route as TeematRouteImport } from './routes/teemat'
 import { Route as TutkaRouteImport } from './routes/tutka'
 
@@ -36,6 +37,11 @@ const PolkuRoute = PolkuRouteImport.update({
   path: '/polku',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TahtikarttaRoute = TahtikarttaRouteImport.update({
+  id: '/tahtikartta',
+  path: '/tahtikartta',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TeematRoute = TeematRouteImport.update({
   id: '/teemat',
   path: '/teemat',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/lampokartta': typeof LampokarttaRoute
   '/pallo': typeof PalloRoute
   '/polku': typeof PolkuRoute
+  '/tahtikartta': typeof TahtikarttaRoute
   '/teemat': typeof TeematRoute
   '/tutka': typeof TutkaRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/lampokartta': typeof LampokarttaRoute
   '/pallo': typeof PalloRoute
   '/polku': typeof PolkuRoute
+  '/tahtikartta': typeof TahtikarttaRoute
   '/teemat': typeof TeematRoute
   '/tutka': typeof TutkaRoute
 }
@@ -69,20 +77,36 @@ export interface FileRoutesById {
   '/lampokartta': typeof LampokarttaRoute
   '/pallo': typeof PalloRoute
   '/polku': typeof PolkuRoute
+  '/tahtikartta': typeof TahtikarttaRoute
   '/teemat': typeof TeematRoute
   '/tutka': typeof TutkaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/lampokartta' | '/pallo' | '/polku' | '/teemat' | '/tutka'
+  fullPaths:
+    | '/'
+    | '/lampokartta'
+    | '/pallo'
+    | '/polku'
+    | '/tahtikartta'
+    | '/teemat'
+    | '/tutka'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/lampokartta' | '/pallo' | '/polku' | '/teemat' | '/tutka'
+  to:
+    | '/'
+    | '/lampokartta'
+    | '/pallo'
+    | '/polku'
+    | '/tahtikartta'
+    | '/teemat'
+    | '/tutka'
   id:
     | '__root__'
     | '/'
     | '/lampokartta'
     | '/pallo'
     | '/polku'
+    | '/tahtikartta'
     | '/teemat'
     | '/tutka'
   fileRoutesById: FileRoutesById
@@ -92,6 +116,7 @@ export interface RootRouteChildren {
   LampokarttaRoute: typeof LampokarttaRoute
   PalloRoute: typeof PalloRoute
   PolkuRoute: typeof PolkuRoute
+  TahtikarttaRoute: typeof TahtikarttaRoute
   TeematRoute: typeof TeematRoute
   TutkaRoute: typeof TutkaRoute
 }
@@ -126,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PolkuRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tahtikartta': {
+      id: '/tahtikartta'
+      path: '/tahtikartta'
+      fullPath: '/tahtikartta'
+      preLoaderRoute: typeof TahtikarttaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/teemat': {
       id: '/teemat'
       path: '/teemat'
@@ -148,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   LampokarttaRoute: LampokarttaRoute,
   PalloRoute: PalloRoute,
   PolkuRoute: PolkuRoute,
+  TahtikarttaRoute: TahtikarttaRoute,
   TeematRoute: TeematRoute,
   TutkaRoute: TutkaRoute,
 }
