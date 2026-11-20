@@ -11,6 +11,10 @@ const ZONE_LONG = ["Välittömät vaikutukset", "Kerrannaisvaikutukset", "Ulkois
 import { radarLayout, isMainline, placeLabels, sensorHits, SENSORS, R, stepToAngle, RINGS, NOW, OLDEST, type SensorKey } from "@/lib/radar";
 
 export const Route = createFileRoute("/tutka")({
+  validateSearch: (search: Record<string, unknown>): { ilmiö?: string; kysymys?: string } => ({
+    ilmiö: typeof search.ilmiö === "string" ? search.ilmiö : undefined,
+    kysymys: typeof search.kysymys === "string" ? search.kysymys : undefined,
+  }),
   loader: ({ context }) => context.queryClient.ensureQueryData(murrosDataQuery()),
   head: () => ({
     meta: [
@@ -29,9 +33,17 @@ const DIAL = R + 50;
 
 function RadarPage() {
   const { data } = useSuspenseQuery(murrosDataQuery());
-  const [focus, setFocus] = useState<string | null>(null);
+  const search = Route.useSearch();
+  const requested = data.nodes.find((node) => node.id === search.ilmiö);
+  const [focus, setFocus] = useState<string | null>(requested?.id ?? null);
+  const [directOnly, setDirectOnly] = useState(Boolean(requested));
+  const [mainOnly, setMainOnly] = useState(!requested);
+  useEffect(() => {
+    setFocus(requested?.id ?? null);
+    setDirectOnly(Boolean(requested));
+    setMainOnly(!requested);
+  }, [requested?.id]);
   const [sensor, setSensor] = useState<SensorKey>("optinen");
-  const [mainOnly, setMainOnly] = useState(true);
   const [showSpine, setShowSpine] = useState(true);
   const [step, setStep] = useState(-100);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -55,7 +67,7 @@ function RadarPage() {
     setStep(Math.round(s0.acc));
   };
   const onSpinUp = () => { if (spin.current?.moved) suppressClick.current = true; spin.current = null; setTimeout(() => { suppressClick.current = false; }, 0); };
-  useEffect(() => { setStep(0); }, [focus]);
+  useEffect(() => { setStep(focus && search.ilmiö ? 30 : 0); }, [focus, search.ilmiö]);
   const pos = useMemo(() => radarLayout(data.nodes, data.edges, focus, step), [data, focus, step]);
   const hits = useMemo(() => sensorHits(sensor, data.nodes, data.edges), [sensor, data]);
   const byId = useMemo(() => new Map(data.nodes.map((n) => [n.id, n])), [data]);
@@ -67,9 +79,9 @@ function RadarPage() {
   const main = useMemo(() => new Set(data.nodes.filter((n) => n.id === focus || isMainline(pos.get(n.id)?.hop ?? null, n.importance)).map((n) => n.id)), [data, pos, focus]);
   const byHop = useMemo(() => {
     const m = new Map<number, string[]>();
-    pos.forEach((p, id) => { if (p.hop && p.hop > 0 && (!mainOnly || main.has(id))) m.set(Math.min(p.hop, RINGS), [...(m.get(Math.min(p.hop, RINGS)) ?? []), id]); });
+    pos.forEach((p, id) => { if (p.hop && p.hop > 0 && (!directOnly || p.hop === 1) && (!mainOnly || main.has(id))) m.set(Math.min(p.hop, RINGS), [...(m.get(Math.min(p.hop, RINGS)) ?? []), id]); });
     return m;
-  }, [pos, main, mainOnly]);
+  }, [pos, main, mainOnly, directOnly]);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -84,7 +96,7 @@ function RadarPage() {
           <Link to="/" className="underline-offset-4 hover:underline">← Kartta</Link>
           <Link to="/lampokartta" className="underline-offset-4 hover:underline">Lämpökartta →</Link>
           <Link to="/pallo" className="underline-offset-4 hover:underline">Pallo →</Link>
-          <Link to="/tahtikartta" className="underline-offset-4 hover:underline">Tähtikartta →</Link>
+          <Link search={{ kysymys: search.kysymys }} to="/tahtikartta" className="underline-offset-4 hover:underline">{search.kysymys ? "← Selitysradalle" : "Tähtikartta →"}</Link>
         </nav>
       </header>
 
@@ -97,6 +109,12 @@ function RadarPage() {
           </button>
         ))}
         <label className="flex items-center gap-1.5 text-sm"><input type="checkbox" checked={showSpine} onChange={(e) => setShowSpine(e.target.checked)} /> Tähtirata</label>
+        {focus && <button type="button" aria-pressed={directOnly} onClick={() => setDirectOnly((value) => !value)}
+          className="rounded-full border bg-card px-3 py-1 text-sm">{directOnly ? "Näytä myös välilliset" : "Näytä suorat yhteydet"}</button>}
+        {focus && search.ilmiö && <>
+          <button type="button" onClick={() => setStep(-20)} className="rounded-full border px-3 py-1 text-sm">Taustat · 20 v</button>
+          <button type="button" onClick={() => setStep(30)} className="rounded-full border px-3 py-1 text-sm">Seuraukset · 30 v</button>
+        </>}
         {focus && <label className="ml-auto flex items-center gap-1.5 text-sm"><input type="checkbox" checked={mainOnly} onChange={(e) => setMainOnly(e.target.checked)} /> Vain päälinja</label>}
         {focus && <button onClick={() => setFocus(null)} className="rounded-full border bg-card px-3 py-1 text-sm hover:bg-muted">Palaa nykyhetkeen</button>}
       </div>
@@ -143,7 +161,7 @@ function RadarPage() {
                 </g>
               );
             })()}
-            {showSpine && (() => {
+            {showSpine && !directOnly && (() => {
               const pts = spineOf(data.nodes).map((n) => pos.get(n.id)!).filter((p) => !focus || p.hop != null);
               return pts.length > 1 && <polyline points={pts.map((p) => `${p.x},${p.y}`).join(" ")} fill="none" stroke="var(--primary)" strokeOpacity={0.4} strokeWidth={2} strokeLinejoin="round" style={{ pointerEvents: "none" }} />;
             })()}
@@ -151,11 +169,13 @@ function RadarPage() {
             {focus && data.edges.map((e, i) => {
               const a = pos.get(e.from), b = pos.get(e.to);
               if (!a || !b || a.hop == null || b.hop == null || Math.abs(a.hop - b.hop) !== 1 || Math.max(a.hop, b.hop) > 2) return null;
+              if (directOnly && Math.max(a.hop, b.hop) > 1) return null;
               if (mainOnly && (!main.has(e.from) || !main.has(e.to))) return null;
               return <line key={i} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={`var(--lane-${LANES[b.lane]!.key})`} strokeOpacity={0.35} />;
             })}
             {data.nodes.map((n) => {
               const p = pos.get(n.id)!;
+              if (focus && directOnly && n.id !== focus && p.hop !== 1) return null;
               const detected = n.id === focus || hits.has(n.id) && (!focus || p.hop != null) && (!mainOnly || main.has(n.id));
               const rr = n.id === focus ? 9 : 2 + n.importance * 0.9;
               return (

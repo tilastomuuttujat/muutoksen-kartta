@@ -1,3 +1,4 @@
+import { READER_PATHS } from "@/lib/reader-paths";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -154,6 +155,17 @@ function SystemMap() {
         </nav>
       </header>
 
+      <section className="my-4" aria-labelledby="reader-paths">
+        <h2 id="reader-paths" className="mb-2 font-display text-xl">Tutki kysymystä</h2>
+        <div className="grid gap-2 sm:grid-cols-3">
+          {READER_PATHS.map((path) => (
+            <Link key={path.id} to="/tahtikartta" search={{ kysymys: path.id }}
+              className="rounded-md border bg-card px-3 py-2 font-medium underline-offset-4 hover:underline">
+              {path.title} <span aria-hidden="true">→</span>
+            </Link>
+          ))}
+        </div>
+      </section>
       <details className="mb-3 rounded-md border bg-card/50 px-3 py-2 text-sm">
       <summary className="cursor-pointer font-semibold">Näkymän asetukset <span className="font-normal text-muted-foreground">· kerrosmalli: {model.label}{hidden.size ? `, ${hidden.size} kerros piilossa` : ""}</span></summary>
       <section aria-label="Kerrosmalli" className="mt-2 flex flex-col gap-2 text-sm">

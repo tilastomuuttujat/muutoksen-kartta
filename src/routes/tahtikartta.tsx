@@ -1,3 +1,4 @@
+import { READER_PATHS } from "@/lib/reader-paths";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -7,6 +8,8 @@ import { slotOf } from "@/lib/radar";
 import { ERAS, eraOf, buildConstellations, clusterIndex, railOf, type Rail } from "@/lib/constellations";
 
 export const Route = createFileRoute("/tahtikartta")({
+  validateSearch: (search: Record<string, unknown>): { kysymys?: string } =>
+    typeof search.kysymys === "string" ? { kysymys: search.kysymys } : {},
   loader: ({ context }) => context.queryClient.ensureQueryData(murrosDataQuery()),
   head: () => ({
     meta: [
@@ -27,6 +30,7 @@ const short = (t: string, k = 30) => (t.length > k ? t.slice(0, k - 1) + "…" :
 
 function StarMapPage() {
   const { data } = useSuspenseQuery(murrosDataQuery());
+  const { kysymys } = Route.useSearch();
   const [rail, setRail] = useState<string | null>(null);
   const [cons, setCons] = useState<string | null>(null);
   const [q, setQ] = useState("");
@@ -61,6 +65,12 @@ function StarMapPage() {
   const selStops = new Set(sel?.stops ?? []), selMembers = new Set(sel?.members ?? []);
   const shown = cons ? rails.filter((r) => r.stops.includes(cons)) : rails;
   const consName = (id: string) => { const c = cById.get(id)!; return `${LANES[c.lane]!.label} · ${ERAS[c.era]!.label}`; };
+  const guide = READER_PATHS.find((item) => item.id === kysymys);
+  const guideNodes = guide?.stops.map((id) => byId.get(id)).filter((n) => n !== undefined) ?? [];
+  const guideEdges = guide?.stops.slice(1).map((id, i) =>
+    data.edges.find((edge) => edge.from === guide.stops[i] && edge.to === id && edge.rationale.trim())) ?? [];
+  const guided = Boolean(guide && guideNodes.length === guide.stops.length && guideEdges.every(Boolean));
+  const guideIds = new Set(guideNodes.map((n) => n.id));
   const pathOf = (r: Rail) => {
     const ps = r.stops.map((s) => center.get(s)!);
     let d = `M${ps[0]!.x},${ps[0]!.y}`;
@@ -95,22 +105,34 @@ function StarMapPage() {
           <svg viewBox={`0 0 ${SW} ${SH}`} className="block w-full select-none" role="img" aria-label="Tähtitaivas: tähtikuviot ja selitysradat">
             {ERAS.map((e, i) => <text key={e.key} x={CX0 + i * CW + CW / 2} y={SH - 8} textAnchor="middle" fontSize={12} fill="var(--background)" opacity={0.5}>{e.label} {e.from}–{e.key === 3 ? "" : e.to}</text>)}
             {LANES.map((l, i) => <text key={l.key} x={10} y={TOP + i * BH + BH / 2} fontSize={13} fontWeight={600} fill={`var(--lane-${l.key})`} opacity={0.8}>{l.label}</text>)}
-            {rails.map((r) => r.id !== rail && (
+            {rails.map((r) => !guided && r.id !== rail && (
               <path key={r.id} d={pathOf(r)} fill="none" stroke={color(r)} strokeOpacity={sel ? 0.06 : cons && !r.stops.includes(cons) ? 0.05 : 0.22} strokeWidth={1.5} style={{ cursor: "pointer" }} onClick={() => setRail(r.id)} />
             ))}
             {constellations.map((c) => {
-              const dim = (sel && !selStops.has(c.id)) || (cons && cons !== c.id && !sel);
+              const dim = guided ? !c.members.some((id) => guideIds.has(id)) : (sel && !selStops.has(c.id)) || (cons && cons !== c.id && !sel);
               return (
                 <g key={c.id} opacity={dim ? 0.3 : 1} style={{ cursor: "pointer" }} onClick={() => { setCons(cons === c.id ? null : c.id); setRail(null); }}>
                   {c.lines.map(([a, b], i) => { const p = pos.get(a)!, q2 = pos.get(b)!; return <line key={i} x1={p.x} y1={p.y} x2={q2.x} y2={q2.y} stroke={`var(--lane-${LANES[c.lane]!.key})`} strokeOpacity={0.45} strokeWidth={0.8} />; })}
-                  {c.members.map((m) => { const n = byId.get(m)!, p = pos.get(m)!, hot = selMembers.has(m); return (
+                  {c.members.map((m) => { const n = byId.get(m)!, p = pos.get(m)!, hot = guided ? guideIds.has(m) : selMembers.has(m); return (
                     <circle key={m} cx={p.x} cy={p.y} r={hot ? 5 : 1.2 + n.importance * 0.55} fill={hot ? "var(--background)" : `var(--lane-${LANES[c.lane]!.key})`} style={{ filter: hot || m === c.key ? `drop-shadow(0 0 4px var(--lane-${LANES[c.lane]!.key}))` : undefined }}><title>{`${n.title} (${n.year})`}</title></circle>
                   ); })}
                   <text x={center.get(c.id)!.x} y={TOP + c.lane * BH + 14} textAnchor="middle" fontSize={10.5} fill="var(--background)" opacity={0.75} stroke="var(--foreground)" strokeWidth={3} paintOrder="stroke">{short(byId.get(c.key)!.title, 26)}</text>
                 </g>
               );
             })}
-            {sel && (
+            {guided && <g pointerEvents="none">
+              <defs><marker id="guide-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+                <path d="M0,0 L7,3.5 L0,7 Z" fill="var(--lane-talous)" />
+              </marker></defs>
+              <polyline points={guideNodes.map((n) => { const p = pos.get(n.id)!; return `${p.x},${p.y}`; }).join(" ")}
+                fill="none" stroke="var(--lane-talous)" strokeWidth="3" markerMid="url(#guide-arrow)" markerEnd="url(#guide-arrow)" />
+              {guideNodes.map((n, i) => {
+                const p = pos.get(n.id)!;
+                return <text key={n.id} x={p.x} y={p.y - 9} textAnchor="middle" fill="var(--background)"
+                  fontSize={15} fontWeight={700} stroke="var(--foreground)" strokeWidth={4} paintOrder="stroke">{i + 1}</text>;
+              })}
+            </g>}
+            {!guided && sel && (
               <g style={{ pointerEvents: "none" }}>
                 <path d={pathOf(sel)} fill="none" stroke={color(sel)} strokeWidth={3} strokeLinecap="round" style={{ filter: `drop-shadow(0 0 6px ${color(sel)})` }} />
                 {sel.stops.map((s, i) => { const p = center.get(s)!; return <g key={s}><circle cx={p.x} cy={p.y} r={10} fill="none" stroke={color(sel)} strokeWidth={2} /><text x={p.x} y={p.y + 4} textAnchor="middle" fontSize={10} fontWeight={700} fill="var(--background)">{i + 1}</text></g>; })}
@@ -119,7 +141,27 @@ function StarMapPage() {
           </svg>
         </div>
         <aside className="space-y-4 rounded-xl border bg-card p-4 text-sm">
-          {sel ? (
+          {guided && guide ? (
+            <>
+              <Link to="/tahtikartta" search={{}} className="underline-offset-4 hover:underline">← Kaikki selitysradat</Link>
+              <h2 className="font-display text-xl">{guide.title}</h2>
+              <ol className="space-y-3">
+                {guideNodes.map((n, i) => (
+                  <li key={n.id}>
+                    <p className="font-semibold">{i + 1}. {n.title} <span className="font-normal text-muted-foreground">· {n.year}</span></p>
+                    <Link to="/tutka" search={{ ilmiö: n.id, kysymys: guide.id }} className="text-sm underline underline-offset-4">Tutki ilmiötä Tutkassa →</Link>
+                    {guideEdges[i] && <p className="mt-1 text-sm text-muted-foreground">↓ {guideEdges[i]?.rationale}</p>}
+                  </li>
+                ))}
+              </ol>
+              <div className="border-t pt-3">
+                <h3 className="font-semibold">Mitä muuttui?</h3>
+                <p>{guide.takeaway}</p>
+                <h3 className="mt-2 font-semibold">Mikä jää avoimeksi?</h3>
+                <p>{guide.openQuestion}</p>
+              </div>
+            </>
+          ) : sel ? (
             <>
               <button onClick={() => setRail(null)} className="text-muted-foreground underline-offset-4 hover:underline">← Kaikki selitysradat</button>
               <div>
@@ -128,16 +170,16 @@ function StarMapPage() {
               </div>
               <ol className="space-y-1">
                 {sel.stops.map((s, i) => (
-                  <li key={s}>
+                  <li key={`${s}-${i}`}>
                     <p><span className="font-semibold">{i + 1}.</span> {consName(s)}</p>
                     <p className="pl-4 text-xs text-muted-foreground">{sel.members.filter((m) => cl.get(m) === s).map((m) => byId.get(m)!.title).slice(0, 3).join(", ")}</p>
-                    {i < sel.links.length && <p className="pl-4 text-xs">↓ {sel.links[i] ? `${sel.links[i]} vaikutusta kuvioiden välillä` : "ei suoraa vaikutusta – yhteys teeman kautta"}</p>}
+                    {i < sel.links.length && <p className="pl-4 text-xs">↓ {sel.links[i] ? `${sel.links[i]} kirjattua yhteyttä kuvioiden välillä` : "teemallinen yhteys"}</p>}
                   </li>
                 ))}
               </ol>
               {sel.conclusion && (
                 <div className="rounded-lg border p-3">
-                  <h3 className="font-semibold">Päätelmä</h3>
+                  <h3 className="font-semibold">{sel.kind === "päätelmä" ? "Päätelmäehdotus · kytkentä tarkistamatta" : "Teeman yhteenveto"}</h3>
                   <p className="mt-1 text-muted-foreground">{sel.conclusion}</p>
                 </div>
               )}
