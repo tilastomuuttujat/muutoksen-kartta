@@ -81,17 +81,31 @@ function StarMapPage() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <header className="mb-4 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="font-display text-3xl sm:text-4xl">Tähtikartta</h1>
-          <p className="mt-1 max-w-2xl text-muted-foreground">Taivas koostuu tähtikuvioista: kukin on yhden elämänalueen ilmiöt yhdellä aikakaudella. Selitysradat kulkevat kuvioiden läpi ja kytkevät ne päätelmiksi. Radan varrella näet, montako vaikutusta kuvioiden välillä kulkee.</p>
-        </div>
-        <nav className="flex gap-4 text-sm text-muted-foreground">
-          <Link to="/" className="underline-offset-4 hover:underline">← Kartta</Link>
-          <Link to="/pallo" className="underline-offset-4 hover:underline">Pallo →</Link>
-          <Link to="/tutka" className="underline-offset-4 hover:underline">Tutka →</Link>
-        </nav>
-      </header>
+      {guided && guide ? (
+        <article className="mx-auto mb-8 max-w-2xl" aria-labelledby="reader-story">
+          <Link to="/" className="text-sm text-muted-foreground underline-offset-4 hover:underline">← Muutoksen kartta</Link>
+          <h1 id="reader-story" className="mb-5 mt-3 font-display text-3xl sm:text-4xl">{guide.title}</h1>
+          <div className="space-y-4 text-base leading-relaxed">
+            {guide.story.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+          </div>
+          <p className="mt-5 border-l-2 pl-4 text-sm leading-relaxed text-muted-foreground">
+            <strong className="font-semibold text-foreground">Mikä jää avoimeksi?</strong>{" "}{guide.openQuestion}
+          </p>
+        </article>
+      ) : (
+        <header className="mb-4 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h1 className="font-display text-3xl sm:text-4xl">Tähtikartta</h1>
+            <p className="mt-1 max-w-2xl text-muted-foreground">Taivas koostuu tähtikuvioista: kukin on yhden elämänalueen ilmiöt yhdellä aikakaudella. Selitysradat kulkevat kuvioiden läpi ja kytkevät ne päätelmiksi. Radan varrella näet, montako vaikutusta kuvioiden välillä kulkee.</p>
+          </div>
+          <nav className="flex gap-4 text-sm text-muted-foreground">
+            <Link to="/" className="underline-offset-4 hover:underline">← Kartta</Link>
+            <Link to="/pallo" className="underline-offset-4 hover:underline">Pallo →</Link>
+            <Link to="/tutka" className="underline-offset-4 hover:underline">Tutka →</Link>
+          </nav>
+        </header>
+      )}
+      {guided && <h2 className="mb-3 font-display text-xl">Tarina Tähtikartalla</h2>}
       <div className="mb-3 relative max-w-sm">
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Hae ilmiötä – näet sen tähtikuvion…" className="w-full rounded-full border bg-card px-4 py-1.5 text-sm" aria-label="Hae ilmiötä" />
         {hits.length > 0 && (
@@ -144,7 +158,7 @@ function StarMapPage() {
           {guided && guide ? (
             <>
               <Link to="/tahtikartta" search={{}} className="underline-offset-4 hover:underline">← Kaikki selitysradat</Link>
-              <h2 className="font-display text-xl">{guide.title}</h2>
+              <h3 className="font-display text-xl">Seuraa yhteyksiä</h3>
               <ol className="space-y-3">
                 {guideNodes.map((n, i) => (
                   <li key={n.id}>
@@ -154,12 +168,6 @@ function StarMapPage() {
                   </li>
                 ))}
               </ol>
-              <div className="border-t pt-3">
-                <h3 className="font-semibold">Mitä muuttui?</h3>
-                <p>{guide.takeaway}</p>
-                <h3 className="mt-2 font-semibold">Mikä jää avoimeksi?</h3>
-                <p>{guide.openQuestion}</p>
-              </div>
             </>
           ) : sel ? (
             <>

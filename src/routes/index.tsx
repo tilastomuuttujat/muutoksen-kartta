@@ -156,7 +156,7 @@ function SystemMap() {
       </header>
 
       <section className="my-4" aria-labelledby="reader-paths">
-        <h2 id="reader-paths" className="mb-2 font-display text-xl">Tutki kysymystä</h2>
+        <h2 id="reader-paths" className="mb-2 font-display text-xl">Lue tarina muutoksesta</h2>
         <div className="grid gap-2 sm:grid-cols-3">
           {READER_PATHS.map((path) => (
             <Link key={path.id} to="/tahtikartta" search={{ kysymys: path.id }}
