@@ -18,14 +18,17 @@ export type RadarPoint = { x: number; y: number; r: number; lane: number; hop: n
  * Rest state: center = present day, distance = how far back in time.
  * Scan state (focusId): center = scanned node, distance = causal hops (1..RINGS); unreachable → outer rim.
  */
-export function radarLayout(nodes: MapNode[], edges: MapEdge[], focusId?: string | null) {
+export function radarLayout(nodes: MapNode[], edges: MapEdge[], focusId?: string | null, step?: number) {
   const pos = new Map<string, RadarPoint>();
   const depths = focusId ? chainDepths(focusId, edges) : null;
+  const focusYear = nodes.find((n) => n.id === focusId)?.year ?? 0;
+  const timed = focusId && step != null ? timeDepths(focusId, nodes, edges, step < 0 ? "up" : "down") : null;
   for (const n of nodes) {
     const lane = laneOf(n.domains);
     let r: number, hop: number | null = null;
     if (depths) {
-      const d = Math.min(depths.up.get(n.id) ?? Infinity, depths.down.get(n.id) ?? Infinity);
+      let d = Math.min(depths.up.get(n.id) ?? Infinity, depths.down.get(n.id) ?? Infinity);
+      if (timed) { const t = timed.get(n.id); d = t === 0 ? 0 : t != null && Math.abs(n.year - focusYear) <= Math.abs(step!) ? t : Infinity; }
       if (d === 0) { pos.set(n.id, { x: 0, y: 0, r: 0, lane, hop: 0 }); continue; }
       if (Number.isFinite(d)) { hop = d; r = (Math.min(d, RINGS) - 0.5 + slotOf(n.id + "r") * 0.8 - 0.4) / RINGS * R * 0.88; }
       else r = R * (0.95 + slotOf(n.id + "r") * 0.05);
@@ -37,6 +40,31 @@ export function radarLayout(nodes: MapNode[], edges: MapEdge[], focusId?: string
   }
   return pos;
 }
+
+/**
+ * Time-directed hop distances: "up" = backgrounds (each step goes back or stays in time),
+ * "down" = consequences (each step goes forward or stays). Keeps past and future apart.
+ */
+export function timeDepths(id: string, nodes: MapNode[], edges: MapEdge[], dir: "up" | "down") {
+  const year = new Map(nodes.map((n) => [n.id, n.year]));
+  const d = new Map<string, number>([[id, 0]]);
+  const q = [id];
+  while (q.length) {
+    const cur = q.shift()!, cy = year.get(cur) ?? 0;
+    for (const e of edges) {
+      const next = dir === "down" ? (e.from === cur ? e.to : null) : e.to === cur ? e.from : null;
+      if (!next || d.has(next)) continue;
+      const ny = year.get(next) ?? 0;
+      if (dir === "down" ? ny < cy : ny > cy) continue;
+      d.set(next, d.get(cur)! + 1); q.push(next);
+    }
+  }
+  return d;
+}
+
+/** Playback steps in years relative to the scanned phenomenon: deepest backgrounds → focus → farthest consequences. */
+export const STEPS = [-100, -50, -20, -10, -5, 0, 5, 10, 20, 50, 100];
+export const nextStep = (s: number) => STEPS[(STEPS.indexOf(s) + 1) % STEPS.length]!;
 
 export const SENSORS = [
   { key: "optinen", label: "Optinen", hint: "kaikki ilmiöt" },
@@ -85,4 +113,14 @@ export function placeLabels(items: LabelIn[], charW = 5, h = 11, reserved: { x0:
     }
   }
   return out;
+}
+
+/** 360° time dial: −100 v at 12 o'clock, 0 v at 6 o'clock, +100 v back at 12, counter-clockwise (past on the left). Angle in radians (SVG, 0 = east). */
+export function stepToAngle(step: number): number {
+  return -Math.PI / 2 - ((step + 100) / 200) * Math.PI * 2;
+}
+export function angleToStep(angle: number): number {
+  let f = (-Math.PI / 2 - angle) / (Math.PI * 2);
+  f = ((f % 1) + 1) % 1;
+  return Math.round(f * 200 - 100);
 }
