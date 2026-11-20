@@ -3,7 +3,8 @@
 // so the map works without any live database connection (also on GitHub Pages).
 import { queryOptions } from "@tanstack/react-query";
 import raw from "@/data/murros-data.json";
-import type { MapNode, MapEdge } from "./system-map";
+import { isCausal, type MapNode, type MapEdge } from "./system-map";
+import { NODE_SERIES } from "./node-series";
 
 export type PathItem = {
   id: string; title: string; year_start: number; year_end: number; type: string; problem: string;
@@ -28,16 +29,21 @@ type RawEdge = {
   from: string; to: string; type: string; class: string | null;
   confidence: string | null; rationale: string | null; pressure: boolean; weight: number;
 };
+export type Series = { key: string; title: string; unit: string; source: string; values: [number, number][] };
 export type MurrosData = {
   nodes: MapNode[];
+  /** Every recorded relation (similarity, contrast, example, cause …). */
   edges: MapEdge[];
+  /** Only cause → effect relations that run forward in time: the ones a reader can follow as an explanation. */
+  causal: MapEdge[];
   conclusions: { id: string; title: string; claim: string; kind: string; status: string; limitations: string | null; series: string[] }[];
-  series: { key: string; title: string; unit: string; source: string; values: unknown }[];
+  /** Usable statistical series only: at least 5 observations that are not all the same value. */
+  series: Series[];
   nodeConclusions: Record<string, string[]>;
 };
 
 export function loadMurrosData(): MurrosData {
-  const d = raw as unknown as { nodes: RawNode[]; edges: RawEdge[]; conclusions: MurrosData["conclusions"]; series: MurrosData["series"] };
+  const d = raw as unknown as { nodes: RawNode[]; edges: RawEdge[]; conclusions: MurrosData["conclusions"]; series: { key: string; title: string; unit: string; source: string; values: unknown }[] };
   const nodes: MapNode[] = d.nodes.map((n) => ({
     id: n.id, title: n.title, year: n.year, type: n.type ?? "", domains: n.domains ?? [],
     importance: n.importance ?? 2, problem: n.problem ?? "", effect: n.long_effect ?? "", role: n.role ?? "",
@@ -45,10 +51,33 @@ export function loadMurrosData(): MurrosData {
   const ids = new Set(nodes.map((n) => n.id));
   const edges: MapEdge[] = d.edges
     .filter((e) => ids.has(e.from) && ids.has(e.to) && e.from !== e.to)
-    .map((e) => ({ from: e.from, to: e.to, type: e.type, rationale: e.rationale ?? "", pressure: !!e.pressure, cls: e.class ?? "" }));
+    .map((e) => ({ from: e.from, to: e.to, type: e.type, rationale: e.rationale ?? "", pressure: !!e.pressure, cls: e.class ?? "", confidence: e.confidence ?? "" }));
+  const yearOf = new Map(nodes.map((n) => [n.id, n.year]));
+  const causal = edges.filter((e) => isCausal(e, (id) => yearOf.get(id)));
   const nodeConclusions: Record<string, string[]> = {};
   for (const n of d.nodes) if (n.conclusion_ids?.length) nodeConclusions[n.id] = n.conclusion_ids.map(String);
-  return { nodes, edges, conclusions: (d.conclusions ?? []).map((c) => ({ ...c, id: String(c.id) })), series: d.series ?? [], nodeConclusions };
+  const series = (d.series ?? []).map((s) => ({ ...s, values: parseValues(s.values) })).filter(usableSeries);
+  return { nodes, edges, causal, conclusions: (d.conclusions ?? []).map((c) => ({ ...c, id: String(c.id) })), series, nodeConclusions };
+}
+
+function parseValues(v: unknown): [number, number][] {
+  const arr = typeof v === "string" ? (JSON.parse(v) as unknown) : v;
+  if (!Array.isArray(arr)) return [];
+  return arr
+    .filter((p): p is [number, number] => Array.isArray(p) && Number.isFinite(Number(p[0])) && p[1] != null && Number.isFinite(Number(p[1])))
+    .map((p) => [Number(p[0]), Number(p[1])] as [number, number])
+    .sort((a, b) => a[0] - b[0]);
+}
+
+/** A series is worth drawing only if it has at least 5 points and actually varies. */
+export function usableSeries(s: { values: [number, number][] }) {
+  return s.values.length >= 5 && new Set(s.values.map((p) => p[1])).size > 1;
+}
+
+/** Hand-picked statistics that measure a phenomenon (see node-series.ts). Text-matched links are never used. */
+export function seriesForNode(data: MurrosData, nodeId: string) {
+  const byKey = new Map(data.series.map((s) => [s.key, s]));
+  return (NODE_SERIES[nodeId] ?? []).map((k) => byKey.get(k)).filter((s): s is Series => s !== undefined);
 }
 
 export const murrosDataQuery = () =>

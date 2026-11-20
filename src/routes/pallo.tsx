@@ -57,8 +57,8 @@ function GlobePage() {
     if (g) target.current = { lat: g.lat, lon: g.lon };
   };
   const fn = focus ? byId.get(focus) : null;
-  const causes = focus ? data.edges.filter((e) => e.to === focus).map((e) => e.from) : [];
-  const effects = focus ? data.edges.filter((e) => e.from === focus).map((e) => e.to) : [];
+  const causes = focus ? data.causal.filter((e) => e.to === focus).map((e) => e.from) : [];
+  const effects = focus ? data.causal.filter((e) => e.from === focus).map((e) => e.to) : [];
   const linked = new Set([...causes, ...effects]);
   const dock = focus && showSpine ? dockOf(focus, constellationOf(focus, data.edges), data.nodes, spine) : null;
 
