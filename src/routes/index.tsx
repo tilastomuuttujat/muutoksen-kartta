@@ -2,8 +2,9 @@ import { READER_PATHS } from "@/lib/reader-paths";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { murrosDataQuery } from "@/lib/murros-data";
-import { LANES, LANE_H, TOP, W, xOf, chainOf, isPressure, layout, layout3d, LAYERS, ISO_W, ISO_H, isoPoint, LENSES, applyLens, LAYER_MODELS, layerModel, searchNodes, resolveStarts, edgeReason, pushTrail, chainDepths, waveDelay, chainWeight, shouldLabel, laneOf, type MapEdge } from "@/lib/system-map";
+import { murrosDataQuery, seriesForNode } from "@/lib/murros-data";
+import { SeriesChart } from "@/components/SeriesChart";
+import { LANES, LANE_H, TOP, W, xOf, chainOf, isPressure, layout, layout3d, LAYERS, ISO_W, ISO_H, isoPoint, LENSES, applyLens, LAYER_MODELS, layerModel, searchNodes, resolveStarts, pushTrail, waveDelay, isWeak, CONFIDENCE_LABEL, chainWeight, shouldLabel, laneOf, type MapEdge } from "@/lib/system-map";
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(murrosDataQuery()),
@@ -63,14 +64,14 @@ function SystemMap() {
   }, []);
   const [mode, setMode] = useState<"3d" | "2d">("3d");
   const [lensKey, setLensKey] = useState<string | null>(null);
-  const lens = useMemo(() => (lensKey ? applyLens(lensKey, data.nodes, data.edges) : null), [lensKey, data.nodes, data.edges]);
+  const lens = useMemo(() => (lensKey ? applyLens(lensKey, data.nodes, data.causal) : null), [lensKey, data.nodes, data.causal]);
   const is3d = mode === "3d";
   const [modelKey, setModelKey] = useState("tahti");
   const [hidden, setHidden] = useState<Set<number>>(new Set());
   const model = layerModel(modelKey);
   const layerIdx = useMemo(() => new Map(data.nodes.map((n) => [n.id, model.of(n)])), [data.nodes, model]);
   const shown = (id: string) => !hidden.has(layerIdx.get(id) ?? 0);
-  const toggleLayer = (i: number) => setHidden((h) => { const n = new Set(h); n.has(i) ? n.delete(i) : n.add(i); return n.size >= 3 ? h : n; });
+  const toggleLayer = (i: number) => setHidden((h) => { const n = new Set(h); if (n.has(i)) n.delete(i); else n.add(i); return n.size >= 3 ? h : n; });
   const pos = useMemo(() => (is3d ? layout3d(data.nodes, modelKey) : layout(data.nodes)), [data.nodes, is3d, modelKey]);
   const VW = is3d ? ISO_W : W, VH = is3d ? ISO_H : H;
   VWref.current = VW;
@@ -97,8 +98,12 @@ function SystemMap() {
   const zoomBtn = (f: number) => zoomAt(VW / 2, VH / 2, view.k * f);
   const byId = useMemo(() => new Map(data.nodes.map((n) => [n.id, n])), [data.nodes]);
   const byIdRef = useRef(byId); byIdRef.current = byId;
-  const chain = useMemo(() => (sel ? chainOf(sel, data.edges) : null), [sel, data.edges]);
-  const depths = useMemo(() => (sel ? chainDepths(sel, data.edges) : null), [sel, data.edges]);
+  // Reading depth: 1 = direct causes and effects only. Deeper steps are opt-in, so the chain stays readable.
+  const [depth, setDepth] = useState(1);
+  const chain = useMemo(() => (sel ? chainOf(sel, data.causal, depth) : null), [sel, data.causal, depth]);
+  const depths = chain?.depths ?? null;
+  const directEdge = (a: string, b: string) => data.causal.find((x) => (x.from === a && x.to === b) || (x.from === b && x.to === a));
+  const stats = useMemo(() => (sel ? seriesForNode(data, sel) : []), [data, sel]);
   const [replay, setReplay] = useState(0);
   const dl = (id: string) => (depths ? waveDelay(id, depths) : 0);
   const wt = (id: string) => (depths ? chainWeight(id, depths, byIdRef.current.get(id)?.importance ?? 2) : 1);
@@ -121,7 +126,7 @@ function SystemMap() {
         <div>
           <h1 className="font-display text-3xl sm:text-4xl">Suomen muutoksen kartta</h1>
           <p className="mt-1 text-muted-foreground">
-            {data.nodes.length} ilmiötä, {data.edges.length} kytköstä. Napauta mitä tahansa pistettä.
+            {data.nodes.length} ilmiötä ja {data.causal.length} syy-seuraussuhdetta. Napauta ilmiötä nähdäksesi, mistä se johtui ja mihin se johti.
           </p>
         </div>
         <div className="relative w-full sm:w-72">
@@ -146,12 +151,17 @@ function SystemMap() {
               </button>
             ))}
           </div>
-          <Link to="/tutka" className="underline-offset-4 hover:underline">Tutka →</Link>
-          <Link to="/pallo" className="underline-offset-4 hover:underline">Pallo →</Link>
-          <Link to="/tahtikartta" className="underline-offset-4 hover:underline">Tähtikartta →</Link>
-          <Link to="/lampokartta" className="underline-offset-4 hover:underline">Lämpökartta →</Link>
-          <Link to="/teemat" className="underline-offset-4 hover:underline">Teemat →</Link>
-          <Link to="/polku" className="underline-offset-4 hover:underline">Aikajana →</Link>
+          <Link to="/polku" className="font-medium underline-offset-4 hover:underline">Aikajana →</Link>
+          <Link to="/teemat" className="font-medium underline-offset-4 hover:underline">Teemat →</Link>
+          <Link to="/lampokartta" className="font-medium underline-offset-4 hover:underline">Aineisto vuosikymmenittäin →</Link>
+          <details className="relative">
+            <summary className="cursor-pointer text-muted-foreground">Kokeelliset näkymät</summary>
+            <div className="absolute right-0 z-20 mt-1 flex w-56 flex-col gap-1 rounded-md border bg-popover p-2 shadow-lg">
+              <Link to="/tutka" className="underline-offset-4 hover:underline">Tutka</Link>
+              <Link to="/pallo" className="underline-offset-4 hover:underline">Pallo</Link>
+              <Link to="/tahtikartta" className="underline-offset-4 hover:underline">Tähtikartta</Link>
+            </div>
+          </details>
         </nav>
       </header>
 
@@ -230,6 +240,7 @@ function SystemMap() {
           <span className="flex items-center gap-1.5"><i className="h-3 w-3 rounded-full bg-tension" />Seuraukset – mihin se johti</span>
         </>)}
         <span className="flex items-center gap-1.5"><i className="h-0.5 w-5 border-t-2 border-dashed border-tension" />Paine</span>
+        <span className="flex items-center gap-1.5"><i className="h-0.5 w-5 border-t-2 border-dotted border-foreground" />Heikko yhteys</span>
       </div>
 
       <div id="kartta" className="relative scroll-mt-2 overflow-x-auto rounded-lg border bg-card">
@@ -265,7 +276,7 @@ function SystemMap() {
             </g>
           ))}
           <g fill="none">
-            {data.edges.map((e, i) => {
+            {data.causal.map((e, i) => {
               const a = pos.get(e.from), b = pos.get(e.to);
               if (!a || !b || !shown(e.from) || !shown(e.to)) return null;
               const on = chain?.edges.has(e);
@@ -274,7 +285,7 @@ function SystemMap() {
               const anim = on ? { animation: `wave-in 600ms ease-out ${Math.max(dl(e.from), dl(e.to)) - 200}ms both`, opacity: 0.15 + ew * 0.8 } : {};
               return (
                 <path key={on ? `${i}-${sel}-${replay}` : i} d={is3d ? curve3d(a, b) : curve(a, b)} className={`transition-opacity duration-500 ${edgeClass(e)}`}
-                  strokeWidth={on ? 0.6 + ew * 2.2 : lens?.edges.has(e) && !chain ? 1.4 : 1} strokeDasharray={p ? "4 4" : undefined}
+                  strokeWidth={on ? 0.6 + ew * 2.2 : lens?.edges.has(e) && !chain ? 1.4 : 1} strokeDasharray={p ? "4 4" : isWeak(e) ? "1 3" : undefined}
                   style={{ stroke: on ? laneColor(chain!.up.has(e.to) || e.to === sel ? e.from : e.to) : p ? "var(--tension)" : "var(--foreground)", ...anim }} />
               );
             })}
@@ -323,38 +334,75 @@ function SystemMap() {
 
       {node && chain ? (
         <section className="mt-5 grid gap-5 md:grid-cols-[1fr_1.4fr_1fr]">
-          <ChainList title="Mistä se kumpusi" items={list(chain.up)} tone="calm" onPick={pick} reason={(id) => edgeReason(id, sel!, data.edges)} />
+          <ChainList title="Mistä se johtui" items={list(chain.up)} tone="calm" onPick={pick} step={(id) => depths?.up.get(id) ?? 1} link={(id) => directEdge(id, sel!)} />
           <div className="rounded-lg border-2 border-primary bg-card p-4">
             <p className="text-xs uppercase tracking-wider text-muted-foreground">{node.type} · {node.year}</p>
             <h2 className="font-display text-2xl">{node.title}</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Ketjussa {chain.nodes.size} / {data.nodes.length} ilmiötä ({Math.round((chain.nodes.size / data.nodes.length) * 100)} % kartasta)
-            </p>
-            {node.effect && <p className="mt-3 text-sm">{node.effect}</p>}
+            {node.problem && <p className="mt-3 text-sm"><b>Ongelma:</b> {node.problem}</p>}
+            {node.effect && <p className="mt-2 text-sm"><b>Pitkä vaikutus:</b> {node.effect}</p>}
+            <div role="radiogroup" aria-label="Kuinka kauas ketjua seurataan" className="mt-3 flex flex-wrap items-center gap-1.5 text-sm">
+              <span className="text-muted-foreground">Näytä:</span>
+              {[1, 2, 3].map((d) => (
+                <button key={d} role="radio" aria-checked={depth === d} onClick={() => setDepth(d)}
+                  className={`rounded-md border px-2.5 py-1 ${depth === d ? "border-primary bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"}`}>
+                  {d === 1 ? "Suorat" : `${d} askelta`}
+                </button>
+              ))}
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">Mitä kauempana ketjussa, sitä enemmän väliin mahtuu muitakin syitä.</p>
             <div className="mt-3 flex flex-wrap gap-4 text-sm">
               <button className="underline-offset-4 hover:underline" onClick={() => setReplay((x) => x + 1)}>▶ Toista vaikutusaalto</button>
               <button className="underline-offset-4 hover:underline" onClick={() => setSel(null)}>Näytä koko kartta</button>
             </div>
           </div>
-          <ChainList title="Mihin se johti" items={list(chain.down)} tone="tension" onPick={pick} reason={(id) => edgeReason(id, sel!, data.edges)} />
+          <ChainList title="Mihin se johti" items={list(chain.down)} tone="tension" onPick={pick} step={(id) => depths?.down.get(id) ?? 1} link={(id) => directEdge(sel!, id)} />
         </section>
-      ) : (
+      ) : null}
+      {node && chain && (
+        <section className="mt-5 rounded-lg border bg-card p-4" aria-labelledby="tilastot">
+          <h3 id="tilastot" className="font-display text-lg">Mitä tilastot näyttävät?</h3>
+          {stats.length ? (
+            <>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Tilasto mittaa ilmiötä itseään. Se näyttää, mitä tapahtui, mutta ei yksin todista, mikä sen aiheutti.
+              </p>
+              <div className="mt-3 grid gap-3 md:grid-cols-2">
+                {stats.map((series) => (
+                  <SeriesChart key={series.key} series={series} markYear={node.year} markLabel={String(node.year)} />
+                ))}
+              </div>
+            </>
+          ) : (
+            <p className="mt-1 text-sm text-muted-foreground">Tähän ilmiöön ei ole vielä liitetty sitä mittaavaa tilastoa. Syyt ja seuraukset perustuvat yllä näkyviin kirjallisiin perusteluihin.</p>
+          )}
+        </section>
+      )}
+      {!(node && chain) && (
         <p className="mt-4 text-center text-muted-foreground">Napauta pistettä nähdäksesi sen vaikutusketjun. Muu kartta jää taustalle näyttämään, mihin kohtaan kokonaisuutta ketju asettuu.</p>
       )}
     </main>
   );
 }
 
-function ChainList({ title, items, tone, onPick, reason }: { title: string; items: { id: string; title: string; year: number }[]; tone: "calm" | "tension"; onPick: (id: string) => void; reason: (id: string) => string }) {
+function ChainList({ title, items, tone, onPick, step, link }: { title: string; items: { id: string; title: string; year: number }[]; tone: "calm" | "tension"; onPick: (id: string) => void; step: (id: string) => number; link: (id: string) => MapEdge | undefined }) {
+  const sorted = [...items].sort((a, b) => step(a.id) - step(b.id) || a.year - b.year);
   return (
     <div>
       <h3 className={`mb-2 text-sm font-semibold uppercase tracking-wider ${tone === "calm" ? "text-calm" : "text-tension"}`}>{title} ({items.length})</h3>
-      {items.length === 0 ? <p className="text-sm text-muted-foreground">Ei kirjattuja kytköksiä.</p> : (
-        <ul className="max-h-72 space-y-1 overflow-y-auto pr-1 text-sm">
-          {items.map((i) => (
-            <li key={i.id}><button className="text-left hover:underline" onClick={() => onPick(i.id)}><span className="tabular-nums text-muted-foreground">{i.year}</span> {i.title}</button>
-              {reason(i.id) && <p className="ml-10 text-xs italic text-muted-foreground">{reason(i.id)}</p>}</li>
-          ))}
+      {items.length === 0 ? <p className="text-sm text-muted-foreground">Aineistossa ei ole kirjattua syy-seuraussuhdetta.</p> : (
+        <ul className="max-h-96 space-y-2 overflow-y-auto pr-1 text-sm">
+          {sorted.map((i) => {
+            const n = step(i.id), e = n === 1 ? link(i.id) : undefined;
+            return (
+              <li key={i.id}>
+                <button className="text-left hover:underline" onClick={() => onPick(i.id)}><span className="tabular-nums text-muted-foreground">{i.year}</span> {i.title}</button>
+                <p className="ml-10 text-xs text-muted-foreground">
+                  {n === 1 ? (e?.confidence ? CONFIDENCE_LABEL[e.confidence] ?? e.confidence : "suora yhteys") : `välillinen · ${n} askelta`}
+                  {e?.rationale && <span className="italic"> – {e.rationale}</span>}
+                </p>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

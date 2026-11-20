@@ -9,7 +9,7 @@ import { ERAS, eraOf, buildConstellations, clusterIndex, railOf, type Rail } fro
 
 export const Route = createFileRoute("/tahtikartta")({
   validateSearch: (search: Record<string, unknown>): { kysymys?: string } =>
-    typeof search.kysymys === "string" ? { kysymys: search.kysymys } : {},
+    typeof search["kysymys"] === "string" ? { kysymys: search["kysymys"] } : {},
   loader: ({ context }) => context.queryClient.ensureQueryData(murrosDataQuery()),
   head: () => ({
     meta: [

@@ -11,10 +11,12 @@ const ZONE_LONG = ["Välittömät vaikutukset", "Kerrannaisvaikutukset", "Ulkois
 import { radarLayout, isMainline, placeLabels, sensorHits, SENSORS, R, stepToAngle, RINGS, NOW, OLDEST, type SensorKey } from "@/lib/radar";
 
 export const Route = createFileRoute("/tutka")({
-  validateSearch: (search: Record<string, unknown>): { ilmiö?: string; kysymys?: string } => ({
-    ilmiö: typeof search.ilmiö === "string" ? search.ilmiö : undefined,
-    kysymys: typeof search.kysymys === "string" ? search.kysymys : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { ilmiö?: string; kysymys?: string } => {
+    const out: { ilmiö?: string; kysymys?: string } = {};
+    if (typeof search["ilmiö"] === "string") out.ilmiö = search["ilmiö"];
+    if (typeof search["kysymys"] === "string") out.kysymys = search["kysymys"];
+    return out;
+  },
   loader: ({ context }) => context.queryClient.ensureQueryData(murrosDataQuery()),
   head: () => ({
     meta: [
@@ -42,7 +44,7 @@ function RadarPage() {
     setFocus(requested?.id ?? null);
     setDirectOnly(Boolean(requested));
     setMainOnly(!requested);
-  }, [requested?.id]);
+  }, [requested]);
   const [sensor, setSensor] = useState<SensorKey>("optinen");
   const [showSpine, setShowSpine] = useState(true);
   const [step, setStep] = useState(-100);
@@ -68,8 +70,8 @@ function RadarPage() {
   };
   const onSpinUp = () => { if (spin.current?.moved) suppressClick.current = true; spin.current = null; setTimeout(() => { suppressClick.current = false; }, 0); };
   useEffect(() => { setStep(focus && search.ilmiö ? 30 : 0); }, [focus, search.ilmiö]);
-  const pos = useMemo(() => radarLayout(data.nodes, data.edges, focus, step), [data, focus, step]);
-  const hits = useMemo(() => sensorHits(sensor, data.nodes, data.edges), [sensor, data]);
+  const pos = useMemo(() => radarLayout(data.nodes, data.causal, focus, step), [data, focus, step]);
+  const hits = useMemo(() => sensorHits(sensor, data.nodes, data.causal), [sensor, data]);
   const byId = useMemo(() => new Map(data.nodes.map((n) => [n.id, n])), [data]);
   const fn = focus ? byId.get(focus) : null;
   const fy = fn?.year ?? 0;
@@ -96,7 +98,7 @@ function RadarPage() {
           <Link to="/" className="underline-offset-4 hover:underline">← Kartta</Link>
           <Link to="/lampokartta" className="underline-offset-4 hover:underline">Lämpökartta →</Link>
           <Link to="/pallo" className="underline-offset-4 hover:underline">Pallo →</Link>
-          <Link search={{ kysymys: search.kysymys }} to="/tahtikartta" className="underline-offset-4 hover:underline">{search.kysymys ? "← Selitysradalle" : "Tähtikartta →"}</Link>
+          <Link search={search.kysymys ? { kysymys: search.kysymys } : {}} to="/tahtikartta" className="underline-offset-4 hover:underline">{search.kysymys ? "← Selitysradalle" : "Tähtikartta →"}</Link>
         </nav>
       </header>
 
@@ -166,7 +168,7 @@ function RadarPage() {
               return pts.length > 1 && <polyline points={pts.map((p) => `${p.x},${p.y}`).join(" ")} fill="none" stroke="var(--primary)" strokeOpacity={0.4} strokeWidth={2} strokeLinejoin="round" style={{ pointerEvents: "none" }} />;
             })()}
             {focus && <circle key={focus} r={R} fill="none" stroke="var(--primary)" strokeWidth={2} className="radar-ping" />}
-            {focus && data.edges.map((e, i) => {
+            {focus && data.causal.map((e, i) => {
               const a = pos.get(e.from), b = pos.get(e.to);
               if (!a || !b || a.hop == null || b.hop == null || Math.abs(a.hop - b.hop) !== 1 || Math.max(a.hop, b.hop) > 2) return null;
               if (directOnly && Math.max(a.hop, b.hop) > 1) return null;

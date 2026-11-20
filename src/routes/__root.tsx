@@ -107,8 +107,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  // The static GitHub Pages build mounts the app inside <div id="root"> of index.html (src/pages.tsx).
+  // Rendering <html>/<body> there puts React's singletons outside its root container, and React's
+  // event dispatch then loops forever on input events (typing in a search box froze the page).
+  // React 19 hoists the <title>/<meta>/<link> tags from HeadContent into <head> on its own.
+  if (import.meta.env.MODE === "pages") {
+    return (
+      <>
+        <HeadContent />
+        {children}
+      </>
+    );
+  }
   return (
-    <html lang="en">
+    <html lang="fi">
       <head>
         <HeadContent />
       </head>

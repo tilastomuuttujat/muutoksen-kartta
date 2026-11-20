@@ -1,6 +1,25 @@
 // Pure layout + chain logic for the system map (browser-safe, testable).
 export type MapNode = { id: string; title: string; year: number; type: string; domains: string[]; importance: number; problem: string; effect: string; role?: string };
-export type MapEdge = { from: string; to: string; type: string; rationale: string; pressure: boolean; cls?: string };
+export type MapEdge = { from: string; to: string; type: string; rationale: string; pressure: boolean; cls?: string; confidence?: string };
+
+// ---- Causal reading: only relations that say "A led to B", pointing forward in time ----
+/** Relation types that describe similarity, contrast, an example or a part-whole link — not cause and effect. */
+export const NON_CAUSAL_TYPES = new Set([
+  "complemented", "complemented_by", "contrasts", "exemplified_by", "coincided_with", "coexisted_with",
+  "same_process_as", "integrates", "integrated_into", "integrated_with", "foreshadowed", "broader_context_for",
+]);
+/** A causal edge has a cause-type relation and its cause does not start after its effect. */
+export function isCausal(e: Pick<MapEdge, "from" | "to" | "type">, yearOf: (id: string) => number | undefined) {
+  if (NON_CAUSAL_TYPES.has(e.type)) return false;
+  const a = yearOf(e.from), b = yearOf(e.to);
+  return a == null || b == null || a <= b;
+}
+export function causalEdges<E extends MapEdge>(nodes: Pick<MapNode, "id" | "year">[], edges: E[]): E[] {
+  const year = new Map(nodes.map((n) => [n.id, n.year]));
+  return edges.filter((e) => isCausal(e, (id) => year.get(id)));
+}
+export const CONFIDENCE_LABEL: Record<string, string> = { vahva: "vahva yhteys", kohtalainen: "kohtalainen yhteys", heikko: "heikko yhteys" };
+export const isWeak = (e: Pick<MapEdge, "confidence">) => e.confidence === "heikko";
 
 export const LANES = [
   { key: "talous", label: "Talous ja tuotanto", words: ["talous", "teollisuus", "energia", "maatalous", "metsätalous", "rahoitus", "rahapolitiikka", "euro", "EU", "liikenne", "teknologia", "digitalisaatio", "tekoäly", "julkinen talous"] },
@@ -42,24 +61,15 @@ export function layout(nodes: MapNode[]) {
 }
 
 /** Everything reachable upstream (causes) and downstream (effects) of `id`. */
-export function chainOf(id: string, edges: MapEdge[]) {
-  const walk = (dir: "up" | "down") => {
-    const seen = new Set<string>([id]);
-    const q = [id];
-    while (q.length) {
-      const cur = q.shift()!;
-      for (const e of edges) {
-        const next = dir === "down" ? (e.from === cur ? e.to : null) : e.to === cur ? e.from : null;
-        if (next && !seen.has(next)) { seen.add(next); q.push(next); }
-      }
-    }
-    seen.delete(id);
-    return seen;
-  };
-  const up = walk("up"), down = walk("down");
+/** Causes (up) and effects (down) of `id`, at most `maxDepth` steps away. Only edges that advance one step are kept. */
+export function chainOf(id: string, edges: MapEdge[], maxDepth = Infinity) {
+  const depths = chainDepths(id, edges, maxDepth);
+  const up = new Set(depths.up.keys()), down = new Set(depths.down.keys());
+  up.delete(id); down.delete(id);
   const nodes = new Set<string>([id, ...up, ...down]);
-  const onChain = (e: MapEdge) => (e.to === id || up.has(e.to)) && (e.from === id || up.has(e.from)) || (e.from === id || down.has(e.from)) && (e.to === id || down.has(e.to));
-  return { up, down, nodes, edges: new Set(edges.filter(onChain)) };
+  const step = (d: Map<string, number>, a: string, b: string) => d.has(a) && d.has(b) && d.get(b)! === d.get(a)! + 1;
+  const onChain = (e: MapEdge) => step(depths.up, e.to, e.from) || step(depths.down, e.from, e.to);
+  return { up, down, nodes, edges: new Set(edges.filter(onChain)), depths };
 }
 
 // ---- 2.5D layered view: fast surface events above, slow deep structures below ----
@@ -182,12 +192,13 @@ export function pushTrail(trail: string[], id: string): string[] {
 }
 
 // ---- Impulse wave: hop distance from the focused node, used to stagger the chain lighting up ----
-export function chainDepths(id: string, edges: MapEdge[]) {
+export function chainDepths(id: string, edges: MapEdge[], maxDepth = Infinity) {
   const walk = (dir: "up" | "down") => {
     const d = new Map<string, number>([[id, 0]]);
     const q = [id];
     while (q.length) {
       const cur = q.shift()!;
+      if (d.get(cur)! >= maxDepth) continue;
       for (const e of edges) {
         const next = dir === "down" ? (e.from === cur ? e.to : null) : e.to === cur ? e.from : null;
         if (next && !d.has(next)) { d.set(next, d.get(cur)! + 1); q.push(next); }

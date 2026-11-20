@@ -113,3 +113,42 @@ describe("shouldLabel", () => {
   it("small chain labels every member, even distant low-importance ones", () => { expect(sl("d", dp, 1, 3)).toBe(true); });
   it("large chain keeps direct neighbours but drops distant minor ones", () => { expect(sl("b", dp, 1, 40)).toBe(true); expect(sl("d", dp, 1, 40)).toBe(false); });
 });
+
+import { causalEdges, isCausal } from "./system-map";
+describe("causal reading", () => {
+  const year: Record<string, number> = { a: 1900, b: 1950, c: 2000 };
+  it("drops similarity/contrast relations and links that run backwards in time", () => {
+    expect(isCausal(e("a", "b"), (id) => year[id])).toBe(true);
+    expect(isCausal(e("a", "b", "complemented"), (id) => year[id])).toBe(false);
+    expect(isCausal(e("a", "b", "contrasts"), (id) => year[id])).toBe(false);
+    expect(isCausal(e("c", "a"), (id) => year[id])).toBe(false);
+  });
+  it("filters a whole edge list", () => {
+    const nodes = Object.entries(year).map(([id, y]) => ({ id, year: y }));
+    expect(causalEdges(nodes, [e("a", "b"), e("b", "a"), e("a", "c", "exemplified_by")])).toHaveLength(1);
+  });
+  it("limits the chain to the requested number of steps", () => {
+    const edges = [e("a", "b"), e("b", "c"), e("c", "d")];
+    expect([...chainOf("a", edges, 1).down]).toEqual(["b"]);
+    expect([...chainOf("a", edges, 2).down].sort()).toEqual(["b", "c"]);
+    expect(chainOf("a", edges, 1).edges.size).toBe(1);
+  });
+});
+
+import { NODE_SERIES } from "./node-series";
+import { loadMurrosData, seriesForNode } from "./murros-data";
+describe("hand-picked statistics", () => {
+  const data = loadMurrosData();
+  it("only references phenomena and usable series that exist", () => {
+    const nodes = new Set(data.nodes.map((n) => n.id));
+    const series = new Set(data.series.map((s) => s.key));
+    for (const [node, keys] of Object.entries(NODE_SERIES)) {
+      expect(nodes.has(node), node).toBe(true);
+      for (const k of keys) expect(series.has(k), k).toBe(true);
+    }
+  });
+  it("never falls back to text-matched links", () => {
+    expect(seriesForNode(data, "kaupungistuminen")).toEqual([]);
+    expect(seriesForNode(data, "1990-luvun-lama").length).toBe(2);
+  });
+});
