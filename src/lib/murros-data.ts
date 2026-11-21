@@ -45,7 +45,7 @@ export type MurrosData = {
 export function loadMurrosData(): MurrosData {
   const d = raw as unknown as { nodes: RawNode[]; edges: RawEdge[]; conclusions: MurrosData["conclusions"]; series: { key: string; title: string; unit: string; source: string; values: unknown }[] };
   const nodes: MapNode[] = d.nodes.map((n) => ({
-    id: n.id, title: n.title, year: n.year, type: n.type ?? "", domains: n.domains ?? [],
+    id: n.id, title: n.title, year: n.year, ...(n.year_end != null ? { yearEnd: n.year_end } : {}), type: n.type ?? "", domains: n.domains ?? [],
     importance: n.importance ?? 2, problem: n.problem ?? "", effect: n.long_effect ?? "", role: n.role ?? "",
   }));
   const ids = new Set(nodes.map((n) => n.id));
