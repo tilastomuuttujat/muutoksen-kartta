@@ -1,5 +1,5 @@
 // Pure layout + chain logic for the system map (browser-safe, testable).
-export type MapNode = { id: string; title: string; year: number; type: string; domains: string[]; importance: number; problem: string; effect: string; role?: string };
+export type MapNode = { id: string; title: string; year: number; yearEnd?: number; type: string; domains: string[]; importance: number; problem: string; effect: string; role?: string };
 export type MapEdge = { from: string; to: string; type: string; rationale: string; pressure: boolean; cls?: string; confidence?: string };
 
 // ---- Causal reading: only relations that say "A led to B", pointing forward in time ----
