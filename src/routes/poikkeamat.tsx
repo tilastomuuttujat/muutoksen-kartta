@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
+import { monotonePath, runs } from "@/lib/curve";
 import { indicatorsQuery, type IndicatorRow } from "@/lib/indicators-data";
 import { murrosDataQuery } from "@/lib/murros-data";
 import {
@@ -433,6 +434,7 @@ function Chart({
   ep: Episode | null;
   onPick: (start: number) => void;
 }) {
+  const id = useId().replace(/[^a-zA-Z0-9]/g, "");
   const w = 720,
     h = 200,
     l = 48,
@@ -440,18 +442,27 @@ function Chart({
     t = 10,
     b = 22;
   const pts = r.pts;
-  const bars = r.ind.transform !== "level";
+  const change = r.ind.transform !== "level";
   const x0 = pts[0]!.year,
     x1 = pts.at(-1)!.year;
   const vals = pts.map((p) => p.value);
-  const lo = Math.min(bars ? 0 : Infinity, ...vals, r.range.low ?? Infinity),
-    hi = Math.max(bars ? 0 : -Infinity, ...vals, r.range.high ?? -Infinity);
+  const lo = Math.min(change ? 0 : Infinity, ...vals, r.range.low ?? Infinity),
+    hi = Math.max(change ? 0 : -Infinity, ...vals, r.range.high ?? -Infinity);
   const x = (y: number) => l + ((y - x0) / Math.max(1, x1 - x0)) * (w - l - rr);
   const y = (v: number) => t + (1 - (v - lo) / Math.max(1e-9, hi - lo)) * (h - t - b);
-  const bw = Math.max(1, ((w - l - rr) / Math.max(1, x1 - x0)) * 0.7);
-  const bandTop = y(r.range.high ?? hi),
-    bandBot = y(r.range.low ?? lo);
+  const step = (w - l - rr) / Math.max(1, x1 - x0);
+  // Band edges in screen space; an open-ended range (e.g. "at most 60 %") extends to the chart edge.
+  const bandTop = r.range.high != null ? y(r.range.high) : t,
+    bandBot = r.range.low != null ? y(r.range.low) : h - b;
   const epOf = new Map(r.episodes.flatMap((e) => e.years.map((yy) => [yy, e] as const)));
+  const segs = runs(pts).map((run) => run.map((p) => ({ x: x(p.year), y: y(p.value) })));
+  const curve = segs.map(monotonePath).join(" ");
+  // Area between the curve and a band edge: clipped to the outside of the band it shows how far the value went.
+  const areaTo = (edge: number) =>
+    segs
+      .filter((s) => s.length > 1)
+      .map((s) => `${monotonePath(s)} L${s.at(-1)!.x},${edge} L${s[0]!.x},${edge} Z`)
+      .join(" ");
   const decade = Math.ceil(x0 / 20) * 20;
   const ticks = Array.from(
     { length: Math.floor((x1 - decade) / 20) + 1 },
@@ -464,6 +475,17 @@ function Chart({
       role="img"
       aria-label={`${r.ind.name} ${x0}–${x1}, ${r.episodes.length} poikkeamajaksoa`}
     >
+      <defs>
+        <clipPath id={`in-${id}`}>
+          <rect x={0} width={w} y={bandTop} height={Math.max(0, bandBot - bandTop)} />
+        </clipPath>
+        <clipPath id={`above-${id}`}>
+          <rect x={0} width={w} y={0} height={Math.max(0, bandTop)} />
+        </clipPath>
+        <clipPath id={`below-${id}`}>
+          <rect x={0} width={w} y={bandBot} height={Math.max(0, h - bandBot)} />
+        </clipPath>
+      </defs>
       <rect
         x={l}
         width={w - l - rr}
@@ -473,20 +495,42 @@ function Chart({
       />
       {ep && (
         <rect
-          x={x(ep.start) - bw}
-          width={x(ep.end) - x(ep.start) + bw * 2}
+          x={Math.max(l, x(ep.start) - step / 2)}
+          width={Math.min(w - rr, x(ep.end) + step / 2) - Math.max(l, x(ep.start) - step / 2)}
           y={t}
           height={h - t - b}
-          style={{ fill: "var(--tension)", opacity: 0.1 }}
+          style={{ fill: "var(--tension)", opacity: 0.08 }}
         />
       )}
-      {bars && <line x1={l} x2={w - rr} y1={y(0)} y2={y(0)} className="stroke-border" />}
+      {change && (
+        <line
+          x1={l}
+          x2={w - rr}
+          y1={y(0)}
+          y2={y(0)}
+          className="stroke-border"
+          strokeDasharray="3 3"
+        />
+      )}
       <text x={l - 4} y={y(hi) + 4} textAnchor="end" className="fill-muted-foreground text-[11px]">
         {fmt(hi)}
       </text>
       <text x={l - 4} y={y(lo) + 4} textAnchor="end" className="fill-muted-foreground text-[11px]">
         {fmt(lo)}
       </text>
+      {[r.range.high, r.range.low].map((v) =>
+        v != null && Math.abs(y(v) - y(hi)) > 12 && Math.abs(y(v) - y(lo)) > 12 ? (
+          <text
+            key={v}
+            x={l - 4}
+            y={y(v) + 4}
+            textAnchor="end"
+            className="fill-muted-foreground text-[11px] font-semibold"
+          >
+            {fmt(v)}
+          </text>
+        ) : null,
+      )}
       {ticks.map((tk) => (
         <text
           key={tk}
@@ -498,53 +542,57 @@ function Chart({
           {tk}
         </text>
       ))}
-      {bars ? (
-        pts.map((p) => {
-          const e = epOf.get(p.year);
-          return (
-            <rect
-              key={p.year}
-              x={x(p.year) - bw / 2}
-              width={bw}
-              y={Math.min(y(p.value), y(0))}
-              height={Math.max(0.5, Math.abs(y(p.value) - y(0)))}
-              style={{
-                fill: e ? "var(--tension)" : "var(--foreground)",
-                opacity: e ? 1 : 0.45,
-                cursor: e ? "pointer" : undefined,
-              }}
-              onClick={e ? () => onPick(e.start) : undefined}
-            >
-              <title>{`${p.year}: ${fmt(p.value)}`}</title>
-            </rect>
-          );
-        })
-      ) : (
-        <>
-          <path
-            d={pts
-              .map((p, i) => `${i ? "L" : "M"}${x(p.year).toFixed(1)},${y(p.value).toFixed(1)}`)
-              .join(" ")}
-            fill="none"
-            strokeWidth={2}
-            className="stroke-foreground"
-          />
-          {pts
-            .filter((p) => epOf.has(p.year))
-            .map((p) => (
-              <circle
-                key={p.year}
-                cx={x(p.year)}
-                cy={y(p.value)}
-                r={4}
-                style={{ fill: "var(--tension)", cursor: "pointer" }}
-                onClick={() => onPick(epOf.get(p.year)!.start)}
-              >
-                <title>{`${p.year}: ${fmt(p.value)}`}</title>
-              </circle>
-            ))}
-        </>
+      {r.range.high != null && (
+        <path
+          d={areaTo(bandTop)}
+          clipPath={`url(#above-${id})`}
+          style={{ fill: "var(--tension)", opacity: 0.25 }}
+        />
       )}
+      {r.range.low != null && (
+        <path
+          d={areaTo(bandBot)}
+          clipPath={`url(#below-${id})`}
+          style={{ fill: "var(--tension)", opacity: 0.25 }}
+        />
+      )}
+      <path
+        d={curve}
+        fill="none"
+        strokeWidth={1.75}
+        strokeLinejoin="round"
+        className="stroke-foreground"
+        clipPath={`url(#in-${id})`}
+      />
+      <path
+        d={curve}
+        fill="none"
+        strokeWidth={2.25}
+        strokeLinejoin="round"
+        clipPath={`url(#above-${id})`}
+        style={{ stroke: "var(--tension)" }}
+      />
+      <path
+        d={curve}
+        fill="none"
+        strokeWidth={2.25}
+        strokeLinejoin="round"
+        clipPath={`url(#below-${id})`}
+        style={{ stroke: "var(--tension)" }}
+      />
+      {pts
+        .filter((p) => epOf.has(p.year))
+        .map((p) => (
+          <g
+            key={p.year}
+            onClick={() => onPick(epOf.get(p.year)!.start)}
+            style={{ cursor: "pointer" }}
+          >
+            <circle cx={x(p.year)} cy={y(p.value)} r={9} fill="transparent" />
+            <circle cx={x(p.year)} cy={y(p.value)} r={2.75} style={{ fill: "var(--tension)" }} />
+            <title>{`${p.year}: ${fmt(p.value)}`}</title>
+          </g>
+        ))}
     </svg>
   );
 }
