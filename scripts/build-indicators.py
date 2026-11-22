@@ -128,10 +128,10 @@ def every(code):
     return {"code": code, "selection": {"filter": "all", "values": ["*"]}}
 
 
-def statfin_item(key, name, title, table, db, values, interpretation):
+def statfin_item(key, name, title, table, db, values, interpretation, lane="hoiva"):
     v = [(y, round(x, 3)) for y, x in sorted(values.items())]
     print(f"{name:45s} {len(v):4d} arvoa {v[0][0]}–{v[-1][0]} (Tilastokeskus)")
-    return {"key": key, "lane": "hoiva", "name": name, "title": title, "unit": "prosenttiyksikköä",
+    return {"key": key, "lane": lane, "name": name, "title": title, "unit": "prosenttiyksikköä",
             "source": f"Tilastokeskus, StatFin {table}", "source_url": STATFIN_PAGE.format(db=db, table=table),
             "interpretation": interpretation, "transform": "diff", "reference": {"kind": "history"}, "values": v}
 
@@ -221,6 +221,51 @@ out.append(statfin_birth_item("statfin.synt.outside_marriage_share", "Avioliiton
                               "Avioliiton ulkopuolella syntyneiden osuus elävänä syntyneistä, %", "12dk", "prosenttiyksikköä",
                               {int(r["timeperiod_y"]): r["value"] for r in outside if r["value"] is not None and int(r["timeperiod_y"]) >= 1970},
                               "Valtaosa avioliiton ulkopuolella syntyneistä syntyy avoliittoon, ei yksinhuoltajalle."))
+
+# ---- Tilastokeskus: työn epävarmuus, nuorten opiskelu ja koulutusrakenne ----
+# Määräaikaisten osuus palkansaajista (12bt). Taulukossa ei ole ikäjakoa: luvut koskevat 15–74-vuotiaita.
+temp = statfin("tyti/12bt.px", [every("timeperiod_y"), pick("sukupuoli_9_20180101", ["SSS", "2"]),
+                                 pick("tyonantajasekt_4_20250101", ["*"]), pick("contentscode", ["Ma_tyo_pros"])])
+for sex, label in (("SSS", "palkansaajat"), ("2", "naispalkansaajat")):
+    out.append(statfin_item(f"statfin.tyti.temporary_share_{'all' if sex == 'SSS' else 'women'}", f"Määräaikaiset: {label}",
+                            f"Määräaikaisessa työsuhteessa olevien osuus, {label} 15–74-v., %", "12bt", "tyti",
+                            {int(r["timeperiod_y"]): r["value"] for r in temp if r["sukupuoli_9_20180101"] == sex and r["value"] is not None},
+                            "Työvoimatutkimus (otos). Ei ikäjakoa: nuorten aikuisten määräaikaisuus on yleistä selvästi korkeampi.", lane="tyo"))
+
+# 25–29-vuotiaiden opiskelu ja NEET (13am).
+young = statfin("tyti/13am.px", [every("timeperiod_y"), pick("sukupuoli_9_20180101", ["SSS"]), pick("ikaryhma_19_20190101", ["25-29"]),
+                                  pick("contentscode", ["tyti-Vaesto", "Tyolliset_opisk_laaja", "Eityolliset_opisk_laaja", "neet_aste"])])
+Y = {(int(r["timeperiod_y"]), r["contentscode"]): r["value"] for r in young if r["value"] is not None}
+yy = sorted({k[0] for k in Y})
+out.append(statfin_item("statfin.tyti.studying_25_29", "Opiskelevat 25–29-vuotiaat",
+                        "Tutkintoon johtavassa tai kurssikoulutuksessa olevien osuus 25–29-vuotiaista, %", "13am", "tyti",
+                        {y: (Y[(y, "Tyolliset_opisk_laaja")] + Y[(y, "Eityolliset_opisk_laaja")]) / Y[(y, "tyti-Vaesto")] * 100
+                         for y in yy if (y, "tyti-Vaesto") in Y and (y, "Tyolliset_opisk_laaja") in Y and (y, "Eityolliset_opisk_laaja") in Y},
+                        "Työvoimatutkimus (otos). Sisältää työn ohessa opiskelevat ja kurssikoulutuksen.", lane="tyo"))
+out.append(statfin_item("statfin.tyti.neet_25_29", "NEET 25–29-vuotiaat",
+                        "Ei työssä, koulutuksessa eikä varusmiespalveluksessa: osuus 25–29-vuotiaista, %", "13am", "tyti",
+                        {y: Y[(y, "neet_aste")] for y in yy if (y, "neet_aste") in Y},
+                        "Työvoimatutkimus (otos). Sisältää myös perhevapaalla kotona olevat, jotka eivät ole työsuhteessa.", lane="tyo"))
+
+# Korkea-asteen tutkinto 30–34-vuotiailla sukupuolen mukaan (12bq).
+edu = statfin("vkour/12bq.px", [every("timeperiod_y"), pick("alue_23_20260101", ["SSS"]), pick("ikaryhma_10_20180101", ["30-34"]),
+                                 pick("sukupuoli_9_20180101", ["1", "2"]), pick("koulutusaste_17_20180101", ["SSS", "5", "6", "7", "8"])])
+E = {}
+for r in edu:
+    if r["value"] is not None:
+        k = (int(r["timeperiod_y"]), r["sukupuoli_9_20180101"])
+        E.setdefault(k, {})[r["koulutusaste_17_20180101"]] = r["value"]
+tertiary = {k: sum(v.get(c, 0) for c in ("5", "6", "7", "8")) / v["SSS"] * 100 for k, v in E.items() if v.get("SSS")}
+eyears = sorted({k[0] for k in tertiary})
+EDU_NOTE = "Korkea-aste = alin korkea-aste, alempi ja ylempi korkeakouluaste sekä tutkijakoulutus. Koko väestö 31.12. (rekisteri)."
+for sex, label in (("2", "naiset"), ("1", "miehet")):
+    out.append(statfin_item(f"statfin.vkour.tertiary_30_34_{'women' if sex == '2' else 'men'}", f"Korkea-asteen tutkinto: {label} 30–34",
+                            f"Korkea-asteen tutkinnon suorittaneiden osuus 30–34-vuotiaista, {label}, %", "12bq", "vkour",
+                            {y: tertiary[(y, sex)] for y in eyears if (y, sex) in tertiary}, EDU_NOTE))
+out.append(statfin_item("statfin.vkour.tertiary_gap_30_34", "Koulutusero: naiset – miehet 30–34",
+                        "Korkea-asteen tutkinnon suorittaneiden osuus 30–34-vuotiaista: naisten ja miesten ero, prosenttiyksikköä", "12bq", "vkour",
+                        {y: tertiary[(y, "2")] - tertiary[(y, "1")] for y in eyears if (y, "2") in tertiary and (y, "1") in tertiary},
+                        EDU_NOTE + " Positiivinen = naisilla useammin korkea-asteen tutkinto."))
 
 crisis = [y for y, x in values(CRISIS) if x == 1]
 data = {"meta": {"generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "source": "Supabase indicator_series / indicator_values; Tilastokeskus StatFin",
