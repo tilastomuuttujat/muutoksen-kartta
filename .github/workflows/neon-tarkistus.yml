@@ -1,0 +1,30 @@
+# Tarkistaa, että NEON_DATABASE_URL-salaisuus toimii, ja listaa Neonin taulut kokoineen.
+# Tulostaa vain taulujen nimet, rivimäärät ja koot: ei yhteystietoja (repo ja sen lokit ovat julkisia).
+name: Neon-tarkistus
+on:
+  push:
+    branches: [neon-tarkistus]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: psql
+        run: command -v psql || (sudo apt-get update -q && sudo apt-get install -y -q postgresql-client)
+      - name: Neonin sisältö
+        env:
+          NEON_DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: |
+          if [ -z "$NEON_DATABASE_URL" ]; then echo "::error::Salaisuus NEON_DATABASE_URL puuttuu"; exit 1; fi
+          q() { psql "$NEON_DATABASE_URL" -X -q -A -F ' | ' -v ON_ERROR_STOP=1 -c "$1" 2>/dev/null; }
+          if ! q "select 1" > /dev/null; then echo "::error::Yhteys Neoniin epäonnistui (tarkista osoite ja sslmode=require)"; exit 1; fi
+          echo "== Palvelin ja koko"
+          q "select split_part(version(), ' on ', 1) as versio, pg_size_pretty(pg_database_size(current_database())) as tietokannan_koko"
+          echo "== Skeemat"
+          q "select nspname from pg_namespace where nspname not in ('pg_catalog','information_schema','pg_toast') and nspname not like 'pg_temp%' and nspname not like 'pg_toast_temp%' order by 1"
+          echo "== Taulut (suurimmat ensin)"
+          q "select schemaname || '.' || relname as taulu, n_live_tup as rivit_arvio, pg_size_pretty(pg_total_relation_size(relid)) as koko from pg_stat_user_tables order by pg_total_relation_size(relid) desc limit 60"
+          echo "== Näkymät"
+          q "select table_schema || '.' || table_name from information_schema.views where table_schema not in ('pg_catalog','information_schema') order by 1 limit 60"
