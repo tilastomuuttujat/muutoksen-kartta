@@ -129,7 +129,7 @@ def every(code):
 
 
 def statfin_item(key, name, title, table, db, values, interpretation):
-    v = [(y, round(x, 2)) for y, x in sorted(values.items())]
+    v = [(y, round(x, 3)) for y, x in sorted(values.items())]
     print(f"{name:45s} {len(v):4d} arvoa {v[0][0]}–{v[-1][0]} (Tilastokeskus)")
     return {"key": key, "lane": "hoiva", "name": name, "title": title, "unit": "prosenttiyksikköä",
             "source": f"Tilastokeskus, StatFin {table}", "source_url": STATFIN_PAGE.format(db=db, table=table),
@@ -169,6 +169,58 @@ for a0, a1 in [(20, 24), (25, 29), (30, 34)]:
 out.append(statfin_item("statfin.perh.12c6.couple_children_30_34", "Lapsiperheen vanhempana 30–34-vuotiaat",
                         "Puolisona perheessä, jossa on lapsia: osuus 30–34-vuotiaista, %", "12c6", "perh", age_share(["2", "4"], 30, 34),
                         "Avio- tai avopuoliso perheessä, jossa asuu lapsia. Ei sisällä yksinhuoltajia eikä vanhempia, joiden lapset asuvat muualla."))
+
+# ---- Tilastokeskus: syntyvyys järjestysluvun mukaan, esikoisen saaneiden ikä, avioliiton ulkopuolella syntyneet ----
+def statfin_birth_item(key, name, title, table, unit, values, interpretation):
+    item = statfin_item(key, name, title, table, "synt", values, interpretation)
+    item["unit"] = unit
+    return item
+
+
+# Naiset ikävuosittain 31.12. (12c6); keskiväkiluku ≈ edellisen ja kuluvan vuoden lopun keskiarvo.
+women = statfin("perh/12c6.px", [pick("alue_23_20260101", ["SSS"]), pick("sukupuoli_9_20180101", ["2"]),
+                                 pick("peasutyyp_3_20190101", ["SSS"]), every("timeperiod_y"), every("ikaryhma_10_20180101")])
+WOMEN = {(int(r["timeperiod_y"]), int(r["ikaryhma_10_20180101"])): r["value"] for r in women
+         if r["ikaryhma_10_20180101"] != "SSS" and r["value"] is not None}
+AGES = range(15, 50)
+births = statfin("synt/12dm.px", [every("Vuosi"), pick("Äidin ikä", [f"{a:03d}" for a in AGES]), pick("Sukupuoli", ["SSS"]),
+                                  every("Lapsen järjestysluku")])
+BIRTHS = {(int(r["Vuosi"]), int(r["Äidin ikä"]), r["Lapsen järjestysluku"]): r["value"] or 0 for r in births}
+ORDERS = {"1": ["1"], "2": ["2"], "3+": ["3", "4", "5", "6", "7", "8", "9-"], "SSS": ["SSS"]}
+
+
+def order_tfr(y, order):
+    total = 0.0
+    for a in AGES:
+        w = (WOMEN.get((y - 1, a), 0) + WOMEN.get((y, a), 0)) / 2
+        total += sum(BIRTHS.get((y, a, o), 0) for o in ORDERS[order]) / w if w else 0
+    return total
+
+
+tfr_years = [y for y in sorted({k[0] for k in BIRTHS}) if (y - 1, 20) in WOMEN and (y, 20) in WOMEN]
+official = {int(r["timeperiod_y"]): r["value"] for r in statfin("synt/12dt.px", [pick("timeperiod_y", [str(y) for y in tfr_years]), every("contentscode")])}
+for y in tfr_years:  # laskentatapa toistaa virallisen luvun; muuten jokin syöte on muuttunut
+    if abs(order_tfr(y, "SSS") - official[y]) > 0.03:
+        sys.exit(f"Järjestyslukujen kokonaishedelmällisyys {y}: {order_tfr(y, 'SSS'):.3f} ≠ virallinen {official[y]}")
+ORDER_NOTE = ("Laskettu: tämän järjestysluvun elävänä syntyneet äidin iän mukaan (12dm) jaettuna saman ikäisten naisten keskiväkiluvulla (12c6), "
+              "summattuna ikiin 15–49. Kolmen järjestysluvun summa vastaa virallista kokonaishedelmällisyyslukua (12dt). ")
+for order, label in (("1", "esikoiset"), ("2", "toiset lapset"), ("3+", "kolmannet ja myöhemmät")):
+    out.append(statfin_birth_item(f"statfin.synt.tfr_order_{order.replace('+', 'plus')}", f"Hedelmällisyys: {label}",
+                                  f"Kokonaishedelmällisyys järjestysluvun mukaan: {label}", "12dm", "lasta / nainen",
+                                  {y: order_tfr(y, order) for y in tfr_years},
+                                  ORDER_NOTE + "Vuosiluku, ei ikäluokan lopullinen lapsiluku."))
+
+age = statfin("synt/14lg.px", [every("timeperiod_y"), pick("contentscode", ["aidin_ika_1_kerta_ka"])])
+out.append(statfin_birth_item("statfin.synt.mother_age_first", "Esikoisen saaneiden äitien keski-ikä",
+                              "Ensimmäistä kertaa biologiseksi äidiksi tulleiden keski-ikä", "14lg", "vuotta",
+                              {int(r["timeperiod_y"]): r["value"] for r in age if r["value"] is not None},
+                              "Koskee vain lapsen saaneita: lapsettomiksi jäävät eivät näy luvussa."))
+
+outside = statfin("synt/12dk.px", [every("timeperiod_y"), pick("contentscode", ["aitieiavio_p"])])
+out.append(statfin_birth_item("statfin.synt.outside_marriage_share", "Avioliiton ulkopuolella syntyneet",
+                              "Avioliiton ulkopuolella syntyneiden osuus elävänä syntyneistä, %", "12dk", "prosenttiyksikköä",
+                              {int(r["timeperiod_y"]): r["value"] for r in outside if r["value"] is not None and int(r["timeperiod_y"]) >= 1970},
+                              "Valtaosa avioliiton ulkopuolella syntyneistä syntyy avoliittoon, ei yksinhuoltajalle."))
 
 crisis = [y for y, x in values(CRISIS) if x == 1]
 data = {"meta": {"generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "source": "Supabase indicator_series / indicator_values; Tilastokeskus StatFin",
