@@ -30,7 +30,10 @@ Samat sarjat ovat poikkeamanäkymässä (`/poikkeamat`).
 | Avioliiton ulkopuolella syntyneet, % | 5,5 (1971) | 25,2 | 41,1 | 48,0 | 47,8 |
 
 Vuosien 2010–2024 laskusta (0,62 lasta naista kohden) esikoiset selittävät 37 %, toiset lapset
-32 % ja kolmannet ja myöhemmät 31 %.
+32 % ja kolmannet ja myöhemmät 31 %. Jako on laskettu kaikista naisista. FLUXin mukaan 82 % laskusta
+liittyy siihen, että harvempi nainen saa ensimmäisen lapsen: siinä myös myöhempien lasten väheneminen
+luetaan esikoisten ansioksi, kun se johtuu äidiksi tulevien vähenemisestä. Luvut eivät ole ristiriidassa
+(ks. `docs/lahteet-lapsettomuus.md`).
 
 Tutkimus:
 - Erlandsson, A. (2017). [Child Home Care Allowance and the Transition to Second- and Third-Order Births in Finland](https://pmc.ncbi.nlm.nih.gov/articles/PMC5511342/). *Population Research and Policy Review* 36(4). Kotihoidon tukea käyttäneillä naisilla suurempi todennäköisyys toiseen ja kolmanteen lapseen, rekisteriaineisto 1992–2007.
@@ -87,7 +90,7 @@ Lisää `effects`-kenttään mitatut luvut ja tarkenna `mechanism`:
 
 ```json
 {
-  "mechanism": "Syntyvyys laski kaikissa järjestysluvuissa: vuosien 2010–2024 laskusta esikoiset selittävät 37 %, toiset lapset 32 % ja kolmannet ja myöhemmät 31 %. Samaan aikaan esikoisen saaneiden äitien keski-ikä nousi 28,3 vuodesta 30,4 vuoteen. Lasku oli pohjoismainen ilmiö, eikä talouden elpyminen 2015–2019 pysäyttänyt sitä.",
+  "mechanism": "Ratkaisevaa oli, että harvempi nainen sai ensimmäisen lapsen: FLUXin mukaan siihen liittyy 82 % vuosien 2010–2024 laskusta, sillä myös toisten ja myöhempien lasten väheneminen johtuu pääosin äidiksi tulevien vähenemisestä. Kaikista naisista laskettuna lasku näkyy kaikissa järjestysluvuissa (esikoiset 37 %, toiset 32 %, kolmannet ja myöhemmät 31 %). Samaan aikaan esikoisen saaneiden äitien keski-ikä nousi 28,3 vuodesta 30,4 vuoteen. Lasku oli pohjoismainen ilmiö, eikä talouden elpyminen 2015–2019 pysäyttänyt sitä.",
   "effects": [
     "kokonaishedelmällisyysluku 1,87 (2010) → 1,25 (2024) → 1,30 (2025)",
     "esikoisten hedelmällisyys 0,78 → 0,55, toisten 0,63 → 0,43, kolmansien ja myöhempien 0,46 → 0,27 (2010–2024)",
