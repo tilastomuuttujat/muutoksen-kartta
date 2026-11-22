@@ -1,4 +1,4 @@
-"""Hakee poikkeamanäkymän indikaattorit Supabasesta tiedostoon src/data/indicators.json.
+"""Hakee poikkeamanäkymän indikaattorit Supabasesta ja Tilastokeskuksen StatFin-rajapinnasta tiedostoon src/data/indicators.json.
 
 Käyttää projektin julkista (publishable) avainta, joten salaisia avaimia ei tarvita:
     python3 scripts/build-indicators.py
@@ -96,8 +96,82 @@ for key, lane, name, transform, ref, *group in SERIES:
     print(f"{name:45s} {len(v):4d} arvoa {v[0][0] if v else '-'}–{v[-1][0] if v else '-'}")
     out.append(item)
 
+# ---- Tilastokeskus (StatFin PxWeb): yksin asuminen ----
+# Näitä sarjoja ei ole Supabasessa, joten ne haetaan suoraan Tilastokeskuksen avoimesta rajapinnasta.
+STATFIN = "https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/"
+STATFIN_PAGE = "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__{db}/statfin_{db}_pxt_{table}.px/"
+
+
+def statfin(table, query):
+    body = json.dumps({"query": query, "response": {"format": "json-stat2"}}).encode()
+    req = urllib.request.Request(STATFIN + table, data=body, headers={"Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=120) as r:
+        js = json.load(r)
+    dims = js["id"]
+    cats = [list(js["dimension"][d]["category"]["index"]) for d in dims]
+    rows, sizes = [], [len(c) for c in cats]
+    for i, value in enumerate(js["value"]):
+        idx, rest = [], i
+        for s in reversed(sizes):
+            idx.append(rest % s)
+            rest //= s
+        idx.reverse()
+        rows.append({**{d: cats[k][idx[k]] for k, d in enumerate(dims)}, "value": value})
+    return rows
+
+
+def pick(code, values):
+    return {"code": code, "selection": {"filter": "item", "values": values}}
+
+
+def every(code):
+    return {"code": code, "selection": {"filter": "all", "values": ["*"]}}
+
+
+def statfin_item(key, name, title, table, db, values, interpretation):
+    v = [(y, round(x, 2)) for y, x in sorted(values.items())]
+    print(f"{name:45s} {len(v):4d} arvoa {v[0][0]}–{v[-1][0]} (Tilastokeskus)")
+    return {"key": key, "lane": "hoiva", "name": name, "title": title, "unit": "prosenttiyksikköä",
+            "source": f"Tilastokeskus, StatFin {table}", "source_url": STATFIN_PAGE.format(db=db, table=table),
+            "interpretation": interpretation, "transform": "diff", "reference": {"kind": "history"}, "values": v}
+
+
+# Yhden hengen asuntokuntien osuus kaikista asuntokunnista (15fi).
+hh = statfin("asku/15fi.px", [pick("alue_23_20260101", ["SSS"]), pick("talotyyppi_4_20210101", ["SSS"]),
+                              pick("sukupuoli_15_20190101", ["SSS"]), pick("ikaryhma_27_20220101", ["SSS"]),
+                              every("timeperiod_y"), every("asuntokuntakoko_3_20190101")])
+H = {(r["timeperiod_y"], r["asuntokuntakoko_3_20190101"]): r["value"] for r in hh}
+share = {int(y): H[(y, "1")] / H[(y, "SSS")] * 100 for (y, s) in H if s == "SSS" and H[(y, "SSS")]}
+out.append(statfin_item("statfin.asku.15fi.one_person_share", "Yhden hengen asuntokuntien osuus",
+                        "Yhden hengen asuntokuntien osuus kaikista asuntokunnista, %", "15fi", "asku", share,
+                        "Osuus asuntokunnista, ei ihmisistä: noin puolet asuntokunnista on yhden hengen, mutta yksin asuu noin neljännes väestöstä. Suuri osa yksin asuvista on ikääntyneitä."))
+
+# Yksin asuvien ja lapsiperheissä elävien osuus ikäryhmästä (12c6).
+fam = statfin("perh/12c6.px", [pick("alue_23_20260101", ["SSS"]), pick("sukupuoli_9_20180101", ["SSS"]),
+                               every("timeperiod_y"), every("peasutyyp_3_20190101"), every("ikaryhma_10_20180101")])
+F = {}
+for r in fam:
+    if r["ikaryhma_10_20180101"] != "SSS" and r["value"] is not None:
+        k = (int(r["timeperiod_y"]), r["peasutyyp_3_20190101"], int(r["ikaryhma_10_20180101"]))
+        F[k] = F.get(k, 0) + r["value"]
+years = sorted({k[0] for k in F})
+
+
+def age_share(status, a0, a1):
+    return {y: sum(F.get((y, s, a), 0) for s in status for a in range(a0, a1 + 1)) /
+               sum(F.get((y, "SSS", a), 0) for a in range(a0, a1 + 1)) * 100 for y in years}
+
+
+ALONE = "Perheväestöön kuulumaton, asuu yksin (Tilastokeskuksen perheasema). Ei sama kuin yksinäisyys tai parisuhteettomuus: osa yksin asuvista on etäsuhteessa."
+for a0, a1 in [(20, 24), (25, 29), (30, 34)]:
+    out.append(statfin_item(f"statfin.perh.12c6.alone_{a0}_{a1}", f"Yksin asuvat {a0}–{a1}-vuotiaat",
+                            f"Yksin asuvien osuus {a0}–{a1}-vuotiaista, %", "12c6", "perh", age_share(["7"], a0, a1), ALONE))
+out.append(statfin_item("statfin.perh.12c6.couple_children_30_34", "Lapsiperheen vanhempana 30–34-vuotiaat",
+                        "Puolisona perheessä, jossa on lapsia: osuus 30–34-vuotiaista, %", "12c6", "perh", age_share(["2", "4"], 30, 34),
+                        "Avio- tai avopuoliso perheessä, jossa asuu lapsia. Ei sisällä yksinhuoltajia eikä vanhempia, joiden lapset asuvat muualla."))
+
 crisis = [y for y, x in values(CRISIS) if x == 1]
-data = {"meta": {"generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "source": "Supabase indicator_series / indicator_values",
+data = {"meta": {"generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "source": "Supabase indicator_series / indicator_values; Tilastokeskus StatFin",
                  "crisis_source": "Jordà–Schularick–Taylor Macrohistory Database (R6): systeemisen pankkikriisin vuodet"},
         "indicators": out, "crisis_years": crisis}
 json.dump(data, open("src/data/indicators.json", "w"), ensure_ascii=False, separators=(",", ":"))
