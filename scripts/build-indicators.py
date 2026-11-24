@@ -6,7 +6,7 @@ Käyttää projektin julkista (publishable) avainta, joten salaisia avaimia ei t
 Mukaan otetaan vain koko maata koskevat, julkaistut arvot. Viitealueet lasketaan selaimessa
 (src/lib/anomaly.ts), jotta menetelmä on testattavissa ja näkyy lukijalle.
 """
-import json, sys, urllib.request, urllib.parse
+import json, sys, time, urllib.error, urllib.request, urllib.parse
 from datetime import datetime, timezone
 
 URL = "https://zzbubbrsgiqsvsovkkmf.supabase.co/rest/v1"
@@ -105,8 +105,15 @@ STATFIN_PAGE = "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__{db}/stat
 def statfin(table, query):
     body = json.dumps({"query": query, "response": {"format": "json-stat2"}}).encode()
     req = urllib.request.Request(STATFIN + table, data=body, headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=120) as r:
-        js = json.load(r)
+    for attempt in range(5):  # PxWeb rajoittaa kyselytahtia; katkenneet yhteydet yritetään uudelleen
+        try:
+            with urllib.request.urlopen(req, timeout=120) as r:
+                js = json.load(r)
+            break
+        except (urllib.error.URLError, ConnectionError):
+            if attempt == 4:
+                raise
+            time.sleep(10 * (attempt + 1))
     dims = js["id"]
     cats = [list(js["dimension"][d]["category"]["index"]) for d in dims]
     rows, sizes = [], [len(c) for c in cats]
@@ -266,6 +273,71 @@ out.append(statfin_item("statfin.vkour.tertiary_gap_30_34", "Koulutusero: naiset
                         "Korkea-asteen tutkinnon suorittaneiden osuus 30–34-vuotiaista: naisten ja miesten ero, prosenttiyksikköä", "12bq", "vkour",
                         {y: tertiary[(y, "2")] - tertiary[(y, "1")] for y in eyears if (y, "2") in tertiary and (y, "1") in tertiary},
                         EDU_NOTE + " Positiivinen = naisilla useammin korkea-asteen tutkinto."))
+
+# ---- Vanhentuneiden Supabase-sarjojen jatkaminen Tilastokeskuksen tiedoilla ----
+# Supabasen sarjat päättyvät osin vuosiin 2018–2023. Ne jatketaan virallisilla StatFin-luvuilla vuodesta `start`
+# alkaen. Päällekkäisten vuosien ero tarkistetaan joka ajossa: liian suuri ero keskeyttää ajon.
+def splice(name, new, start, source, check=None, note=""):
+    it = next(i for i in out if i["name"] == name)
+    old = dict(it["values"])
+    if check is not None:
+        overlap = [y for y in old if y in new and y >= start]
+        diff = max((abs(new[y] - old[y]) for y in overlap), default=0.0)
+        if diff > check:
+            sys.exit(f"{name}: StatFin poikkeaa vanhasta sarjasta {diff:.3f} > {check}")
+    merged = {y: v for y, v in old.items() if y < start}
+    merged.update({y: v for y, v in new.items() if y >= start and v is not None})
+    it["values"] = [(y, round(v, 3)) for y, v in sorted(merged.items())]
+    it["source"] = f"{it['source']}; {start}–{max(merged)}: {source}"
+    it["interpretation"] = f"{it['interpretation']} {note}".strip()
+    print(f"{name:45s} jatkettu {start}–{max(merged)} ({source})")
+
+
+vm = statfin("kuol/12at.px", [every("timeperiod_y"), pick("contentscode", ["kuol-vaesto"])])
+year_end_pop = {int(r["timeperiod_y"]): r["value"] for r in vm}
+mean_pop = {y: (year_end_pop[y] + year_end_pop[y - 1]) / 2 for y in year_end_pop if y - 1 in year_end_pop}
+
+lfs = statfin("tyti/13aj.px", [every("timeperiod_y"), pick("sukupuoli_9_20180101", ["SSS"]), pick("ikaryhma_19_20190101", ["15-74", "15-64"]),
+                                pick("contentscode", ["tyti-Tyottomyysaste", "tyti-Tyollisyysaste"])])
+LFS = {(int(r["timeperiod_y"]), r["ikaryhma_19_20190101"], r["contentscode"]): r["value"] for r in lfs}
+splice("Työttömyysaste", {y: v for (y, a, c), v in LFS.items() if a == "15-74" and c == "tyti-Tyottomyysaste"}, 2009,
+       "Tilastokeskus, työvoimatutkimus, StatFin 13aj (15–74-v.)", check=0.3)
+splice("Työllisyysaste 15–64", {y: v for (y, a, c), v in LFS.items() if a == "15-64" and c == "tyti-Tyollisyysaste"}, 2009,
+       "Tilastokeskus, työvoimatutkimus, StatFin 13aj", check=1.1,
+       note="Vuodesta 2009 työvoimatutkimuksen nykyiset, tarkistetut luvut; ne poikkeavat vanhasta julkaisusta enintään 1 prosenttiyksikön.")
+
+gini = statfin("tjt/11x3.px", [pick("tulolaji_12_20190417", ["SL1TJKT"]), pick("contentscode", ["Gini"]), every("timeperiod_y")])
+splice("Tuloerot (Gini)", {int(r["timeperiod_y"]): r["value"] for r in gini if r["value"] is not None}, 1995,
+       "Tilastokeskus, tulonjakotilasto, StatFin 11x3 (rekisteri, käytettävissä olevat rahatulot)", check=0.05)
+
+rw = statfin("ati/14un.px", [pick("tyonantajasekt_3_20190528", ["SSS"]), pick("palk_muo_2_20120101", ["0"]), pick("sukupuoli_9_20180101", ["SSS"]),
+                              every("timeperiod_y"), pick("contentscode", ["real_2015_100"])])
+RW = {int(r["timeperiod_y"]): r["value"] for r in rw if r["value"] is not None}
+real = next(i for i in out if i["name"] == "Reaalipalkat")
+base_year, base = real["values"][-1]
+splice("Reaalipalkat", {y: base * RW[y] / RW[base_year] for y in RW if y > base_year}, base_year + 1,
+       "Tilastokeskus, reaaliansioindeksi, StatFin 14un (ketjutettu)",
+       note=f"Vuodesta {base_year + 1} sarjaa on jatkettu Tilastokeskuksen reaaliansioindeksin vuosimuutoksilla; indeksit eivät ole täysin samaa käsitettä.")
+
+co2 = statfin("khki/138v.px", [every("timeperiod_y"), pick("paastoluokka_1_20150101", ["0A"]), pick("energia_khk_1_20210901", ["01"])])
+splice("CO₂-päästöt asukasta kohti", {int(r["timeperiod_y"]): r["value"] * 1000 / mean_pop[int(r["timeperiod_y"])] for r in co2},
+       next(i for i in out if i["name"] == "CO₂-päästöt asukasta kohti")["values"][-1][0] + 1,
+       "Tilastokeskus, kasvihuonekaasut, StatFin 138v (CO₂ ilman LULUCF-sektoria)", check=0.15,
+       note="Viimeisin vuosi on Tilastokeskuksen pikaennakko.")
+
+kill = statfin("rpk/13gw.px", [every("timeperiod_y"), pick("rikokset_15_20190102", ["210101"]), pick("rikokset_34_20180101", ["SSS"]),
+                                pick("contentscode", ["rikokset_lkm"])])
+splice("Poliisin tietoon tulleet tapot / 100 000",
+       {int(r["timeperiod_y"]): r["value"] / mean_pop[int(r["timeperiod_y"])] * 100000 for r in kill},
+       next(i for i in out if i["name"] == "Poliisin tietoon tulleet tapot / 100 000")["values"][-1][0] + 1,
+       "Tilastokeskus, tietoon tulleet rikokset, StatFin 13gw (tappo 21:1 §)", check=0.05)
+
+tfr_all = statfin("synt/12dt.px", [every("timeperiod_y")])
+tfr_item = next(i for i in out if i["name"] == "Hedelmällisyysluku")
+splice("Hedelmällisyysluku", {int(r["timeperiod_y"]): r["value"] for r in tfr_all if r["value"] is not None}, tfr_item["values"][0][0],
+       "Tilastokeskus, StatFin 12dt")
+tfr_item["source"] = "Tilastokeskus, StatFin 12dt"
+tfr_item["source_url"] = STATFIN_PAGE.format(db="synt", table="12dt")
 
 crisis = [y for y, x in values(CRISIS) if x == 1]
 data = {"meta": {"generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "source": "Supabase indicator_series / indicator_values; Tilastokeskus StatFin",
