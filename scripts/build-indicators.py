@@ -102,9 +102,9 @@ STATFIN = "https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/"
 STATFIN_PAGE = "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__{db}/statfin_{db}_pxt_{table}.px/"
 
 
-def statfin(table, query):
+def statfin(table, query, base=STATFIN):
     body = json.dumps({"query": query, "response": {"format": "json-stat2"}}).encode()
-    req = urllib.request.Request(STATFIN + table, data=body, headers={"Content-Type": "application/json"})
+    req = urllib.request.Request(base + table, data=body, headers={"Content-Type": "application/json"})
     for attempt in range(5):  # PxWeb rajoittaa kyselytahtia; katkenneet yhteydet yritetään uudelleen
         try:
             with urllib.request.urlopen(req, timeout=120) as r:
@@ -273,6 +273,55 @@ out.append(statfin_item("statfin.vkour.tertiary_gap_30_34", "Koulutusero: naiset
                         "Korkea-asteen tutkinnon suorittaneiden osuus 30–34-vuotiaista: naisten ja miesten ero, prosenttiyksikköä", "12bq", "vkour",
                         {y: tertiary[(y, "2")] - tertiary[(y, "1")] for y in eyears if (y, "2") in tertiary and (y, "1") in tertiary},
                         EDU_NOTE + " Positiivinen = naisilla useammin korkea-asteen tutkinto."))
+
+# ---- Nuoret aikuiset pitkällä aikavälillä ----
+# 15–29-vuotiaiden osuus väestöstä 1865–2025 (11rc).
+age5 = statfin("vaerak/11rc.px", [every("timeperiod_y"), pick("sukupuoli_9_20180101", ["SSS"]),
+                                  pick("ikaryhma_10_20180101", ["SSS", "15-19", "20-24", "25-29"])])
+A5 = {}
+for r in age5:
+    if r["value"] is not None:
+        A5.setdefault(int(r["timeperiod_y"]), {})[r["ikaryhma_10_20180101"]] = r["value"]
+young = statfin_item("statfin.vaerak.share_15_29", "Nuorten aikuisten osuus väestöstä",
+                     "15–29-vuotiaiden osuus väestöstä 31.12., %", "11rc", "vaerak",
+                     {y: (a["15-19"] + a["20-24"] + a["25-29"]) / a["SSS"] * 100 for y, a in A5.items() if a.get("SSS")},
+                     "Väestörakenne. Arvioidaan vuosimuutoksena: osuus nousee suurten ikäluokkien tullessa aikuisiksi ja laskee syntyvyyden laskun jälkeen.")
+out.append(young)
+
+# 25–29-vuotiaiden työttömyysaste suhteessa koko työvoiman (15–74) työttömyysasteeseen.
+# 1963–1988: Tilastokeskus, Työvoimatilasto 1993:7 (SVT Työmarkkinat), taulukko 8, molemmat sukupuolet.
+# Luvut on kirjattu käsin julkaisusta; 1963–1969 postitiedustelu, vuodesta 1970 haastattelututkimus.
+LFS_1993 = {  # vuosi: (25–29, 15–74)
+    1963: (1.2, 1.4), 1964: (1.3, 1.6), 1965: (1.2, 1.4), 1966: (1.1, 1.5), 1967: (2.5, 3.0), 1968: (3.9, 4.1),
+    1969: (2.1, 2.8), 1970: (3.0, 2.0), 1971: (3.2, 2.4), 1972: (3.0, 2.7), 1973: (2.3, 2.4), 1974: (1.9, 1.8),
+    1975: (2.9, 2.6), 1976: (4.2, 3.9), 1977: (6.6, 5.9), 1978: (8.6, 7.3), 1979: (7.2, 6.0), 1980: (5.3, 4.7),
+    1981: (5.5, 4.9), 1982: (5.8, 5.4), 1983: (5.4, 5.5), 1984: (4.9, 5.2), 1985: (5.1, 5.0), 1986: (5.2, 5.4),
+    1987: (5.1, 5.1), 1988: (4.3, 4.5),
+}
+LFS_1993_URL = "https://otos.stat.fi/bitstreams/8f4faa7d-611b-4be3-8a6f-52c8092f5389/download"
+old_lfs = statfin("tyti/statfinpas_tyti_pxt_11pl_2020.px",
+                  [every("Vuosi"), pick("Sukupuoli", ["SSS"]), pick("Ikäluokka", ["25-29", "15-74"]), pick("Tiedot", ["Tyottomyysaste"])],
+                  base="https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin_Passiivi/")
+new_lfs = statfin("tyti/13aj.px", [every("timeperiod_y"), pick("sukupuoli_9_20180101", ["SSS"]),
+                                   pick("ikaryhma_19_20190101", ["25-29", "15-74"]), pick("contentscode", ["tyti-Tyottomyysaste"])])
+UR = {}
+for r in old_lfs:
+    if int(r["Vuosi"]) < 2009 and r["value"] is not None:
+        UR.setdefault(int(r["Vuosi"]), {})[r["Ikäluokka"]] = r["value"]
+for r in new_lfs:
+    if r["value"] is not None:
+        UR.setdefault(int(r["timeperiod_y"]), {})[r["ikaryhma_19_20190101"]] = r["value"]
+ratio = {y: a / b for y, (a, b) in LFS_1993.items()}
+ratio.update({y: v["25-29"] / v["15-74"] for y, v in UR.items() if v.get("15-74")})
+rv = [(y, round(x, 3)) for y, x in sorted(ratio.items())]
+print(f"{'Nuorten työttömyys suhteessa kaikkiin':45s} {len(rv):4d} arvoa {rv[0][0]}–{rv[-1][0]} (Tilastokeskus)")
+out.append({"key": "statfin.tyti.unemployment_ratio_25_29", "lane": "tyo", "name": "Työttömyys 25–29 suhteessa kaikkiin",
+            "title": "25–29-vuotiaiden työttömyysaste jaettuna 15–74-vuotiaiden työttömyysasteella",
+            "unit": "suhdeluku (1 = sama kuin kaikilla)",
+            "source": "Tilastokeskus: Työvoimatilasto 1993:7, taulukko 8 (1963–1988); StatFin 11pl (1989–2008) ja 13aj (2009–)",
+            "source_url": LFS_1993_URL,
+            "interpretation": "Yli 1 = nuorilla aikuisilla on suurempi työttömyysriski kuin työvoimalla keskimäärin. Suhdeluku kestää menetelmämuutoksia paremmin kuin itse työttömyysaste, mutta sarjassa on katko vuonna 1989: vanhan julkaisun luvuilla suhdeluku oli vuosina 1989–1991 noin 0,1–0,2 korkeampi kuin nykyisessä tarkistetussa sarjassa. 1963–1969 postitiedustelu, vuodesta 1970 haastattelututkimus.",
+            "transform": "level", "reference": {"kind": "history"}, "values": rv})
 
 # ---- Vanhentuneiden Supabase-sarjojen jatkaminen Tilastokeskuksen tiedoilla ----
 # Supabasen sarjat päättyvät osin vuosiin 2018–2023. Ne jatketaan virallisilla StatFin-luvuilla vuodesta `start`
