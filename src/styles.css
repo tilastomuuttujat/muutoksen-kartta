@@ -178,3 +178,13 @@ circle { transform-box: fill-box; transform-origin: center; }
 @keyframes radar-ping { from { r: 4px; opacity: 0.9; } to { r: 300px; opacity: 0; } }
 .radar-ping { animation: radar-ping 1.6s ease-out 2 forwards; }
 @media (prefers-reduced-motion: reduce) { * { animation-duration: 1ms !important; animation-delay: 0ms !important; } }
+
+/* Selitysten aikajana: uudet merkinnät ilmestyvät pehmeästi. */
+@keyframes lc-pop {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+.lc-pop { animation: lc-pop 0.45s ease-out both; transform-box: fill-box; }
+@media (prefers-reduced-motion: reduce) {
+  .lc-pop { animation: none; }
+}

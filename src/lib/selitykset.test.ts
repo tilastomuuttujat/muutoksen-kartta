@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { NORDIC, PHENOMENA, byVerdict, decompose, series, valueAt } from "./selitykset";
+import { NORDIC, PHENOMENA, byVerdict, currentBeat, decompose, pointsUntil, revealedExplanations, series, valueAt } from "./selitykset";
 
 describe("decompose", () => {
   it("splits a change into shares that sum to one", () => {
@@ -47,5 +47,32 @@ describe("numbers quoted in the text match the data", () => {
     const age = series("statfin.synt.mother_age_first");
     expect(valueAt(age, 2010)).toBeCloseTo(28.3, 1);
     expect(valueAt(age, 2025)).toBeCloseTo(30.5, 1);
+  });
+});
+
+describe("timeline", () => {
+  const ph = PHENOMENA[0]!;
+  it("every beat points to an existing explanation and every explanation gets a beat", () => {
+    const ids = new Set(ph.explanations.map((e) => e.id));
+    const beatIds = ph.beats.flatMap((b) => (b.explanation ? [b.explanation] : []));
+    for (const id of beatIds) expect(ids.has(id)).toBe(true);
+    for (const id of ids) expect(beatIds).toContain(id);
+  });
+  it("beats are in time order", () => {
+    const ats = ph.beats.map((b) => b.at);
+    expect([...ats].sort((a, b) => a - b)).toEqual(ats);
+  });
+  it("reveals explanations as time passes", () => {
+    expect(revealedExplanations(ph.beats, 2009)).toHaveLength(0);
+    expect(revealedExplanations(ph.beats, 2010.5).map((r) => r.id)).toEqual(["pohjoismaat"]);
+    expect(revealedExplanations(ph.beats, 2025)).toHaveLength(ph.explanations.length);
+  });
+  it("current beat is the latest one started", () => {
+    expect(currentBeat(ph.beats, 2017.4)?.at).toBe(2016);
+    expect(currentBeat(ph.beats, 1999)).toBeNull();
+  });
+  it("interpolates the tip of a growing line", () => {
+    expect(pointsUntil([[2000, 1], [2001, 2], [2002, 4]], 2001.5)).toEqual([[2000, 1], [2001, 2], [2001.5, 3]]);
+    expect(pointsUntil([[2000, 1], [2001, 2]], 2001)).toEqual([[2000, 1], [2001, 2]]);
   });
 });

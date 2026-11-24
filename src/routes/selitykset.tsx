@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ExplanationTimeline } from "@/components/ExplanationTimeline";
 import {
   DECISIONS,
   NORDIC,
@@ -59,13 +60,15 @@ function ExplanationsPage() {
         </ul>
       </header>
 
+      <ExplanationTimeline ph={ph} />
+
       <Decomposition />
 
       <section className="mt-6" aria-labelledby="ledger">
         <h2 id="ledger" className="font-display text-2xl">Selitykset ja mitä aineisto niistä sanoo</h2>
         <p className="mt-1 text-sm text-muted-foreground">Järjestys näytön mukaan. Avaa rivi nähdäksesi havainnon kaaviona ja lähteet.</p>
         <ol className="mt-3 space-y-3">
-          {rows.map((e, i) => <Row key={e.id} e={e} open={i === 0} />)}
+          {rows.map((e) => <Row key={e.id} e={e} open={false} />)}
         </ol>
       </section>
 

@@ -11,6 +11,8 @@ export type Evidence = "order" | "economy" | "nordic" | "unions" | "decisions";
 export type Explanation = {
   id: string;
   title: string;
+  /** Lyhyt nimi aikajanan merkintään. */
+  short: string;
   /** Mitä näkisimme, jos selitys pitäisi. */
   predicts: string;
   /** Mitä havaittiin. */
@@ -21,6 +23,14 @@ export type Explanation = {
   evidence: Evidence;
   sources: Source[];
 };
+/** Aikajanan tahti: vuonna `at` (tai jaksolla at–until) näytettävä havainto ja sen tuoma selitysarvio. */
+export type Beat = {
+  at: number;
+  until?: number;
+  text: string;
+  /** Selitys, jonka tämä havainto arvioi; tulos ilmestyy aikajanalle tästä vuodesta alkaen. */
+  explanation?: string;
+};
 export type Phenomenon = {
   id: string;
   question: string;
@@ -28,6 +38,7 @@ export type Phenomenon = {
   lead: string;
   explanations: Explanation[];
   notTold: string[];
+  beats: Beat[];
 };
 
 export const VERDICTS: Record<Verdict, { label: string; symbol: string; rank: number; tone: string }> = {
@@ -89,6 +100,7 @@ export const PHENOMENA: Phenomenon[] = [
     explanations: [
       {
         id: "esikoiset",
+        short: "Esikoiset harvenevat",
         title: "Ensimmäinen lapsi jää saamatta tai lykkääntyy",
         predicts: "Lasku keskittyy esikoisiin, ja esikoisen saavien äitien ikä nousee.",
         observed:
@@ -104,6 +116,7 @@ export const PHENOMENA: Phenomenon[] = [
       },
       {
         id: "parisuhteet",
+        short: "Parisuhteet vähenevät",
         title: "Parisuhteita on vähemmän",
         predicts: "Lasku johtuu siitä, että harvempi on parisuhteessa; pareilla syntyvyys pysyy ennallaan.",
         observed:
@@ -115,6 +128,7 @@ export const PHENOMENA: Phenomenon[] = [
       },
       {
         id: "talous",
+        short: "Huono talous",
         title: "Huono talous ja työttömyys",
         predicts: "Syntyvyys laskee taantumassa ja palautuu, kun työllisyys paranee.",
         observed: "Vuosina 2015–2019 työllisyysaste nousi 67,1 prosentista 71,6 prosenttiin, mutta syntyvyys laski nopeimmin juuri silloin: 1,65:stä 1,35:een.",
@@ -125,6 +139,7 @@ export const PHENOMENA: Phenomenon[] = [
       },
       {
         id: "pohjoismaat",
+        short: "Suomen oma politiikka",
         title: "Suomen oma perhepolitiikka",
         predicts: "Lasku on suomalainen ilmiö, eikä sitä näy maissa, joiden politiikka on erilainen.",
         observed: "Syntyvyys laski vuoden 2010 jälkeen kaikissa Pohjoismaissa: Ruotsissa 1,98:sta 1,43:een, Norjassa 1,95:stä 1,45:een, Tanskassa 1,87:stä 1,47:ään ja Islannissa 2,20:sta 1,56:een.",
@@ -135,6 +150,7 @@ export const PHENOMENA: Phenomenon[] = [
       },
       {
         id: "turva",
+        short: "Turvan heikennykset",
         title: "Työn ja toimeentulon turvan heikentyminen",
         predicts: "Syntyvyys laskee nopeimmin, kun nuorten aikuisten turvaa heikennetään, ja kääntyy, kun turvaa parannetaan.",
         observed: "Heikennyksiä tehtiin vuosina 2016–2019 ja 2024, jolloin syntyvyys laski. Myös parannusten jälkeen (2020, 2022) lasku jatkui pienen nousun jälkeen.",
@@ -148,6 +164,17 @@ export const PHENOMENA: Phenomenon[] = [
         ],
       },
     ],
+    beats: [
+      { at: 2000, until: 2009, text: "2000-luvulla syntyvyys pysyi kaikissa Pohjoismaissa 1,7–2,0 lapsessa naista kohden." },
+      { at: 2010, text: "Käänne: syntyvyys alkaa laskea samaan aikaan kaikissa Pohjoismaissa, joiden perhepolitiikka on erilainen.", explanation: "pohjoismaat" },
+      { at: 2013, text: "Lasku näkyy ensin esikoisissa: harvempi nainen saa ensimmäisen lapsen, ja esikoisen saavat ovat vanhempia.", explanation: "esikoiset" },
+      { at: 2015, until: 2019, text: "Työllisyys nousee 67 prosentista 72 prosenttiin, mutta syntyvyys laskee nopeimmin juuri nyt.", explanation: "talous" },
+      { at: 2016, until: 2019, text: "Samaan aikaan nuorten aikuisten turvaa heikennetään (▼). Ajoitus osuu yhteen, mutta vertailuryhmää ei ole.", explanation: "turva" },
+      { at: 2019, text: "Rekisteritutkimus: noin kolme neljäsosaa esikoisten vähenemisestä tapahtui pareilla, neljännes parisuhteiden muutoksista.", explanation: "parisuhteet" },
+      { at: 2020, until: 2022, text: "Turvaa parannetaan (▲). Syntyvyys nousee hetkeksi vuonna 2021 ja laskee taas." },
+      { at: 2024, text: "Uudet heikennykset (▼). Syntyvyys on ennätysmatala, 1,25." },
+      { at: 2025, text: "Syntyvyys nousee 1,30:een, ja nousu painottuu esikoisiin. Yksi vuosi ei vielä tee käännettä." },
+    ],
     notTold: [
       "Kuinka suuri osa lapsettomuudesta on toivottua ja kuinka suuri tahatonta.",
       "Miksi esikoisia syntyy vähemmän myös pareille, joilla on yhteinen koti.",
@@ -155,3 +182,27 @@ export const PHENOMENA: Phenomenon[] = [
     ],
   },
 ];
+
+/** Tahti, joka on voimassa vuonna `year` (viimeisin alkanut). */
+export function currentBeat(beats: Beat[], year: number): Beat | null {
+  let cur: Beat | null = null;
+  for (const b of beats) if (b.at <= Math.floor(year)) cur = b;
+  return cur;
+}
+
+/** Selitykset, joiden arvio on jo tullut aikajanalle vuoteen `year` mennessä, ilmestymisjärjestyksessä. */
+export function revealedExplanations(beats: Beat[], year: number): { id: string; at: number }[] {
+  return beats.filter((b) => b.explanation && b.at <= Math.floor(year)).map((b) => ({ id: b.explanation!, at: b.at }));
+}
+
+/** Sarjan pisteet vuoteen `year` asti; murtovuodelle lisätään tasaisesti interpoloitu kärkipiste animaatiota varten. */
+export function pointsUntil(points: [number, number][], year: number): [number, number][] {
+  const out = points.filter(([y]) => y <= year);
+  const next = points.find(([y]) => y > year);
+  const last = out.at(-1);
+  if (last && next && year > last[0]) {
+    const t = (year - last[0]) / (next[0] - last[0]);
+    out.push([year, last[1] + t * (next[1] - last[1])]);
+  }
+  return out;
+}
