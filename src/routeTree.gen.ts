@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ElamankaariRouteImport } from './routes/elamankaari'
 import { Route as LampokarttaRouteImport } from './routes/lampokartta'
 import { Route as PalloRouteImport } from './routes/pallo'
 import { Route as PoikkeamatRouteImport } from './routes/poikkeamat'
@@ -21,6 +22,11 @@ import { Route as TutkaRouteImport } from './routes/tutka'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ElamankaariRoute = ElamankaariRouteImport.update({
+  id: '/elamankaari',
+  path: '/elamankaari',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LampokarttaRoute = LampokarttaRouteImport.update({
@@ -61,6 +67,7 @@ const TutkaRoute = TutkaRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/elamankaari': typeof ElamankaariRoute
   '/lampokartta': typeof LampokarttaRoute
   '/pallo': typeof PalloRoute
   '/poikkeamat': typeof PoikkeamatRoute
@@ -71,6 +78,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/elamankaari': typeof ElamankaariRoute
   '/lampokartta': typeof LampokarttaRoute
   '/pallo': typeof PalloRoute
   '/poikkeamat': typeof PoikkeamatRoute
@@ -82,6 +90,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/elamankaari': typeof ElamankaariRoute
   '/lampokartta': typeof LampokarttaRoute
   '/pallo': typeof PalloRoute
   '/poikkeamat': typeof PoikkeamatRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/elamankaari'
     | '/lampokartta'
     | '/pallo'
     | '/poikkeamat'
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/elamankaari'
     | '/lampokartta'
     | '/pallo'
     | '/poikkeamat'
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/elamankaari'
     | '/lampokartta'
     | '/pallo'
     | '/poikkeamat'
@@ -125,6 +137,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ElamankaariRoute: typeof ElamankaariRoute
   LampokarttaRoute: typeof LampokarttaRoute
   PalloRoute: typeof PalloRoute
   PoikkeamatRoute: typeof PoikkeamatRoute
@@ -141,6 +154,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/elamankaari': {
+      id: '/elamankaari'
+      path: '/elamankaari'
+      fullPath: '/elamankaari'
+      preLoaderRoute: typeof ElamankaariRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lampokartta': {
@@ -197,6 +217,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ElamankaariRoute: ElamankaariRoute,
   LampokarttaRoute: LampokarttaRoute,
   PalloRoute: PalloRoute,
   PoikkeamatRoute: PoikkeamatRoute,
