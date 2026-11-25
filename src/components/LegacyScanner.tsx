@@ -5,6 +5,7 @@ import {
   PERIODS,
   opposing,
   scanAll,
+  scanLegacy,
   valueAt,
   type Legacy,
   type Kind,
@@ -28,9 +29,16 @@ export function LegacyScanner() {
   const [lane, setLane] = useState("");
   const [kind, setKind] = useState<Kind | "">("");
   const [q, setQ] = useState("");
-  const [key, setKey] = useState("");
+  const [key, setKey] = useState(
+    "gapminder.finland.children_per_woman_total_fertility.v20261026",
+  );
   const [limit, setLimit] = useState(20);
   const [comparison, setComparison] = useState(3);
+  const [historyKey, setHistoryKey] = useState(
+    "gapminder.finland.children_per_woman_total_fertility.v20261026",
+  );
+  const historySeries =
+    uniqueSeries().find((s) => s.k === historyKey) ?? uniqueSeries()[0]!;
   const rows = useMemo(() => scanAll(SCANNER.series, w), [w]);
   const prior = useMemo(
     () =>
@@ -45,7 +53,9 @@ export function LegacyScanner() {
       (!kind || r.kind === kind) &&
       (!q || r.s.t.toLocaleLowerCase("fi").includes(q.toLocaleLowerCase("fi"))),
   );
-  const selected = filtered.find((r) => r.s.k === key) ?? filtered[0];
+  const selected =
+    filtered.find((r) => r.s.k === key) ??
+    (key === historyKey ? undefined : filtered[0]);
   const opposite = selected ? opposing(selected, rows) : [];
   const valid =
     [w.start, w.shock, w.end].every(
@@ -71,7 +81,27 @@ export function LegacyScanner() {
           mittarit palasivat lähtötasolle, mitkä jäivät uudelle tasolle ja missä
           kehitys kulki vastakkaisiin suuntiin.
         </p>
-        <div className="mt-4 flex flex-wrap gap-2">
+        <HistoryOverview
+          series={historySeries}
+          selected={w.shock}
+          onPick={(p) => {
+            setW(p);
+            setLimit(20);
+            setLane("");
+            setKind("");
+            setQ("");
+            setKey(historySeries.k);
+          }}
+          onSeries={(k) => {
+            setHistoryKey(k);
+            setKey(k);
+            setLane("");
+            setKind("");
+            setQ("");
+          }}
+        />
+        <p className="mt-5 text-sm font-medium">Tarkenna murroskauteen</p>
+        <div className="mt-2 flex flex-wrap gap-2">
           {PERIODS.map((p) => (
             <button
               key={p.start}
@@ -157,6 +187,7 @@ export function LegacyScanner() {
               value={kind}
               onChange={(e) => {
                 setKind(e.target.value as Kind | "");
+                setKey("");
                 setLimit(20);
               }}
               className="mt-1 w-full rounded border bg-background p-2"
@@ -174,11 +205,18 @@ export function LegacyScanner() {
           Mittari
           <select
             value={selected?.s.k ?? ""}
-            onChange={(e) => setKey(e.target.value)}
+            onChange={(e) => {
+              setKey(e.target.value);
+              setHistoryKey(e.target.value);
+            }}
             className="mt-1 w-full rounded border bg-background p-2"
           >
-            {!filtered.length && (
-              <option value="">Ei kattavia mittareita</option>
+            {!selected && (
+              <option value="">
+                {filtered.length
+                  ? "Valitse kauden mittari"
+                  : "Ei kattavia mittareita"}
+              </option>
             )}
             {filtered.map((r) => (
               <option key={r.s.k} value={r.s.k}>
@@ -231,7 +269,10 @@ export function LegacyScanner() {
               <button
                 key={r.s.k}
                 aria-pressed={selected?.s.k === r.s.k}
-                onClick={() => setKey(r.s.k)}
+                onClick={() => {
+                  setKey(r.s.k);
+                  setHistoryKey(r.s.k);
+                }}
                 className={
                   "block w-full border-b p-3 text-left text-sm " +
                   (selected?.s.k === r.s.k ? "bg-muted" : "hover:bg-muted/50")
@@ -664,6 +705,213 @@ function DevelopmentChart({ r, w }: { r: Legacy; w: Window }) {
         Katkoviiva on laskennallinen trendijatkumo, ei arvio siitä, mitä ilman
         kriisiä olisi varmasti tapahtunut. Havaitut arvot voivat sisältää
         arvioita. Katkokset viivassa tarkoittavat puuttuvia havaintoja.
+      </p>
+    </div>
+  );
+}
+
+function HistoryOverview({
+  series,
+  selected,
+  onPick,
+  onSeries,
+}: {
+  series: Legacy["s"];
+  selected: number;
+  onPick: (p: Window) => void;
+  onSeries: (k: string) => void;
+}) {
+  const [search, setSearch] = useState("");
+  const all = uniqueSeries();
+  const choices = all.filter(
+    (s) =>
+      s.k === series.k ||
+      s.t.toLocaleLowerCase("fi").includes(search.toLocaleLowerCase("fi")),
+  );
+  const start = 1850,
+    end = 2025;
+  const values = Array.from({ length: end - start + 1 }, (_, i) => ({
+    year: start + i,
+    v: valueAt(series, start + i),
+  }));
+  const nums = values.flatMap((p) => (p.v === null ? [] : [p.v]));
+  const lo = Math.min(...nums),
+    hi = Math.max(...nums),
+    span = hi - lo || 1;
+  const x = (year: number) => 76 + ((year - start) / (end - start)) * 840;
+  const y = (v: number) => 242 - ((v - lo) / span) * 182;
+  const path = values
+    .map((p, i) =>
+      p.v === null
+        ? ""
+        : (i === 0 || values[i - 1]?.v === null ? "M" : "L") +
+          x(p.year) +
+          "," +
+          y(p.v),
+    )
+    .join(" ");
+  return (
+    <div className="mt-4 rounded-lg border bg-background p-3 sm:p-4">
+      <h3 className="font-display text-xl">
+        Kuusi murrosta yhdellä aikajanalla · 1850–2025
+      </h3>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Sama mittari kaikilla kausilla. Valitse murros tarkentaaksesi alempaa
+        analyysiä. Tyhjä kohta tarkoittaa puuttuvaa havaintoa.
+      </p>
+      <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_2fr]">
+        <input
+          aria-label="Hae historiamittaria"
+          placeholder="Hae mittaria…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="min-w-0 rounded border bg-background p-2 text-sm"
+        />
+        <select
+          aria-label="Historian mittari"
+          value={series.k}
+          onChange={(e) => onSeries(e.target.value)}
+          className="min-w-0 rounded border bg-background p-2 text-sm"
+        >
+          {choices.map((s) => (
+            <option key={s.k} value={s.k}>
+              {s.t}
+            </option>
+          ))}
+        </select>
+      </div>
+      <p className="mt-4 text-sm font-semibold">{series.t}</p>
+      <p className="text-xs text-muted-foreground">{series.u}</p>
+      <div className="overflow-x-auto">
+        <svg
+          viewBox="0 0 960 280"
+          className="mt-2 w-full min-w-[700px]"
+          role="img"
+          aria-label={series.t + " 1850–2025 ja kuusi historiallista murrosta"}
+        >
+          {PERIODS.map((p) => (
+            <g key={p.shock}>
+              <rect
+                x={x(p.start)}
+                y={42}
+                width={x(p.end) - x(p.start)}
+                height={200}
+                fill={selected === p.shock ? "#2563eb" : "#94a3b8"}
+                opacity={selected === p.shock ? 0.12 : 0.07}
+              />
+              <line
+                x1={x(p.shock)}
+                x2={x(p.shock)}
+                y1="35"
+                y2="242"
+                stroke={selected === p.shock ? "#2563eb" : "#a16207"}
+                strokeDasharray="4 4"
+              />
+              <text
+                x={x(p.shock)}
+                y={p.shock === 2020 ? 30 : 17}
+                textAnchor="middle"
+                fontSize="12"
+                fill="currentColor"
+              >
+                {p.shock}
+              </text>
+            </g>
+          ))}
+          {[0, 0.25, 0.5, 0.75, 1].map((t) => (
+            <g key={t}>
+              <line
+                x1="76"
+                x2="916"
+                y1={y(lo + t * span)}
+                y2={y(lo + t * span)}
+                stroke="currentColor"
+                opacity=".12"
+              />
+              <text
+                x="68"
+                y={y(lo + t * span) + 4}
+                textAnchor="end"
+                fill="currentColor"
+                fontSize="11"
+              >
+                {fmt(lo + t * span)}
+              </text>
+            </g>
+          ))}
+          <path
+            d={path}
+            stroke="#2563eb"
+            strokeWidth="2.5"
+            fill="none"
+            strokeLinejoin="round"
+          />
+          {[1850, 1875, 1900, 1925, 1950, 1975, 2000, 2025].map((yr) => (
+            <text
+              key={yr}
+              x={x(yr)}
+              y="265"
+              textAnchor="middle"
+              fontSize="12"
+              fill="currentColor"
+            >
+              {yr}
+            </text>
+          ))}
+          {PERIODS.map((p) => {
+            const v = valueAt(series, p.shock);
+            return v === null ? null : (
+              <circle
+                key={p.shock}
+                cx={x(p.shock)}
+                cy={y(v)}
+                r="4"
+                fill="#2563eb"
+                stroke="white"
+                strokeWidth="1.5"
+              />
+            );
+          })}
+        </svg>
+      </div>
+      <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {PERIODS.map((p) => {
+          const r = scanLegacy(series, p);
+          return (
+            <button
+              key={p.shock}
+              onClick={() => onPick(p)}
+              aria-pressed={selected === p.shock}
+              className="rounded-lg border p-3 text-left text-sm hover:bg-muted aria-pressed:ring-2 aria-pressed:ring-primary"
+            >
+              <span className="block text-xs text-muted-foreground">
+                {p.start}–{p.end}
+              </span>
+              <strong className="block">{p.label}</strong>
+              {r ? (
+                <>
+                  <span className="mt-2 block text-xs">
+                    {fmt(r.a)} → {fmt(r.b)} → {fmt(r.c)}
+                  </span>
+                  <span
+                    className="mt-1 block text-xs"
+                    style={{ color: colors[r.kind] }}
+                  >
+                    {LABELS[r.kind]}
+                  </span>
+                </>
+              ) : (
+                <span className="mt-2 block text-xs text-muted-foreground">
+                  Ei riittävää vertailuaineistoa
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <p className="mt-3 text-xs text-muted-foreground">
+        Kortit näyttävät lähtövuoden, murrosvuoden ja päätepisteen arvot.
+        Murrosjaksojen pituudet vaihtelevat; luokitus ei osoita syy-yhteyttä.
       </p>
     </div>
   );
