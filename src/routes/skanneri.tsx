@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { CrisisTrace } from "@/components/CrisisTrace";
 import { useMemo, useState } from "react";
 import { LegacyScanner } from "@/components/LegacyScanner";
 import {
@@ -23,14 +24,14 @@ import {
   type Status,
 } from "@/lib/scanner";
 
-type Search = { nakyma?: "perinto"; kohde?: string; tapa?: Mode; viive?: number; kriisit?: "pois"; a?: number; b?: number };
+type Search = { nakyma?: "perinto" | "jalki"; kohde?: string; tapa?: Mode; viive?: number; kriisit?: "pois"; a?: number; b?: number };
 type Patch = { [K in keyof Search]?: Search[K] | undefined };
 const DEFAULT_TARGET = "gapminder.finland.children_per_woman_total_fertility.v20261026";
 
 export const Route = createFileRoute("/skanneri")({
   validateSearch: (s: Record<string, unknown>): Search => {
     const out: Search = {};
-    if (s["nakyma"] === "perinto") out.nakyma = "perinto";
+    if (s["nakyma"] === "perinto" || s["nakyma"] === "jalki") out.nakyma = s["nakyma"];
     if (typeof s["kohde"] === "string") out.kohde = s["kohde"];
     if (s["tapa"] === "a" || s["tapa"] === "t" || s["tapa"] === "m") out.tapa = s["tapa"];
     const v = Number(s["viive"]);
@@ -96,10 +97,11 @@ function ScannerPage() {
       </header>
 
       <nav className="mb-5 flex flex-wrap gap-2" aria-label="Skannerin näkymä">
-        <button type="button" aria-pressed={search.nakyma !== "perinto"} onClick={() => set({ nakyma: undefined })} className="rounded-lg border px-4 py-2 text-sm aria-pressed:bg-primary aria-pressed:text-primary-foreground">Järjestysskanneri</button>
+        <button type="button" aria-pressed={!search.nakyma} onClick={() => set({ nakyma: undefined })} className="rounded-lg border px-4 py-2 text-sm aria-pressed:bg-primary aria-pressed:text-primary-foreground">Järjestysskanneri</button>
         <button type="button" aria-pressed={search.nakyma === "perinto"} onClick={() => set({ nakyma: "perinto" })} className="rounded-lg border px-4 py-2 text-sm aria-pressed:bg-primary aria-pressed:text-primary-foreground">Perintöskanneri · uusi</button>
+        <button type="button" aria-pressed={search.nakyma === "jalki"} onClick={() => set({ nakyma: "jalki" })} className="rounded-lg border px-4 py-2 text-sm aria-pressed:bg-primary aria-pressed:text-primary-foreground">Kriisin jälki · trendikorjattu</button>
       </nav>
-      {search.nakyma === "perinto" ? <LegacyScanner /> : <>
+      {search.nakyma === "perinto" ? <LegacyScanner /> : search.nakyma === "jalki" ? <CrisisTrace /> : <>
       <Seismograph det={det} a={A} b={B} onPick={(y) => set({ a: y })} />
 
       <TargetScan target={target} mode={mode} w={w} dropCrises={dropCrises} crises={crises} set={set} />
