@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ElamankaariRouteImport } from './routes/elamankaari'
 import { Route as LampokarttaRouteImport } from './routes/lampokartta'
+import { Route as MitajosRouteImport } from './routes/mitajos'
 import { Route as PalloRouteImport } from './routes/pallo'
 import { Route as PoikkeamatRouteImport } from './routes/poikkeamat'
 import { Route as PolkuRouteImport } from './routes/polku'
@@ -34,6 +35,11 @@ const ElamankaariRoute = ElamankaariRouteImport.update({
 const LampokarttaRoute = LampokarttaRouteImport.update({
   id: '/lampokartta',
   path: '/lampokartta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MitajosRoute = MitajosRouteImport.update({
+  id: '/mitajos',
+  path: '/mitajos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PalloRoute = PalloRouteImport.update({
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/elamankaari': typeof ElamankaariRoute
   '/lampokartta': typeof LampokarttaRoute
+  '/mitajos': typeof MitajosRoute
   '/pallo': typeof PalloRoute
   '/poikkeamat': typeof PoikkeamatRoute
   '/polku': typeof PolkuRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/elamankaari': typeof ElamankaariRoute
   '/lampokartta': typeof LampokarttaRoute
+  '/mitajos': typeof MitajosRoute
   '/pallo': typeof PalloRoute
   '/poikkeamat': typeof PoikkeamatRoute
   '/polku': typeof PolkuRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/elamankaari': typeof ElamankaariRoute
   '/lampokartta': typeof LampokarttaRoute
+  '/mitajos': typeof MitajosRoute
   '/pallo': typeof PalloRoute
   '/poikkeamat': typeof PoikkeamatRoute
   '/polku': typeof PolkuRoute
@@ -123,6 +132,7 @@ export interface FileRouteTypes {
     | '/'
     | '/elamankaari'
     | '/lampokartta'
+    | '/mitajos'
     | '/pallo'
     | '/poikkeamat'
     | '/polku'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/'
     | '/elamankaari'
     | '/lampokartta'
+    | '/mitajos'
     | '/pallo'
     | '/poikkeamat'
     | '/polku'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/'
     | '/elamankaari'
     | '/lampokartta'
+    | '/mitajos'
     | '/pallo'
     | '/poikkeamat'
     | '/polku'
@@ -163,6 +175,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ElamankaariRoute: typeof ElamankaariRoute
   LampokarttaRoute: typeof LampokarttaRoute
+  MitajosRoute: typeof MitajosRoute
   PalloRoute: typeof PalloRoute
   PoikkeamatRoute: typeof PoikkeamatRoute
   PolkuRoute: typeof PolkuRoute
@@ -194,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/lampokartta'
       fullPath: '/lampokartta'
       preLoaderRoute: typeof LampokarttaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mitajos': {
+      id: '/mitajos'
+      path: '/mitajos'
+      fullPath: '/mitajos'
+      preLoaderRoute: typeof MitajosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pallo': {
@@ -259,6 +279,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ElamankaariRoute: ElamankaariRoute,
   LampokarttaRoute: LampokarttaRoute,
+  MitajosRoute: MitajosRoute,
   PalloRoute: PalloRoute,
   PoikkeamatRoute: PoikkeamatRoute,
   PolkuRoute: PolkuRoute,
