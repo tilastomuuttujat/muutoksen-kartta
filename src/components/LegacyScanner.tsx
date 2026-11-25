@@ -77,9 +77,9 @@ export function LegacyScanner() {
           Mitä muutoksesta jäi seuraavalle aikakaudelle?
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Valitse lähtövuosi, murrosvuosi ja tarkastelun päätepiste. Näet mitkä
-          mittarit palasivat lähtötasolle, mitkä jäivät uudelle tasolle ja missä
-          kehitys kulki vastakkaisiin suuntiin.
+          Valitse aikajanan alta murroskausi. Näet mitkä mittarit palasivat
+          lähtötasolle, mitkä jäivät uudelle tasolle ja missä kehitys kulki
+          vastakkaisiin suuntiin.
         </p>
         <HistoryOverview
           series={historySeries}
@@ -100,56 +100,37 @@ export function LegacyScanner() {
             setQ("");
           }}
         />
-        <p className="mt-5 text-sm font-medium">Tarkenna murroskauteen</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {PERIODS.map((p) => (
-            <button
-              key={p.start}
-              type="button"
-              aria-pressed={
-                w.start === p.start && w.shock === p.shock && w.end === p.end
-              }
-              onClick={() => {
-                setW(p);
-                setLimit(20);
-              }}
-              className={
-                "rounded-full border px-3 py-2 text-sm " +
-                (w.start === p.start && w.shock === p.shock && w.end === p.end
-                  ? "bg-primary text-primary-foreground"
-                  : "hover:bg-muted")
-              }
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
-        <div className="mt-5 grid grid-cols-3 gap-2">
-          {(
-            [
-              ["start", "Ennen"],
-              ["shock", "Murros"],
-              ["end", "Jälkeen"],
-            ] as const
-          ).map(([k, label]) => (
-            <label key={k} className="text-sm font-medium">
-              {label}
-              <input
-                type="number"
-                min={1850}
-                max={2025}
-                value={w[k]}
-                onChange={(e) => change(k, Number(e.target.value))}
-                className="mt-1 block w-full rounded-md border bg-background p-2 text-lg"
-              />
-            </label>
-          ))}
-        </div>
-        {!valid && (
-          <p role="alert" className="mt-3 text-sm text-destructive">
-            Valitse kolme kokonaislukuvuotta aikajärjestyksessä (1850–2025).
-          </p>
-        )}
+        <details className="mt-4 rounded-lg border p-3">
+          <summary className="cursor-pointer text-sm font-medium">
+            Muokkaa tarkasteluvuosia · {w.start}–{w.end} (murros {w.shock})
+          </summary>
+          <div className="mt-5 grid grid-cols-3 gap-2">
+            {(
+              [
+                ["start", "Ennen"],
+                ["shock", "Murros"],
+                ["end", "Jälkeen"],
+              ] as const
+            ).map(([k, label]) => (
+              <label key={k} className="text-sm font-medium">
+                {label}
+                <input
+                  type="number"
+                  min={1850}
+                  max={2025}
+                  value={w[k]}
+                  onChange={(e) => change(k, Number(e.target.value))}
+                  className="mt-1 block w-full rounded-md border bg-background p-2 text-lg"
+                />
+              </label>
+            ))}
+          </div>
+          {!valid && (
+            <p role="alert" className="mt-3 text-sm text-destructive">
+              Valitse kolme kokonaislukuvuotta aikajärjestyksessä (1850–2025).
+            </p>
+          )}
+        </details>
         <p className="mt-3 text-sm text-muted-foreground">
           {rows.length} / {uniqueSeries().length} sarjaa täyttää kattavuusehdot.
           Puuttuvia vuosia ei arvioida.
