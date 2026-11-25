@@ -16,6 +16,7 @@ import { Route as PalloRouteImport } from './routes/pallo'
 import { Route as PoikkeamatRouteImport } from './routes/poikkeamat'
 import { Route as PolkuRouteImport } from './routes/polku'
 import { Route as SelityksetRouteImport } from './routes/selitykset'
+import { Route as SkanneriRouteImport } from './routes/skanneri'
 import { Route as TahtikarttaRouteImport } from './routes/tahtikartta'
 import { Route as TeematRouteImport } from './routes/teemat'
 import { Route as TutkaRouteImport } from './routes/tutka'
@@ -55,6 +56,11 @@ const SelityksetRoute = SelityksetRouteImport.update({
   path: '/selitykset',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SkanneriRoute = SkanneriRouteImport.update({
+  id: '/skanneri',
+  path: '/skanneri',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TahtikarttaRoute = TahtikarttaRouteImport.update({
   id: '/tahtikartta',
   path: '/tahtikartta',
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/poikkeamat': typeof PoikkeamatRoute
   '/polku': typeof PolkuRoute
   '/selitykset': typeof SelityksetRoute
+  '/skanneri': typeof SkanneriRoute
   '/tahtikartta': typeof TahtikarttaRoute
   '/teemat': typeof TeematRoute
   '/tutka': typeof TutkaRoute
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/poikkeamat': typeof PoikkeamatRoute
   '/polku': typeof PolkuRoute
   '/selitykset': typeof SelityksetRoute
+  '/skanneri': typeof SkanneriRoute
   '/tahtikartta': typeof TahtikarttaRoute
   '/teemat': typeof TeematRoute
   '/tutka': typeof TutkaRoute
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/poikkeamat': typeof PoikkeamatRoute
   '/polku': typeof PolkuRoute
   '/selitykset': typeof SelityksetRoute
+  '/skanneri': typeof SkanneriRoute
   '/tahtikartta': typeof TahtikarttaRoute
   '/teemat': typeof TeematRoute
   '/tutka': typeof TutkaRoute
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/poikkeamat'
     | '/polku'
     | '/selitykset'
+    | '/skanneri'
     | '/tahtikartta'
     | '/teemat'
     | '/tutka'
@@ -130,6 +140,7 @@ export interface FileRouteTypes {
     | '/poikkeamat'
     | '/polku'
     | '/selitykset'
+    | '/skanneri'
     | '/tahtikartta'
     | '/teemat'
     | '/tutka'
@@ -142,6 +153,7 @@ export interface FileRouteTypes {
     | '/poikkeamat'
     | '/polku'
     | '/selitykset'
+    | '/skanneri'
     | '/tahtikartta'
     | '/teemat'
     | '/tutka'
@@ -155,6 +167,7 @@ export interface RootRouteChildren {
   PoikkeamatRoute: typeof PoikkeamatRoute
   PolkuRoute: typeof PolkuRoute
   SelityksetRoute: typeof SelityksetRoute
+  SkanneriRoute: typeof SkanneriRoute
   TahtikarttaRoute: typeof TahtikarttaRoute
   TeematRoute: typeof TeematRoute
   TutkaRoute: typeof TutkaRoute
@@ -211,6 +224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SelityksetRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/skanneri': {
+      id: '/skanneri'
+      path: '/skanneri'
+      fullPath: '/skanneri'
+      preLoaderRoute: typeof SkanneriRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tahtikartta': {
       id: '/tahtikartta'
       path: '/tahtikartta'
@@ -243,6 +263,7 @@ const rootRouteChildren: RootRouteChildren = {
   PoikkeamatRoute: PoikkeamatRoute,
   PolkuRoute: PolkuRoute,
   SelityksetRoute: SelityksetRoute,
+  SkanneriRoute: SkanneriRoute,
   TahtikarttaRoute: TahtikarttaRoute,
   TeematRoute: TeematRoute,
   TutkaRoute: TutkaRoute,
