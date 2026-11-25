@@ -31,3 +31,4 @@ dist-ssr
 *.sln
 *.sw?
 scan-data/
+__pycache__/
