@@ -18,7 +18,7 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment2.outputs.page_url || steps.deployment3.outputs.page_url }}
     runs-on: ubuntu-latest
     env:
       PAGES_ARTIFACT_NAME: github-pages-${{ github.run_attempt }}
@@ -54,7 +54,27 @@ jobs:
           done
           echo 'Pages artifact did not become visible.' >&2
           exit 1
+      # GitHubin julkaisurajapinta ei aina näe juuri ladattua pakettia (tai palauttaa 500), vaikka se on
+      # jo näkyvissä Actions-rajapinnassa. Yritetään uudelleen viiveellä ennen kuin ajo kaatuu.
       - uses: actions/deploy-pages@v4
         id: deployment
+        continue-on-error: true
+        with:
+          artifact_name: ${{ env.PAGES_ARTIFACT_NAME }}
+      - name: Wait before retrying deployment
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 60
+      - uses: actions/deploy-pages@v4
+        id: deployment2
+        if: steps.deployment.outcome == 'failure'
+        continue-on-error: true
+        with:
+          artifact_name: ${{ env.PAGES_ARTIFACT_NAME }}
+      - name: Wait before last deployment attempt
+        if: steps.deployment.outcome == 'failure' && steps.deployment2.outcome == 'failure'
+        run: sleep 180
+      - uses: actions/deploy-pages@v4
+        id: deployment3
+        if: steps.deployment.outcome == 'failure' && steps.deployment2.outcome == 'failure'
         with:
           artifact_name: ${{ env.PAGES_ARTIFACT_NAME }}
