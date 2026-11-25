@@ -84,3 +84,75 @@ rakennemuutoksille. Yksi ei riitä.
    nuorten työ, asuminen), ja kaksoiskappaleiden merkintä yhdeksi ilmiöksi.
 3. **Animaation rakenne:** koko aineisto taustan seismografina, kysymyksen sarjat korostettuna ja
    selitysarviot vain sinne, missä testi on tehty.
+
+# Koe 2: kertovatko teemojen ja väestöryhmien erot vaikutussuhteista?
+
+Kysymys: jos skannaus antaa eri teemoille ja ryhmille eri tuloksen, voiko eroista päätellä, mikä
+vaikutti mihin? Skriptit: `lag.py` (teemojen ajoitus) sekä `h1990.py` → `h1990_test.py` →
+`h1990_fig.py` (alueiden ennalta kirjattu testi).
+
+## Ajoitus: teemat reagoivat kriiseihin eri aikaan
+
+Kriisivuosien (koe 1) ympärillä laskettiin, minä vuonna kunkin teeman sarjoissa oli eniten
+poikkeamia (t = kriisivuosi):
+
+| Teema | Huippu | Poikkeamaosuus |
+|---|---|---|
+| Hoiva ja terveys | t−1 | huippu ennen kriisivuotta, koska sodat alkoivat ennen talouden romahdusta |
+| Työ ja tuotanto | t0 | noin 0,6 |
+| Julkinen talous | t+1 | 0,34 |
+| Varallisuuden jakautuminen | t+4 | 0,36 |
+
+Järjestys vastaa tunnettua ketjua: ensin tuotanto ja työ, vuotta myöhemmin julkinen talous
+(verotulot ja menot) ja vasta vuosia myöhemmin tulo- ja varallisuuserot. **Ajoitus kertoo
+etenemisjärjestyksen, mutta ei syy-yhteyttä.** Sama järjestys syntyisi, jos tilastot vain
+julkaistaisiin tai reagoisivat eri viiveellä.
+
+## Väestöryhmät: aineisto on enimmäkseen alueittaista
+
+Ryhmiin jaetut sarjat: alueet 756, muut ryhmittelyt 627, ikä 123, maat 42, sukupuoli 38. Vertailuun
+riittää siis lähinnä alueiden aineisto. Ikä- ja sukupuolisarjoja on vähän ja ne ovat eri ilmiöistä,
+joten niiden eroista ei voi vielä tehdä luotettavaa testiä.
+
+## Ennalta kirjattu testi: selittääkö toimialarakenne 1990-luvun laman alue-erot?
+
+Hypoteesi kirjattiin ennen tulosten katsomista: **maakunnat, joissa teollisuuden ja rakentamisen
+osuus työllisistä oli 1989 suurempi, menettivät 1989–1993 enemmän työpaikkoja.** Aineisto: Turson
+`h1990_altp904_employed`, 20 maakuntaa, vuodet 1989, 1993 ja 2000. Testi: Spearmanin
+järjestyskorrelaatio, yksisuuntainen permutaatiotesti.
+
+![Laman alue-erot](img/kuva3-lama-alueet.png)
+
+| Altistus 1989 | rho | p |
+|---|---|---|
+| Teollisuus + rakentaminen (ennalta kirjattu) | −0,07 | 0,39 |
+| Teollisuus | −0,07 | 0,39 |
+| Rakentaminen | −0,15 | 0,26 |
+| Maatalous | −0,23 | 0,16 |
+
+- Ilman Ahvenanmaata rho oli +0,09 eli suunta kääntyi.
+- Toimialarakenteen mukainen odotus (shift-share) selitti 28 % alue-eroista, mutta ilman
+  Ahvenanmaata vain 8 %.
+- Mannermaan maakunnat menettivät 13–22 % työpaikoistaan; Ahvenanmaa vain 2 %.
+- Valtakunnallisesti työpaikat vähenivät lähes kaikilla yksityisillä aloilla: rakentaminen −35 %,
+  teollisuus −24 %, kauppa −24 %, rahoitus −25 %, majoitus −22 %, maatalous −20 %. Julkiset alat
+  menettivät vähän (hallinto −4 %, koulutus −3 %, terveys −8 %).
+- Jälkikäteen tarkistetut vaihtoehdot eivät muuttaneet kuvaa: julkisen sektorin osuus rho +0,05.
+
+**Tulos: hypoteesi ei saanut tukea.** Lama osui kaikkiin maakuntiin ja laajasti kaikkiin yksityisiin
+aloihin, joten alueiden toimialarakenne ei selitä, miksi jokin maakunta menetti enemmän kuin toinen.
+Tulos sopii kuvaan laajasta kysynnän romahduksesta (pankkikriisi, velkaantuminen, idänkaupan loppu)
+eikä teollisuusalueisiin rajautuneesta kriisistä.
+
+## Arvio: toimiiko erojen vertailu vaikutussuhteiden etsimiseen?
+
+| Kysymys | Toimiiko? |
+|---|---|
+| Mikä reagoi ensin ja mikä myöhemmin | **Kyllä**: teemojen ajoitus antaa johdonmukaisen järjestyksen |
+| Syy-yhteys pelkästä ajoituksesta | **Ei**: järjestys on ehdokas, ei todiste |
+| Selityksen testaaminen ryhmien eroilla | **Kyllä, kun altistus on määritelty etukäteen**: testi voi myös hylätä selityksen, kuten tässä |
+| Ikä- ja sukupuoliryhmien vertailu | **Ei vielä**: ryhmiteltyjä sarjoja liian vähän |
+
+Animaatioon tämä tarkoittaa: teemojen ajoitus voidaan näyttää etenemisenä ("ensin työ, sitten
+julkinen talous"), mutta selitysarvio (sopii / osittain / ei yksin) vain sinne, missä on tehty
+tällainen ennalta kirjattu testi.
