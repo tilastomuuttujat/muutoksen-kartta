@@ -128,73 +128,71 @@ export function LegacyScanner() {
       <section className="rounded-xl border bg-card p-5">
         <h2 className="font-display text-xl">1. Missä muutos jäi elämään?</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Elämänalueiden jakauma. Napauta kaistaa rajataksesi sarjat. Värit
-          kuvaavat muutoksen pysyvyyttä, eivät sen hyvyyttä.
+          Valitse elämänalue ja mittari. Kuvaaja näyttää havaitun kehityksen ja
+          murrosta edeltäneen suunnan jatkumon.
         </p>
-        <div className="my-4 flex flex-wrap gap-3 text-xs">
-          {kinds.map((k) => (
-            <button
-              key={k}
-              onClick={() => {
-                setKind(kind === k ? "" : k);
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <label className="text-sm font-medium">
+            Elämänalue
+            <select
+              value={lane}
+              onChange={(e) => {
+                setLane(e.target.value);
+                setKey("");
                 setLimit(20);
               }}
-              aria-pressed={kind === k}
-              className={
-                "flex items-center gap-1 rounded border px-2 py-1 " +
-                (kind === k ? "border-primary" : "border-transparent")
-              }
+              className="mt-1 w-full rounded border bg-background p-2"
             >
-              <span
-                className="h-3 w-3 rounded-sm"
-                style={{ background: colors[k] }}
-              />
-              {LABELS[k]}
-            </button>
-          ))}
+              <option value="">Kaikki elämänalueet</option>
+              {LANES.map((l) => (
+                <option key={l} value={l}>
+                  {l} ({rows.filter((r) => r.s.lane === l).length})
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="text-sm font-medium">
+            Muutos suhteessa lähtötasoon
+            <select
+              value={kind}
+              onChange={(e) => {
+                setKind(e.target.value as Kind | "");
+                setLimit(20);
+              }}
+              className="mt-1 w-full rounded border bg-background p-2"
+            >
+              <option value="">Kaikki kehityskulut</option>
+              {kinds.map((k) => (
+                <option key={k} value={k}>
+                  {LABELS[k]}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
-        <div className="space-y-3">
-          {LANES.map((l) => {
-            const list = rows.filter((r) => r.s.lane === l);
-            return (
-              <button
-                key={l}
-                aria-pressed={lane === l}
-                onClick={() => {
-                  setLane(lane === l ? "" : l);
-                  setLimit(20);
-                }}
-                className={
-                  "grid w-full grid-cols-[minmax(100px,1fr)_2fr_32px] items-center gap-2 rounded p-1 text-left text-xs " +
-                  (lane === l ? "ring-2 ring-primary" : "hover:bg-muted")
-                }
-              >
-                <span>{l}</span>
-                <span className="flex h-5 overflow-hidden rounded bg-muted">
-                  {kinds.map((k) => {
-                    const n = list.filter((r) => r.kind === k).length;
-                    return (
-                      <span
-                        key={k}
-                        title={LABELS[k] + ": " + n}
-                        style={{
-                          width:
-                            (list.length ? (n / list.length) * 100 : 0) + "%",
-                          background: colors[k],
-                        }}
-                      />
-                    );
-                  })}
-                </span>
-                <span className="text-right tabular-nums">{list.length}</span>
-              </button>
-            );
-          })}
-        </div>
-        <p className="mt-3 text-xs text-muted-foreground">
-          Palkkien pituus on osuus alueen kattavista sarjoista; oikealla
-          sarjojen määrä. Alueet eivät ole yhteiskunnallisia painokertoimia.
-        </p>
+        <label className="mt-3 block text-sm font-medium">
+          Mittari
+          <select
+            value={selected?.s.k ?? ""}
+            onChange={(e) => setKey(e.target.value)}
+            className="mt-1 w-full rounded border bg-background p-2"
+          >
+            {!filtered.length && (
+              <option value="">Ei kattavia mittareita</option>
+            )}
+            {filtered.map((r) => (
+              <option key={r.s.k} value={r.s.k}>
+                {r.s.t}
+              </option>
+            ))}
+          </select>
+        </label>
+        {selected && <DevelopmentChart r={selected} w={w} />}
+        {!selected && (
+          <p className="mt-4 text-sm text-muted-foreground">
+            Ei kattavia mittareita valitulla jaksolla.
+          </p>
+        )}
       </section>
       <section className="rounded-xl border bg-card p-5">
         <h2 className="font-display text-xl">
@@ -361,10 +359,12 @@ export function LegacyScanner() {
           etääntyi lisää; muut = osa muutoksesta jäi.
         </p>
         <p className="mt-2">
-          Ei trendikorjausta, merkitsevyystestiä eikä syy-seurausarviota. Myös
-          trendit, mittarimuutokset ja väestön rakenne voivat näkyä tuloksissa.
-          Aineisto sisältää havaintoja ja arvioita; tarkista alkuperäiset
-          lähteet ennen johtopäätöksiä.
+          Trendiviiva on erillinen havainnollistava vertailu: lineaarinen
+          sovitus enintään kymmenen vuotta ennen lähtövuotta (vähintään kuusi
+          havaintoa). Se ei muuta luokituksia. Ei merkitsevyystestiä eikä
+          syy-seurausarviota. Myös trendit, mittarimuutokset ja väestön rakenne
+          voivat näkyä tuloksissa. Aineisto sisältää havaintoja ja arvioita;
+          tarkista alkuperäiset lähteet ennen johtopäätöksiä.
         </p>
         <p className="mt-2 text-muted-foreground">
           Lähde: {SCANNER.meta.source}.
@@ -454,6 +454,216 @@ function Detail({ r, w }: { r: Legacy; w: Window }) {
       <p className="mt-1 text-xs text-muted-foreground">
         {r.observations}/{vals.length} vuosihavaintoa · vertailutaso{" "}
         {fmt(r.scale)} {r.s.u}/vuosi
+      </p>
+    </div>
+  );
+}
+
+function DevelopmentChart({ r, w }: { r: Legacy; w: Window }) {
+  const start = Math.max(1850, w.start - 10);
+  const end = Math.max(w.end, Math.min(2045, w.shock + 20));
+  const observed = Array.from({ length: end - start + 1 }, (_, i) => ({
+    year: start + i,
+    v: start + i <= 2025 ? valueAt(r.s, start + i) : null,
+  }));
+  const pre = observed.filter(
+    (p): p is { year: number; v: number } => p.year <= w.start && p.v !== null,
+  );
+  const mean = pre.length ? pre.reduce((a, p) => a + p.v, 0) / pre.length : 0;
+  const my = pre.length ? pre.reduce((a, p) => a + p.year, 0) / pre.length : 0;
+  const den = pre.reduce((a, p) => a + (p.year - my) ** 2, 0);
+  const slope = den
+    ? pre.reduce((a, p) => a + (p.year - my) * (p.v - mean), 0) / den
+    : 0;
+  const trend = (yr: number) => mean + slope * (yr - my);
+  const hasTrend = pre.length >= 6 && den > 0;
+  const lastObserved = Math.max(
+    ...observed.filter((p) => p.v !== null).map((p) => p.year),
+  );
+  const points = observed.flatMap((p) => (p.v === null ? [] : [p.v]));
+  if (hasTrend) points.push(trend(start), trend(Math.min(lastObserved, end)));
+  const lo = Math.min(...points),
+    hi = Math.max(...points),
+    span = hi - lo || 1;
+  const x = (yr: number) => 85 + ((yr - start) / (end - start)) * 625;
+  const y = (v: number) => 210 - ((v - lo) / span) * 166;
+  const path = observed
+    .map((p, i) =>
+      p.v === null
+        ? ""
+        : (i === 0 || observed[i - 1]?.v === null ? "M" : "L") +
+          x(p.year) +
+          "," +
+          y(p.v),
+    )
+    .join(" ");
+  const marks = [
+    ...new Set(
+      [
+        start,
+        w.start,
+        w.shock,
+        w.end,
+        w.shock + 5,
+        w.shock + 10,
+        w.shock + 20,
+      ].filter((yr) => yr >= start && yr <= end),
+    ),
+  ].sort((a, b) => a - b);
+  const milestones = [5, 10, 20].map((n) => ({
+    n,
+    year: w.shock + n,
+    v: w.shock + n <= 2025 ? valueAt(r.s, w.shock + n) : null,
+  }));
+  return (
+    <div className="mt-5 rounded-lg border p-4">
+      <h3 className="font-display text-xl">{r.s.t}</h3>
+      <p className="mt-1 text-xs text-muted-foreground">
+        {r.s.u} · {w.start}–{w.end} · {LABELS[r.kind]} suhteessa lähtötasoon
+      </p>
+      <div className="mt-3 overflow-x-auto">
+        <svg
+          viewBox="0 0 745 270"
+          className="w-full min-w-[540px]"
+          role="img"
+          aria-label="Havaittu kehitys, historiallinen trendijatkumo ja murrosvuosi"
+        >
+          {lastObserved < end && (
+            <rect
+              x={x(lastObserved)}
+              y={30}
+              width={x(end) - x(lastObserved)}
+              height={180}
+              fill="#94a3b8"
+              opacity=".15"
+            />
+          )}
+          {[0, 0.25, 0.5, 0.75, 1].map((p) => (
+            <g key={p}>
+              <line
+                x1="85"
+                x2="710"
+                y1={y(lo + p * span)}
+                y2={y(lo + p * span)}
+                stroke="currentColor"
+                opacity=".12"
+              />
+              <text
+                x="78"
+                y={y(lo + p * span) + 4}
+                textAnchor="end"
+                fontSize="11"
+                fill="currentColor"
+              >
+                {fmt(lo + p * span)}
+              </text>
+            </g>
+          ))}
+          <line
+            x1={x(w.shock)}
+            x2={x(w.shock)}
+            y1="25"
+            y2="210"
+            stroke="#b45309"
+            strokeDasharray="4 4"
+          />
+          <text
+            x={x(w.shock)}
+            y="17"
+            textAnchor="middle"
+            fontSize="12"
+            fill="#b45309"
+          >
+            Murros {w.shock}
+          </text>
+          <line
+            x1={x(w.end)}
+            x2={x(w.end)}
+            y1="30"
+            y2="210"
+            stroke="currentColor"
+            opacity=".35"
+            strokeDasharray="3 4"
+          />
+          {hasTrend && (
+            <line
+              x1={x(start)}
+              x2={x(lastObserved)}
+              y1={y(trend(start))}
+              y2={y(trend(lastObserved))}
+              stroke="currentColor"
+              opacity=".65"
+              strokeDasharray="7 5"
+              strokeWidth="2"
+            />
+          )}
+          <path
+            d={path}
+            fill="none"
+            stroke="#2563eb"
+            strokeWidth="2.7"
+            strokeLinejoin="round"
+          />
+          {[w.start, w.shock, w.end].map((yr) => (
+            <circle
+              key={yr}
+              cx={x(yr)}
+              cy={y(valueAt(r.s, yr)!)}
+              r="4"
+              fill="#2563eb"
+              stroke="white"
+              strokeWidth="1.5"
+            />
+          ))}
+          {marks.map((yr, i) => (
+            <text
+              key={yr}
+              x={x(yr)}
+              y={i % 2 ? 249 : 233}
+              textAnchor="middle"
+              fontSize="11"
+              fill="currentColor"
+            >
+              {yr}
+            </text>
+          ))}
+        </svg>
+      </div>
+      <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs">
+        <span className="text-blue-700 dark:text-blue-300">
+          ━━ Havaittu kehitys
+        </span>
+        <span>
+          ┄┄{" "}
+          {hasTrend
+            ? "Murrosta edeltävä trendijatkumo"
+            : "Ei riittävää trendiaineistoa"}
+        </span>
+        <span className="text-muted-foreground">
+          ▧ Ei havaintoja sarjan lopun jälkeen
+        </span>
+      </div>
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        {milestones.map((m) => (
+          <div key={m.n} className="rounded bg-muted p-3 text-center">
+            <p className="text-xs text-muted-foreground">
+              +{m.n} vuotta · {m.year}
+            </p>
+            <p className="font-semibold">
+              {m.v === null ? "Ei tietoa" : fmt(m.v)}
+            </p>
+            {m.v !== null && (
+              <p className="text-xs text-muted-foreground">
+                Muutos lähtötasosta {signed(m.v - r.a)}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+      <p className="mt-3 text-xs text-muted-foreground">
+        Katkoviiva on laskennallinen trendijatkumo, ei arvio siitä, mitä ilman
+        kriisiä olisi varmasti tapahtunut. Havaitut arvot voivat sisältää
+        arvioita. Katkokset viivassa tarkoittavat puuttuvia havaintoja.
       </p>
     </div>
   );
