@@ -13,8 +13,7 @@ import {
   type Window,
 } from "@/lib/legacy-scan";
 
-const fmt = (v: number) =>
-  v.toLocaleString("fi-FI", { maximumFractionDigits: 2 });
+const fmt = (v: number) => v.toLocaleString("fi-FI", { maximumFractionDigits: 2 });
 const signed = (v: number) => (v > 0 ? "+" : "") + fmt(v);
 const colors: Record<Kind, string> = {
   continued: "#b45309",
@@ -30,9 +29,7 @@ const crimeSourceUrl =
 const population = SCANNER.series.find(
   (series) => series.k === "fi.statfin15ai.total.ep.fe4e7bf6af",
 );
-const supplements = new Map(
-  tursoSupplement.series.map((item) => [item.key, item]),
-);
+const supplements = new Map(tursoSupplement.series.map((item) => [item.key, item]));
 const officialCrimeSeries: Legacy["s"][] = tursoSupplement.series
   .filter((item) => item.key.startsWith("statfin13gw."))
   .map((item) => ({
@@ -45,7 +42,7 @@ const officialCrimeSeries: Legacy["s"][] = tursoSupplement.series
     theme: "Rikollisuus",
     f: "",
   }));
-const legacySeries = SCANNER.series.map((series) => {
+const baseLegacySeries = SCANNER.series.map((series) => {
   const supplement = supplements.get(series.k);
   if (!supplement) return series;
   const values = [...series.v];
@@ -56,6 +53,22 @@ const legacySeries = SCANNER.series.map((series) => {
   });
   return { ...series, v: values };
 });
+const baseKeys = new Set(baseLegacySeries.map((series) => series.k));
+const addedSeries: Legacy["s"][] = tursoSupplement.series
+  .filter((item) => item.unit && item.lane && !baseKeys.has(item.key))
+  .map((item) => ({
+    k: item.key,
+    t: item.title,
+    y0: item.from,
+    v: item.values,
+    u: item.unit!,
+    lane: item.lane!,
+    theme: item.lane!,
+    f: "",
+  }));
+const legacySeries = [...baseLegacySeries, ...addedSeries];
+const isCohort = (key: string) => supplements.get(key)?.yearBasis === "birth";
+const calendarSeries = legacySeries.filter((series) => !isCohort(series.k));
 const unemploymentKey = "fi.histlabour.lfs2019.unemployment_rate";
 const longSeriesSources = new Map([
   [
@@ -76,10 +89,7 @@ const longSeriesSources = new Map([
   ],
 ]);
 const historyChoices = legacySeries.filter(
-  (series) =>
-    !series.dup ||
-    series.k === unemploymentKey ||
-    longSeriesSources.has(series.k),
+  (series) => !series.dup || series.k === unemploymentKey || longSeriesSources.has(series.k),
 );
 
 export function LegacyScanner() {
@@ -87,22 +97,16 @@ export function LegacyScanner() {
   const [lane, setLane] = useState("");
   const [kind, setKind] = useState<Kind | "">("");
   const [q, setQ] = useState("");
-  const [key, setKey] = useState(
-    "gapminder.finland.children_per_woman_total_fertility.v20261026",
-  );
+  const [key, setKey] = useState("gapminder.finland.children_per_woman_total_fertility.v20261026");
   const [limit, setLimit] = useState(20);
   const [comparison, setComparison] = useState(3);
   const [historyKey, setHistoryKey] = useState(
     "gapminder.finland.children_per_woman_total_fertility.v20261026",
   );
-  const historySeries =
-    historyChoices.find((s) => s.k === historyKey) ?? historyChoices[0]!;
-  const rows = useMemo(() => scanAll(legacySeries, w), [w]);
+  const historySeries = historyChoices.find((s) => s.k === historyKey) ?? historyChoices[0]!;
+  const rows = useMemo(() => scanAll(calendarSeries, w), [w]);
   const prior = useMemo(
-    () =>
-      new Map(
-        scanAll(legacySeries, PERIODS[comparison]!).map((r) => [r.s.k, r]),
-      ),
+    () => new Map(scanAll(calendarSeries, PERIODS[comparison]!).map((r) => [r.s.k, r])),
     [comparison],
   );
   const filtered = rows.filter(
@@ -112,13 +116,10 @@ export function LegacyScanner() {
       (!q || r.s.t.toLocaleLowerCase("fi").includes(q.toLocaleLowerCase("fi"))),
   );
   const selected =
-    filtered.find((r) => r.s.k === key) ??
-    (key === historyKey ? undefined : filtered[0]);
+    filtered.find((r) => r.s.k === key) ?? (key === historyKey ? undefined : filtered[0]);
   const opposite = selected ? opposing(selected, rows) : [];
   const valid =
-    [w.start, w.shock, w.end].every(
-      (y) => Number.isInteger(y) && y >= 1850 && y <= 2025,
-    ) &&
+    [w.start, w.shock, w.end].every((y) => Number.isInteger(y) && y >= 1850 && y <= 2025) &&
     w.start < w.shock &&
     w.shock < w.end;
   const change = (k: keyof Window, v: number) => {
@@ -135,9 +136,8 @@ export function LegacyScanner() {
           Mitä muutoksesta jäi seuraavalle aikakaudelle?
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Valitse aikajanan alta murroskausi. Näet mitkä mittarit palasivat
-          lähtötasolle, mitkä jäivät uudelle tasolle ja missä kehitys kulki
-          vastakkaisiin suuntiin.
+          Valitse aikajanan alta murroskausi. Näet mitkä mittarit palasivat lähtötasolle, mitkä
+          jäivät uudelle tasolle ja missä kehitys kulki vastakkaisiin suuntiin.
         </p>
         <HistoryOverview
           series={historySeries}
@@ -190,16 +190,16 @@ export function LegacyScanner() {
           )}
         </details>
         <p className="mt-3 text-sm text-muted-foreground">
-          {rows.length} / {historyChoices.length} sarjaa täyttää kattavuusehdot.
-          Puuttuvia vuosia ei arvioida.
+          {rows.length} / {calendarSeries.filter((series) => !series.dup).length}{" "}
+          kalenterivuosisarjaa täyttää kattavuusehdot. Puuttuvia vuosia ei arvioida.
         </p>
       </section>
       <LivelihoodComparison />
       <section className="rounded-xl border bg-card p-5">
         <h2 className="font-display text-xl">1. Missä muutos jäi elämään?</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Valitse elämänalue ja mittari. Kuvaaja näyttää havaitun kehityksen ja
-          murrosta edeltäneen suunnan jatkumon.
+          Valitse elämänalue ja mittari. Kuvaaja näyttää havaitun kehityksen ja murrosta edeltäneen
+          suunnan jatkumon.
         </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <label className="text-sm font-medium">
@@ -253,9 +253,7 @@ export function LegacyScanner() {
           >
             {!selected && (
               <option value="">
-                {filtered.length
-                  ? "Valitse kauden mittari"
-                  : "Ei kattavia mittareita"}
+                {filtered.length ? "Valitse kauden mittari" : "Ei kattavia mittareita"}
               </option>
             )}
             {filtered.map((r) => (
@@ -273,9 +271,7 @@ export function LegacyScanner() {
         )}
       </section>
       <section className="rounded-xl border bg-card p-5">
-        <h2 className="font-display text-xl">
-          2. Seuraa yksittäistä kehityskulkua
-        </h2>
+        <h2 className="font-display text-xl">2. Seuraa yksittäistä kehityskulkua</h2>
         <div className="mt-3 flex flex-wrap gap-2">
           <input
             aria-label="Hae mittaria"
@@ -333,9 +329,7 @@ export function LegacyScanner() {
               </button>
             )}
             {!filtered.length && (
-              <p className="p-4 text-sm">
-                Ei kattavia sarjoja näillä rajauksilla.
-              </p>
+              <p className="p-4 text-sm">Ei kattavia sarjoja näillä rajauksilla.</p>
             )}
           </div>
           {selected && <Detail r={selected} w={w} />}
@@ -347,19 +341,16 @@ export function LegacyScanner() {
             3. Kulkevatko muut elämänalueet toiseen suuntaan?
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Kohde: {selected.s.t}. Alla muiden kaistojen mittarit, joiden
-            nettomuutos on vastakkaissuuntainen ja vähintään yhden oman
-            vertailutason suuruinen. Tämä ei vielä osoita ristiriitaa tai
-            vaikutusta.
+            Kohde: {selected.s.t}. Alla muiden kaistojen mittarit, joiden nettomuutos on
+            vastakkaissuuntainen ja vähintään yhden oman vertailutason suuruinen. Tämä ei vielä
+            osoita ristiriitaa tai vaikutusta.
           </p>
           <div className="mt-4 space-y-3">
             {opposite.slice(0, 8).map((r) => (
               <div key={r.s.k} className="border-b pb-3">
                 <div className="flex justify-between gap-2 text-sm">
                   <span>{r.s.t}</span>
-                  <strong className="tabular-nums">
-                    {signed(r.residual)} ×
-                  </strong>
+                  <strong className="tabular-nums">{signed(r.residual)} ×</strong>
                 </div>
                 <p className="text-xs text-muted-foreground">
                   {r.s.lane} · {fmt(r.a)} → {fmt(r.c)} {r.s.u}
@@ -382,9 +373,7 @@ export function LegacyScanner() {
             ))}
           </div>
           {!opposite.length && (
-            <p className="mt-3 text-sm text-muted-foreground">
-              Ei ehdokkaita tällä kriteerillä.
-            </p>
+            <p className="mt-3 text-sm text-muted-foreground">Ei ehdokkaita tällä kriteerillä.</p>
           )}
         </section>
       )}
@@ -413,52 +402,43 @@ export function LegacyScanner() {
           </div>
         ) : (
           <p className="mt-3 text-sm text-muted-foreground">
-            Valitulla mittarilla ei ole riittävän kattavaa tietoa
-            vertailujaksolla.
+            Valitulla mittarilla ei ole riittävän kattavaa tietoa vertailujaksolla.
           </p>
         )}
         <p className="mt-3 text-sm text-muted-foreground">
-          Yhteinen sarjajoukko: {rows.filter((r) => prior.has(r.s.k)).length}{" "}
-          mittaria. Samankaltainen muutos voi olla tutkimisen arvoinen, mutta ei
-          todista sukupolvivaikutusta.
+          Yhteinen sarjajoukko: {rows.filter((r) => prior.has(r.s.k)).length} mittaria.
+          Samankaltainen muutos voi olla tutkimisen arvoinen, mutta ei todista sukupolvivaikutusta.
         </p>
       </section>
       <details className="rounded-xl border bg-card p-5 text-sm">
-        <summary className="cursor-pointer font-medium">
-          Laskenta, rajaukset ja lähde
-        </summary>
+        <summary className="cursor-pointer font-medium">Laskenta, rajaukset ja lähde</summary>
         <p className="mt-3">
-          Kolme ankkurivuotta ovat todellisia aineistossa olevia arvoja; koko
-          ikkunasta vaaditaan vähintään 70 % vuosista. Vertailutaso on sarjan
-          siihenastisten peräkkäisten vuosien absoluuttisen muutoksen 75.
-          prosenttipiste (vähintään 10 muutosta). Nollatasoiset sarjat ja
-          kaksoiskappaleet jätetään pois. Nettomuutos ja alkumuutos jaetaan
-          tällä tasolla. Jos alkumuutos on pienempi kuin yksi vertailutaso,
-          palautumista ei luokitella. Muuten jäljellä olevan muutoksen suhde
-          alkumuutokseen: itseisarvo enintään 20 % = lähellä lähtötasoa;
-          negatiivinen = ylitti lähtötason vastakkaiseen suuntaan; yli 120 % =
-          etääntyi lisää; muut = osa muutoksesta jäi.
+          Kolme ankkurivuotta ovat todellisia aineistossa olevia arvoja; koko ikkunasta vaaditaan
+          vähintään 70 % vuosista. Vertailutaso on sarjan siihenastisten peräkkäisten vuosien
+          absoluuttisen muutoksen 75. prosenttipiste (vähintään 10 muutosta). Nollatasoiset sarjat
+          ja kaksoiskappaleet jätetään pois. Nettomuutos ja alkumuutos jaetaan tällä tasolla. Jos
+          alkumuutos on pienempi kuin yksi vertailutaso, palautumista ei luokitella. Muuten jäljellä
+          olevan muutoksen suhde alkumuutokseen: itseisarvo enintään 20 % = lähellä lähtötasoa;
+          negatiivinen = ylitti lähtötason vastakkaiseen suuntaan; yli 120 % = etääntyi lisää; muut
+          = osa muutoksesta jäi.
         </p>
         <p className="mt-2">
-          Trendiviiva on erillinen havainnollistava vertailu: lineaarinen
-          sovitus enintään kymmenen vuotta ennen lähtövuotta (vähintään kuusi
-          havaintoa). Se ei muuta luokituksia. Ei merkitsevyystestiä eikä
-          syy-seurausarviota. Myös trendit, mittarimuutokset ja väestön rakenne
-          voivat näkyä tuloksissa. Aineisto sisältää havaintoja ja arvioita;
-          tarkista alkuperäiset lähteet ennen johtopäätöksiä.
+          Trendiviiva on erillinen havainnollistava vertailu: lineaarinen sovitus enintään kymmenen
+          vuotta ennen lähtövuotta (vähintään kuusi havaintoa). Se ei muuta luokituksia. Ei
+          merkitsevyystestiä eikä syy-seurausarviota. Myös trendit, mittarimuutokset ja väestön
+          rakenne voivat näkyä tuloksissa. Aineisto sisältää havaintoja ja arvioita; tarkista
+          alkuperäiset lähteet ennen johtopäätöksiä.
         </p>
         <p className="mt-2 text-muted-foreground">
-          Lähde: {SCANNER.meta.source}. Viimeisimmät täydennykset on julkaistu
-          erillisestä Turso-viennistä.
+          Lähde: {SCANNER.meta.source}. Viimeisimmät täydennykset on julkaistu erillisestä
+          Turso-viennistä.
         </p>
       </details>
     </div>
   );
 }
 function Detail({ r, w }: { r: Legacy; w: Window }) {
-  const vals = Array.from({ length: w.end - w.start + 1 }, (_, i) =>
-    valueAt(r.s, w.start + i),
-  );
+  const vals = Array.from({ length: w.end - w.start + 1 }, (_, i) => valueAt(r.s, w.start + i));
   const nums = vals.filter((v): v is number => v !== null);
   const lo = Math.min(...nums),
     hi = Math.max(...nums);
@@ -466,9 +446,7 @@ function Detail({ r, w }: { r: Legacy; w: Window }) {
   const y = (v: number) => 105 - ((v - lo) / (hi - lo || 1)) * 85;
   const path = vals
     .map((v, i) =>
-      v === null
-        ? ""
-        : (i === 0 || vals[i - 1] === null ? "M" : "L") + x(i) + "," + y(v),
+      v === null ? "" : (i === 0 || vals[i - 1] === null ? "M" : "L") + x(i) + "," + y(v),
     )
     .join(" ");
   return (
@@ -495,12 +473,7 @@ function Detail({ r, w }: { r: Legacy; w: Window }) {
         <path d={path} fill="none" stroke="currentColor" strokeWidth="2" />
         {[w.start, w.shock, w.end].map((yr, i) => (
           <g key={yr}>
-            <circle
-              cx={x(yr - w.start)}
-              cy={y([r.a, r.b, r.c][i]!)}
-              r="4"
-              fill={colors[r.kind]}
-            />
+            <circle cx={x(yr - w.start)} cy={y([r.a, r.b, r.c][i]!)} r="4" fill={colors[r.kind]} />
             <text
               x={x(yr - w.start)}
               y="126"
@@ -516,17 +489,12 @@ function Detail({ r, w }: { r: Legacy; w: Window }) {
       <div className="grid grid-cols-3 gap-1 text-center text-xs">
         {[r.a, r.b, r.c].map((v, i) => (
           <div key={i} className="rounded bg-muted p-2">
-            <span className="block text-muted-foreground">
-              {[w.start, w.shock, w.end][i]}
-            </span>
+            <span className="block text-muted-foreground">{[w.start, w.shock, w.end][i]}</span>
             <strong>{fmt(v)}</strong>
           </div>
         ))}
       </div>
-      <p
-        className="mt-3 text-sm font-semibold"
-        style={{ color: colors[r.kind] }}
-      >
+      <p className="mt-3 text-sm font-semibold" style={{ color: colors[r.kind] }}>
         {LABELS[r.kind]}
       </p>
       <p className="mt-1 text-xs">
@@ -534,8 +502,7 @@ function Detail({ r, w }: { r: Legacy; w: Window }) {
         {r.ratio !== null ? " · jäljellä " + fmt(r.ratio * 100) + " %" : ""}
       </p>
       <p className="mt-1 text-xs text-muted-foreground">
-        {r.observations}/{vals.length} vuosihavaintoa · vertailutaso{" "}
-        {fmt(r.scale)} {r.s.u}/vuosi
+        {r.observations}/{vals.length} vuosihavaintoa · vertailutaso {fmt(r.scale)} {r.s.u}/vuosi
       </p>
     </div>
   );
@@ -554,14 +521,10 @@ function DevelopmentChart({ r, w }: { r: Legacy; w: Window }) {
   const mean = pre.length ? pre.reduce((a, p) => a + p.v, 0) / pre.length : 0;
   const my = pre.length ? pre.reduce((a, p) => a + p.year, 0) / pre.length : 0;
   const den = pre.reduce((a, p) => a + (p.year - my) ** 2, 0);
-  const slope = den
-    ? pre.reduce((a, p) => a + (p.year - my) * (p.v - mean), 0) / den
-    : 0;
+  const slope = den ? pre.reduce((a, p) => a + (p.year - my) * (p.v - mean), 0) / den : 0;
   const trend = (yr: number) => mean + slope * (yr - my);
   const hasTrend = pre.length >= 6 && den > 0;
-  const lastObserved = Math.max(
-    ...observed.filter((p) => p.v !== null).map((p) => p.year),
-  );
+  const lastObserved = Math.max(...observed.filter((p) => p.v !== null).map((p) => p.year));
   const points = observed.flatMap((p) => (p.v === null ? [] : [p.v]));
   if (hasTrend) points.push(trend(start), trend(Math.min(lastObserved, end)));
   const lo = Math.min(...points),
@@ -573,23 +536,14 @@ function DevelopmentChart({ r, w }: { r: Legacy; w: Window }) {
     .map((p, i) =>
       p.v === null
         ? ""
-        : (i === 0 || observed[i - 1]?.v === null ? "M" : "L") +
-          x(p.year) +
-          "," +
-          y(p.v),
+        : (i === 0 || observed[i - 1]?.v === null ? "M" : "L") + x(p.year) + "," + y(p.v),
     )
     .join(" ");
   const marks = [
     ...new Set(
-      [
-        start,
-        w.start,
-        w.shock,
-        w.end,
-        w.shock + 5,
-        w.shock + 10,
-        w.shock + 20,
-      ].filter((yr) => yr >= start && yr <= end),
+      [start, w.start, w.shock, w.end, w.shock + 5, w.shock + 10, w.shock + 20].filter(
+        (yr) => yr >= start && yr <= end,
+      ),
     ),
   ].sort((a, b) => a - b);
   const milestones = [5, 10, 20].map((n) => ({
@@ -649,13 +603,7 @@ function DevelopmentChart({ r, w }: { r: Legacy; w: Window }) {
             stroke="#b45309"
             strokeDasharray="4 4"
           />
-          <text
-            x={x(w.shock)}
-            y="17"
-            textAnchor="middle"
-            fontSize="12"
-            fill="#b45309"
-          >
+          <text x={x(w.shock)} y="17" textAnchor="middle" fontSize="12" fill="#b45309">
             Murros {w.shock}
           </text>
           <line
@@ -679,13 +627,7 @@ function DevelopmentChart({ r, w }: { r: Legacy; w: Window }) {
               strokeWidth="2"
             />
           )}
-          <path
-            d={path}
-            fill="none"
-            stroke="#2563eb"
-            strokeWidth="2.7"
-            strokeLinejoin="round"
-          />
+          <path d={path} fill="none" stroke="#2563eb" strokeWidth="2.7" strokeLinejoin="round" />
           {[w.start, w.shock, w.end].map((yr) => (
             <circle
               key={yr}
@@ -712,18 +654,11 @@ function DevelopmentChart({ r, w }: { r: Legacy; w: Window }) {
         </svg>
       </div>
       <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs">
-        <span className="text-blue-700 dark:text-blue-300">
-          ━━ Havaittu kehitys
-        </span>
+        <span className="text-blue-700 dark:text-blue-300">━━ Havaittu kehitys</span>
         <span>
-          ┄┄{" "}
-          {hasTrend
-            ? "Murrosta edeltävä trendijatkumo"
-            : "Ei riittävää trendiaineistoa"}
+          ┄┄ {hasTrend ? "Murrosta edeltävä trendijatkumo" : "Ei riittävää trendiaineistoa"}
         </span>
-        <span className="text-muted-foreground">
-          ▧ Ei havaintoja sarjan lopun jälkeen
-        </span>
+        <span className="text-muted-foreground">▧ Ei havaintoja sarjan lopun jälkeen</span>
       </div>
       <div className="mt-4 grid grid-cols-3 gap-2">
         {milestones.map((m) => (
@@ -731,9 +666,7 @@ function DevelopmentChart({ r, w }: { r: Legacy; w: Window }) {
             <p className="text-xs text-muted-foreground">
               +{m.n} vuotta · {m.year}
             </p>
-            <p className="font-semibold">
-              {m.v === null ? "Ei tietoa" : fmt(m.v)}
-            </p>
+            <p className="font-semibold">{m.v === null ? "Ei tietoa" : fmt(m.v)}</p>
             {m.v !== null && (
               <p className="text-xs text-muted-foreground">
                 Muutos lähtötasosta {signed(m.v - r.a)}
@@ -743,9 +676,9 @@ function DevelopmentChart({ r, w }: { r: Legacy; w: Window }) {
         ))}
       </div>
       <p className="mt-3 text-xs text-muted-foreground">
-        Katkoviiva on laskennallinen trendijatkumo, ei arvio siitä, mitä ilman
-        kriisiä olisi varmasti tapahtunut. Havaitut arvot voivat sisältää
-        arvioita. Katkokset viivassa tarkoittavat puuttuvia havaintoja.
+        Katkoviiva on laskennallinen trendijatkumo, ei arvio siitä, mitä ilman kriisiä olisi
+        varmasti tapahtunut. Havaitut arvot voivat sisältää arvioita. Katkokset viivassa
+        tarkoittavat puuttuvia havaintoja.
       </p>
     </div>
   );
@@ -773,34 +706,25 @@ function HistoryOverview({
 }) {
   const [search, setSearch] = useState("");
   const [perCapita, setPerCapita] = useState(false);
+  const cohort = isCohort(series.k);
   const all = historyChoices;
   const choices = all.filter(
-    (s) =>
-      s.k === series.k ||
-      s.t.toLocaleLowerCase("fi").includes(search.toLocaleLowerCase("fi")),
+    (s) => s.k === series.k || s.t.toLocaleLowerCase("fi").includes(search.toLocaleLowerCase("fi")),
   );
   const start = 1850,
     end = 2025;
   const crimeGroup = crimeGroups.find((group) => group.includes(series.k));
-  const companions = crimeGroup?.flatMap((key) =>
-    all.filter((item) => item.k === key),
-  );
-  const baseSeries =
-    companions?.length && companions.length > 1 ? companions : [series];
+  const companions = crimeGroup?.flatMap((key) => all.filter((item) => item.k === key));
+  const baseSeries = companions?.length && companions.length > 1 ? companions : [series];
   const official = officialCrimeSeries.filter((item) =>
-    baseSeries.some(
-      (base) =>
-        base.k === item.k.replace("statfin13gw.", "crime.hcs.fi.police_"),
-    ),
+    baseSeries.some((base) => base.k === item.k.replace("statfin13gw.", "crime.hcs.fi.police_")),
   );
   const chartSeries = [...baseSeries, ...official];
   const crimeView =
-    series.k.startsWith("crime.hcs.fi.conv_") ||
-    series.k.startsWith("crime.hcs.fi.police_");
+    series.k.startsWith("crime.hcs.fi.conv_") || series.k.startsWith("crime.hcs.fi.police_");
   const useRates = perCapita && crimeView;
   const hasSource =
-    official.length > 0 ||
-    baseSeries.some((item) => /police_(manslaughter|murder)$/.test(item.k));
+    official.length > 0 || baseSeries.some((item) => /police_(manslaughter|murder)$/.test(item.k));
   const chartValue = (item: Legacy["s"], year: number) => {
     const count = valueAt(item, year);
     if (!useRates || count === null) return count;
@@ -816,9 +740,7 @@ function HistoryOverview({
       v: chartValue(item, start + i),
     })),
   }));
-  const nums = lines.flatMap(({ values }) =>
-    values.flatMap((p) => (p.v === null ? [] : [p.v])),
-  );
+  const nums = lines.flatMap(({ values }) => values.flatMap((p) => (p.v === null ? [] : [p.v])));
   const lo = paired ? 0 : Math.min(...nums),
     hi = Math.max(...nums),
     span = hi - lo || 1;
@@ -829,20 +751,18 @@ function HistoryOverview({
       .map((p, i) =>
         p.v === null
           ? ""
-          : (i === 0 || values[i - 1]?.v === null ? "M" : "L") +
-            x(p.year) +
-            "," +
-            y(p.v),
+          : (i === 0 || values[i - 1]?.v === null ? "M" : "L") + x(p.year) + "," + y(p.v),
       )
       .join(" ");
   return (
     <div className="mt-4 rounded-lg border bg-background p-3 sm:p-4">
       <h3 className="font-display text-xl">
-        Kuusi murrosta yhdellä aikajanalla · 1850–2025
+        {cohort ? "Syntymäkohortit · 1850–2025" : "Kuusi murrosta yhdellä aikajanalla · 1850–2025"}
       </h3>
       <p className="mt-1 text-sm text-muted-foreground">
-        Valitse murros tarkentaaksesi alempaa analyysiä. Tyhjä kohta tarkoittaa
-        puuttuvaa havaintoa.
+        {cohort
+          ? "Vaaka-akseli näyttää naisten syntymävuoden. Kunkin kohortin luku kuvaa myöhemmin toteutunutta lapsilukua tai lapsettomuutta."
+          : "Valitse murros tarkentaaksesi alempaa analyysiä. Tyhjä kohta tarkoittaa puuttuvaa havaintoa."}
       </p>
       <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_2fr]">
         <input
@@ -867,9 +787,7 @@ function HistoryOverview({
       </div>
       <p className="mt-4 text-sm font-semibold">{series.t}</p>
       {series.sparse && (
-        <p className="text-xs text-muted-foreground">
-          Havainto viiden vuoden välein.
-        </p>
+        <p className="text-xs text-muted-foreground">Havainto viiden vuoden välein.</p>
       )}
       {longSeriesSources.has(series.k) && (
         <a className="text-xs underline" href={longSeriesSources.get(series.k)}>
@@ -895,8 +813,7 @@ function HistoryOverview({
       )}
       {useRates && (
         <p className="mt-1 text-xs text-muted-foreground">
-          Jakajana käytetään keskiväkilukua vuodesta 1860. Kortit näyttävät
-          lukumäärät.
+          Jakajana käytetään keskiväkilukua vuodesta 1860. Kortit näyttävät lukumäärät.
         </p>
       )}
       {hasSource && (
@@ -926,9 +843,8 @@ function HistoryOverview({
           </ul>
           {baseSeries.length > 1 && (
             <p className="mt-2 text-xs text-muted-foreground">
-              Vuonna 1927 vaihtuu mittari: tuomittujen henkilöiden määrästä
-              siirrytään poliisin tietoon tulleiden rikosten määrään. Myös
-              rikosluokat voivat erota.
+              Vuonna 1927 vaihtuu mittari: tuomittujen henkilöiden määrästä siirrytään poliisin
+              tietoon tulleiden rikosten määrään. Myös rikosluokat voivat erota.
             </p>
           )}
         </>
@@ -938,9 +854,9 @@ function HistoryOverview({
       ))}
       {baseSeries.some((item) => item.k.endsWith("police_murder")) && (
         <p className="mt-1 text-xs text-muted-foreground">
-          Lähdevertailu 2006–2022: tapoissa 2 ja murhissa 4 vuosieroa. Vuonna
-          2015 historiallisessa koosteessa on 48 murhaa ja StatFinissä 36. Eron
-          syy jää avoimeksi. Vuosien 2020–2022 luvut täsmäävät.
+          Lähdevertailu 2006–2022: tapoissa 2 ja murhissa 4 vuosieroa. Vuonna 2015 historiallisessa
+          koosteessa on 48 murhaa ja StatFinissä 36. Eron syy jää avoimeksi. Vuosien 2020–2022 luvut
+          täsmäävät.
         </p>
       )}
       <div className="overflow-x-auto">
@@ -948,37 +864,41 @@ function HistoryOverview({
           viewBox="0 0 960 280"
           className="mt-2 w-full min-w-[700px]"
           role="img"
-          aria-label={series.t + " 1850–2025 ja kuusi historiallista murrosta"}
+          aria-label={
+            series.t +
+            (cohort ? " syntymävuoden mukaan" : " 1850–2025 ja kuusi historiallista murrosta")
+          }
         >
-          {PERIODS.map((p) => (
-            <g key={p.shock}>
-              <rect
-                x={x(p.start)}
-                y={42}
-                width={x(p.end) - x(p.start)}
-                height={200}
-                fill={selected === p.shock ? "#2563eb" : "#94a3b8"}
-                opacity={selected === p.shock ? 0.12 : 0.07}
-              />
-              <line
-                x1={x(p.shock)}
-                x2={x(p.shock)}
-                y1="35"
-                y2="242"
-                stroke={selected === p.shock ? "#2563eb" : "#a16207"}
-                strokeDasharray="4 4"
-              />
-              <text
-                x={x(p.shock)}
-                y={p.shock === 2020 ? 30 : 17}
-                textAnchor="middle"
-                fontSize="12"
-                fill="currentColor"
-              >
-                {p.shock}
-              </text>
-            </g>
-          ))}
+          {!cohort &&
+            PERIODS.map((p) => (
+              <g key={p.shock}>
+                <rect
+                  x={x(p.start)}
+                  y={42}
+                  width={x(p.end) - x(p.start)}
+                  height={200}
+                  fill={selected === p.shock ? "#2563eb" : "#94a3b8"}
+                  opacity={selected === p.shock ? 0.12 : 0.07}
+                />
+                <line
+                  x1={x(p.shock)}
+                  x2={x(p.shock)}
+                  y1="35"
+                  y2="242"
+                  stroke={selected === p.shock ? "#2563eb" : "#a16207"}
+                  strokeDasharray="4 4"
+                />
+                <text
+                  x={x(p.shock)}
+                  y={p.shock === 2020 ? 30 : 17}
+                  textAnchor="middle"
+                  fontSize="12"
+                  fill="currentColor"
+                >
+                  {p.shock}
+                </text>
+              </g>
+            ))}
           {[0, 0.25, 0.5, 0.75, 1].map((t) => (
             <g key={t}>
               <line
@@ -1048,83 +968,74 @@ function HistoryOverview({
             />
           ))}
           {[1850, 1875, 1900, 1925, 1950, 1975, 2000, 2025].map((yr) => (
-            <text
-              key={yr}
-              x={x(yr)}
-              y="265"
-              textAnchor="middle"
-              fontSize="12"
-              fill="currentColor"
-            >
+            <text key={yr} x={x(yr)} y="265" textAnchor="middle" fontSize="12" fill="currentColor">
               {yr}
             </text>
           ))}
-          {lines.flatMap(({ item, color }) =>
-            PERIODS.map((p) => {
-              const v = chartValue(item, p.shock);
-              return v === null ? null : (
-                <circle
-                  key={item.k + ":" + p.shock}
-                  cx={x(p.shock)}
-                  cy={y(v)}
-                  r="4"
-                  fill={color}
-                  stroke="white"
-                  strokeWidth="1.5"
-                />
-              );
-            }),
-          )}
+          {!cohort &&
+            lines.flatMap(({ item, color }) =>
+              PERIODS.map((p) => {
+                const v = chartValue(item, p.shock);
+                return v === null ? null : (
+                  <circle
+                    key={item.k + ":" + p.shock}
+                    cx={x(p.shock)}
+                    cy={y(v)}
+                    r="4"
+                    fill={color}
+                    stroke="white"
+                    strokeWidth="1.5"
+                  />
+                );
+              }),
+            )}
         </svg>
       </div>
-      <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-        {PERIODS.map((p) => {
-          const r =
-            scanLegacy(series, p) ??
-            baseSeries
-              .map((item) => scanLegacy(item, p))
-              .find((result) => result !== null);
-          return (
-            <button
-              key={p.shock}
-              onClick={() => onPick(p, r?.s.k ?? series.k)}
-              aria-pressed={selected === p.shock}
-              className="rounded-lg border p-3 text-left text-sm hover:bg-muted aria-pressed:ring-2 aria-pressed:ring-primary"
-            >
-              <span className="block text-xs text-muted-foreground">
-                {p.start}–{p.end}
-              </span>
-              <strong className="block">{p.label}</strong>
-              {r ? (
-                <>
-                  {paired && (
+      {!cohort && (
+        <>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {PERIODS.map((p) => {
+              const r =
+                scanLegacy(series, p) ??
+                baseSeries.map((item) => scanLegacy(item, p)).find((result) => result !== null);
+              return (
+                <button
+                  key={p.shock}
+                  onClick={() => onPick(p, r?.s.k ?? series.k)}
+                  aria-pressed={selected === p.shock}
+                  className="rounded-lg border p-3 text-left text-sm hover:bg-muted aria-pressed:ring-2 aria-pressed:ring-primary"
+                >
+                  <span className="block text-xs text-muted-foreground">
+                    {p.start}–{p.end}
+                  </span>
+                  <strong className="block">{p.label}</strong>
+                  {r ? (
+                    <>
+                      {paired && (
+                        <span className="mt-2 block text-xs text-muted-foreground">{r.s.t}</span>
+                      )}
+                      <span className="mt-2 block text-xs">
+                        {fmt(r.a)} → {fmt(r.b)} → {fmt(r.c)}
+                      </span>
+                      <span className="mt-1 block text-xs" style={{ color: colors[r.kind] }}>
+                        {LABELS[r.kind]}
+                      </span>
+                    </>
+                  ) : (
                     <span className="mt-2 block text-xs text-muted-foreground">
-                      {r.s.t}
+                      Ei riittävää vertailuaineistoa
                     </span>
                   )}
-                  <span className="mt-2 block text-xs">
-                    {fmt(r.a)} → {fmt(r.b)} → {fmt(r.c)}
-                  </span>
-                  <span
-                    className="mt-1 block text-xs"
-                    style={{ color: colors[r.kind] }}
-                  >
-                    {LABELS[r.kind]}
-                  </span>
-                </>
-              ) : (
-                <span className="mt-2 block text-xs text-muted-foreground">
-                  Ei riittävää vertailuaineistoa
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
-      <p className="mt-3 text-xs text-muted-foreground">
-        Kortit näyttävät lähtövuoden, murrosvuoden ja päätepisteen arvot.
-        Murrosjaksojen pituudet vaihtelevat; luokitus ei osoita syy-yhteyttä.
-      </p>
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Kortit näyttävät lähtövuoden, murrosvuoden ja päätepisteen arvot. Murrosjaksojen
+            pituudet vaihtelevat; luokitus ei osoita syy-yhteyttä.
+          </p>
+        </>
+      )}
     </div>
   );
 }
@@ -1157,25 +1068,45 @@ const livelihoodMetrics = [
 const comparisonThemes = [
   { label: "Työ ja toimeentulo", metrics: livelihoodMetrics },
   {
+    label: "Pienet asunnot, tulot ja muuttoliike",
+    note: "Vuokrat ovat nimellisiä neliövuokria. Asuntojen hinnat ja tulot on oikaistu inflaatiolla. Muuttoluvut koskevat koko 25–34-vuotiaiden ikäryhmää. Tulot koskevat alle 35-vuotiaita yksin asuvia vuokralaisia.",
+    metrics: [
+      ["statfin.11x4.ksu.01", "Uudet vuokrat · yksiöt"],
+      ["statfin.11x4.ksu.02", "Uudet vuokrat · kaksiot"],
+      ["statfin.13mz.ksu.01", "Reaalihinta · vanhat yksiöt"],
+      ["statfin.13mz.ksu.02", "Reaalihinta · vanhat kaksiot"],
+      [
+        "statfin.tjt12g9.10.2.kvkturahamod",
+        "Reaalitulot · alle 35-vuotiaat yksin vuokralla asuvat",
+      ],
+      ["statfin.muutl11aa.sss.25_34.vm41", "Maahanmuutto · 25–34-vuotiaat"],
+      ["statfin.muutl11aa.sss.25_34.vm42", "Maastamuutto · 25–34-vuotiaat"],
+    ],
+  },
+  {
+    label: "Työllisyys ja alaikäiset lapset",
+    note: "Työvoimatutkimus kattaa 20–64-vuotiaat. Ilman alaikäisiä lapsia elävään ryhmään voi kuulua aikuisten lasten vanhempia.",
+    metrics: [
+      ["statfin.tyti15h5.2.a18_v.employment", "Naiset · alaikäisten lasten vanhemmat"],
+      ["statfin.tyti15h5.2.a18_0.employment", "Naiset · ei alaikäisiä lapsia"],
+      ["statfin.tyti15h5.1.a18_v.employment", "Miehet · alaikäisten lasten vanhemmat"],
+      ["statfin.tyti15h5.1.a18_0.employment", "Miehet · ei alaikäisiä lapsia"],
+    ],
+  },
+  {
     label: "Koulunkäynti ja koulutusvuodet",
     metrics: [
       [
         "owid.finland.primary-enrollment-selected-countries.v20261026",
         "Alkeisopetuksen netto-osallistumisaste",
       ],
-      [
-        "owid.finland.mean_years_schooling_15_64",
-        "Keskimääräiset koulutusvuodet, 15–64-vuotiaat",
-      ],
+      ["owid.finland.mean_years_schooling_15_64", "Keskimääräiset koulutusvuodet, 15–64-vuotiaat"],
     ],
   },
   {
     label: "Työaika ja reaalipalkat",
     metrics: [
-      [
-        "owid.finland.annual_working_hours_per_worker",
-        "Vuosityötunnit työllistä kohti",
-      ],
+      ["owid.finland.annual_working_hours_per_worker", "Vuosityötunnit työllistä kohti"],
       ["fi.historical20261026.jst.real_wage_index", "Reaalipalkkaindeksi"],
     ],
   },
@@ -1207,9 +1138,8 @@ function LivelihoodComparison() {
     <section className="rounded-xl border bg-card p-5">
       <h2 className="font-display text-xl">Pitkien aikasarjojen vertailu</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Kuvaajissa on sama aikajana 1850–2025 ja kullakin mittarilla oma
-        asteikkonsa. Valitse murros nähdäksesi kolmen vertailuvuoden arvot.
-        Puuttuvat vuodet näkyvät katkoksina.
+        Kuvaajissa on sama aikajana 1850–2025 ja kullakin mittarilla oma asteikkonsa. Valitse murros
+        nähdäksesi kolmen vertailuvuoden arvot. Puuttuvat vuodet näkyvät katkoksina.
       </p>
       <label className="mt-3 block text-sm font-medium">
         Vertailun aihe
@@ -1225,6 +1155,7 @@ function LivelihoodComparison() {
           ))}
         </select>
       </label>
+      {"note" in theme && <p className="mt-2 text-sm text-muted-foreground">{theme.note}</p>}
       <div className="my-4 flex flex-wrap gap-2">
         {periods.map((item, index) => (
           <button
@@ -1242,14 +1173,12 @@ function LivelihoodComparison() {
         {theme.metrics.map(([key, label], index) => {
           const series = legacySeries.find((item) => item.k === key);
           if (!series) return null;
-          const values = series.v.filter(
-            (value): value is number => value !== null,
-          );
+          const values = series.v.filter((value): value is number => value !== null);
           if (!values.length) return null;
+          const color = colors[index % colors.length];
           const min = Math.min(...values);
           const max = Math.max(...values);
-          const y = (value: number) =>
-            94 - ((value - min) / (max - min || 1)) * 78;
+          const y = (value: number) => 94 - ((value - min) / (max - min || 1)) * 78;
           const path = series.v
             .map((value, offset) =>
               value === null
@@ -1268,13 +1197,11 @@ function LivelihoodComparison() {
                 {series.sparse ? " · viiden vuoden välein" : ""}
               </p>
               {longSeriesSources.has(key) && (
-                <a
-                  className="text-xs underline"
-                  href={longSeriesSources.get(key)}
-                >
+                <a className="text-xs underline" href={longSeriesSources.get(key)}>
                   Aineistolähde
                 </a>
               )}
+              <ContinuationSource seriesKey={key} />
               <svg
                 viewBox="0 0 355 120"
                 className="mt-2 w-full"
@@ -1286,7 +1213,7 @@ function LivelihoodComparison() {
                   y="12"
                   width={x(period.end) - x(period.start)}
                   height="82"
-                  fill={colors[index]}
+                  fill={color}
                   opacity=".13"
                 />
                 <line
@@ -1294,7 +1221,7 @@ function LivelihoodComparison() {
                   x2={x(period.shock)}
                   y1="12"
                   y2="94"
-                  stroke={colors[index]}
+                  stroke={color}
                   strokeDasharray="3 3"
                 />
                 {[min, (min + max) / 2, max].map((value, tick) => (
@@ -1307,13 +1234,7 @@ function LivelihoodComparison() {
                       stroke="currentColor"
                       opacity=".15"
                     />
-                    <text
-                      x="32"
-                      y={y(value) + 3}
-                      textAnchor="end"
-                      fill="currentColor"
-                      fontSize="9"
-                    >
+                    <text x="32" y={y(value) + 3} textAnchor="end" fill="currentColor" fontSize="9">
                       {fmt(value)}
                     </text>
                   </g>
@@ -1326,7 +1247,7 @@ function LivelihoodComparison() {
                         cx={x(series.y0 + index)}
                         cy={y(value)}
                         r="2"
-                        fill={colors[1]}
+                        fill={color}
                       >
                         <title>
                           {series.y0 + index}: {fmt(value)}
@@ -1334,12 +1255,7 @@ function LivelihoodComparison() {
                       </circle>
                     ),
                   )}
-                <path
-                  d={path}
-                  fill="none"
-                  stroke={colors[index]}
-                  strokeWidth="2"
-                />
+                <path d={path} fill="none" stroke={color} strokeWidth="2" />
                 {[1850, 1900, 1950, 2000, 2025].map((year) => (
                   <text
                     key={year}
@@ -1361,9 +1277,7 @@ function LivelihoodComparison() {
                       <dt className="text-xs text-muted-foreground">
                         {["Ennen", "Murros", "Jälkeen"][i]} · {year}
                       </dt>
-                      <dd className="font-medium">
-                        {value === null ? "Ei tietoa" : fmt(value)}
-                      </dd>
+                      <dd className="font-medium">{value === null ? "Ei tietoa" : fmt(value)}</dd>
                     </div>
                   );
                 })}
