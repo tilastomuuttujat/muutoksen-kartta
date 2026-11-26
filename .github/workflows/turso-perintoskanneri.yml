@@ -32,5 +32,7 @@ jobs:
                       raise SystemExit("Tietokantakysely epäonnistui.")
                   result=item["response"]["result"]
                   for row in result["rows"]:
-                      print(" | ".join(str(cell.get("value","")) for cell in row),file=out)
+                      line = " | ".join(str(cell.get("value","")) for cell in row)
+                      print("TURSO_CHECK", line)
+                      print(line,file=out)
           PY
