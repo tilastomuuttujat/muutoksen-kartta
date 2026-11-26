@@ -19,14 +19,13 @@ tee päätelmiä itse, vaan rajaa, mitkä selitykset kannattaa testata.
 3. **Kahden jakson vertailu:** elämänalueiden osuudet ja sarjat, jotka reagoivat vain toisessa
    jaksossa. Mukana vain sarjat, jotka kattavat molemmat jaksot.
 
-Kaksoiskappaleet (vuosimuutosten korrelaatio > 0,97) jätetään pois: 112 sarjaa 511:stä.
+Kaksoiskappaleet (vuosimuutosten korrelaatio > 0,97) jätetään pois: 115 sarjaa 520:stä. Viisivuotiset havaintopisteet näkyvät aikajanalla.
 
 ## Esimerkkejä
 
-- **Syntyvyys (TFR, Gapminder).** Kun kriisivuodet ohitetaan, ainoa ehdokas, joka muuttuu ennen
-  syntyvyyttä, on 25–34-vuotiaiden naisten työttömyysaste: r = −0,66 kahden vuoden viiveellä
-  (1995–2023). Työttömyyden nousua seuraa syntyvyyden lasku kahden vuoden päästä. Tämä on testattava
-  hypoteesi, ei todiste: sarja on lyhyt ja molempiin voi vaikuttaa suhdanne.
+- **Syntyvyys (historiallinen Gapminder-sarja, jatkettu StatFinillä).** Kun kriisivuodet ohitetaan,
+  25–34-vuotiaiden naisten työttömyysasteen ja syntyvyyden vuosimuutosten yhteys on
+  r = −0,58 kahden vuoden viiveellä. Tulos luokitellaan heikoksi useiden vertailujen korjauksen jälkeen.
 - **Mekaaniset parit** nousevat myös esiin: esim. 0-vuotiaana kuolleet seuraavat syntyvyyttä
   (enemmän syntyneitä, enemmän kuolleita) ja 30–34-vuotiaiden hedelmällisyys "edeltää" kokonaislukua,
   koska se on sen osa. Siksi jokainen ehdokas tarkistetaan pariksi avaamalla.
