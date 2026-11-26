@@ -1,0 +1,317 @@
+{
+  "source": "Turso, public__indicator_series ja public__indicator_values",
+  "exportRun": 45765429773,
+  "series": [
+    {
+      "key": "gapminder.finland.children_per_woman_total_fertility.v20261026",
+      "title": "Kokonaishedelmällisyysluku, Gapminder v15",
+      "from": 2024,
+      "values": [
+        1.25,
+        1.3
+      ],
+      "sources": [
+        "https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/synt/12dt.px"
+      ],
+      "note": "Kokonaishedelmällisyysluku, Tilastokeskus."
+    },
+    {
+      "key": "fi.histlabour.lfs2019.employment_rate",
+      "title": "Työllisyysaste 15–64-vuotiaat, historiallinen sarja",
+      "from": 2019,
+      "values": [
+        71.6,
+        70.7,
+        72.3,
+        73.8,
+        73.6,
+        72.1,
+        71.4
+      ],
+      "sources": [
+        "https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tyti/13aj.px"
+      ],
+      "note": "Työllisyysaste, 15–64-vuotiaat, työvoimatutkimuksen tarkistetut luvut."
+    },
+    {
+      "key": "fi.historical20261026.jst.real_wage_index",
+      "title": "Reaalipalkkaindeksi — laskettu JST R6:sta",
+      "from": 2021,
+      "values": [
+        136.384,
+        130.46,
+        127.827,
+        130.197,
+        133.619
+      ],
+      "sources": [
+        "https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/ati/14un.px"
+      ],
+      "note": "Historiallinen JST R6 -sarja jatkettu Tilastokeskuksen reaaliansioindeksin vuosimuutoksilla, 2020 ankkurivuotena."
+    },
+    {
+      "key": "fi.distribution.gini2020.disposable",
+      "title": "Gini: käytettävissä olevat rahatulot, historiallinen lähdeversio",
+      "from": 2019,
+      "values": [
+        27.9,
+        27.7,
+        29.1,
+        28.6,
+        27.9,
+        28.4
+      ],
+      "sources": [
+        "https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tjt/11x3.px"
+      ],
+      "note": "Gini, käytettävissä olevat rahatulot, rekisteriaineisto."
+    },
+    {
+      "key": "crime.hcs.fi.police_manslaughter",
+      "title": "Poliisin tietoon tulleet tapot, historiallinen kooste",
+      "from": 2023,
+      "values": [
+        38,
+        53,
+        56
+      ],
+      "sources": [
+        "https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/rpk/13gw.px"
+      ],
+      "note": "Tapot, StatFin 13gw, poliisi (1), rikosnimike 210101. Vuodet 2020–2022 vastaavat historiallista koostetta; vanhemmissa päällekkäisissä vuosissa on eroja."
+    },
+    {
+      "key": "crime.hcs.fi.police_murder",
+      "title": "Poliisin tietoon tulleet murhat, historiallinen kooste",
+      "from": 2023,
+      "values": [
+        19,
+        36,
+        24
+      ],
+      "sources": [
+        "https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/rpk/13gw.px"
+      ],
+      "note": "Murhat, StatFin 13gw, poliisi (1), rikosnimike 210201. Vuodet 2020–2022 vastaavat historiallista koostetta; vanhemmissa päällekkäisissä vuosissa on eroja."
+    },
+    {
+      "key": "crime.hcs.fi.prison_all_daily_average",
+      "title": "Keskimääräinen vankiluku, historiallinen kooste",
+      "from": 2023,
+      "values": [
+        3143,
+        3356,
+        3545
+      ],
+      "sources": [
+        "https://www.rikosseuraamus.fi/app/uploads/sites/11/2026/05/RISE-Tilastollinen-vuosikirja-2025.pdf"
+      ],
+      "note": "Rikosseuraamuslaitos, vuosikirja 2025, taulukko 2. Vankien päivittäinen keskimäärä."
+    },
+    {
+      "key": "crime.hcs.fi.prison_all_dec31",
+      "title": "Vangit vuoden lopussa, historiallinen kooste",
+      "from": 2023,
+      "values": [
+        3166,
+        3406,
+        3598
+      ],
+      "sources": [
+        "https://www.rikosseuraamus.fi/app/uploads/sites/11/2024/11/RISE-Tilastollinen-vuosikirja-2023.pdf",
+        "https://www.rikosseuraamus.fi/app/uploads/sites/11/2024/11/RISE-Tilastollinen-vuosikirja-2024.pdf",
+        "https://www.rikosseuraamus.fi/app/uploads/sites/11/2026/05/RISE-Tilastollinen-vuosikirja-2025.pdf"
+      ],
+      "note": "Rikosseuraamuslaitos, taulukko 1, kaikki laitokset, vuoden lopussa."
+    },
+    {
+      "key": "crime.hcs.fi.prison_sentenced_dec31",
+      "title": "Rangaistusvangit vuoden lopussa, historiallinen kooste",
+      "from": 2023,
+      "values": [
+        2325,
+        2500,
+        2602
+      ],
+      "sources": [
+        "https://www.rikosseuraamus.fi/app/uploads/sites/11/2024/11/RISE-Tilastollinen-vuosikirja-2023.pdf",
+        "https://www.rikosseuraamus.fi/app/uploads/sites/11/2024/11/RISE-Tilastollinen-vuosikirja-2024.pdf",
+        "https://www.rikosseuraamus.fi/app/uploads/sites/11/2026/05/RISE-Tilastollinen-vuosikirja-2025.pdf"
+      ],
+      "note": "Rikosseuraamuslaitos, taulukko 1, vankeusvangit vuoden lopussa; sakkovangit ja tutkintavangit tilastoitu erikseen."
+    },
+    {
+      "key": "fi.histlabour.lfs2019.unemployment_rate",
+      "title": "Työttömyysaste, työvoimatutkimuksen historiallinen sarja",
+      "from": 2019,
+      "values": [
+        6.8,
+        7.7,
+        7.7,
+        6.8,
+        7.2,
+        8.4,
+        9.7
+      ],
+      "sources": [
+        "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__tyti/statfin_tyti_pxt_13aj.px/"
+      ],
+      "note": "Tilastokeskus, työvoimatutkimus 13aj, 15–74-vuotiaat, koko maa. Tarkistettu sarja."
+    },
+    {
+      "key": "statfin13gw.assault",
+      "title": "Pahoinpitelyt (lievät, perusmuotoiset ja törkeät) · StatFin 13gw",
+      "from": 2006,
+      "values": [
+        30158,
+        33751,
+        34003,
+        32080,
+        32315,
+        39319,
+        37425,
+        34680,
+        32145,
+        33133,
+        32972,
+        33053,
+        33150,
+        33426,
+        32778,
+        33620,
+        37647,
+        40712,
+        40466,
+        44013
+      ],
+      "sources": [
+        "https://statfin.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__rpk/statfin_rpk_pxt_13gw.px/"
+      ],
+      "note": "StatFin 13gw; rikosnimikkeet 210501 210601 210701; poliisi (1)."
+    },
+    {
+      "key": "statfin13gw.fraud",
+      "title": "Petokset (lievät, perusmuotoiset ja törkeät) · StatFin 13gw",
+      "from": 2006,
+      "values": [
+        11615,
+        12777,
+        14864,
+        16267,
+        14518,
+        16409,
+        19023,
+        20245,
+        20041,
+        22516,
+        21752,
+        20386,
+        21978,
+        25518,
+        31720,
+        34580,
+        36591,
+        40391,
+        38404,
+        33112
+      ],
+      "sources": [
+        "https://statfin.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__rpk/statfin_rpk_pxt_13gw.px/"
+      ],
+      "note": "StatFin 13gw; rikosnimikkeet 360101 360201 360301; poliisi (1)."
+    },
+    {
+      "key": "statfin13gw.robbery",
+      "title": "Ryöstöt ja ryöstön yritykset · StatFin 13gw",
+      "from": 2006,
+      "values": [
+        1700,
+        1784,
+        1696,
+        1640,
+        1508,
+        1622,
+        1616,
+        1523,
+        1687,
+        1548,
+        1670,
+        1643,
+        1707,
+        1808,
+        2000,
+        1901,
+        2336,
+        2732,
+        2592,
+        2433
+      ],
+      "sources": [
+        "https://statfin.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__rpk/statfin_rpk_pxt_13gw.px/"
+      ],
+      "note": "StatFin 13gw; rikosnimikkeet 310101 310102 310201 310202; poliisi (1)."
+    },
+    {
+      "key": "statfin13gw.theft_petty",
+      "title": "Varkaudet, törkeät varkaudet ja näpistykset · StatFin 13gw",
+      "from": 2006,
+      "values": [
+        135880,
+        135425,
+        137388,
+        142763,
+        139531,
+        142513,
+        130928,
+        133751,
+        135282,
+        130522,
+        124060,
+        118464,
+        116275,
+        120074,
+        131312,
+        121283,
+        122411,
+        123849,
+        124304,
+        142069
+      ],
+      "sources": [
+        "https://statfin.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__rpk/statfin_rpk_pxt_13gw.px/"
+      ],
+      "note": "StatFin 13gw; rikosnimikkeet 280101 280201 280301; poliisi (1)."
+    },
+    {
+      "key": "statfin13gw.narcotics",
+      "title": "Huumausainerikokset (rikoslain 50. luku) · StatFin 13gw",
+      "from": 2006,
+      "values": [
+        14226,
+        16293,
+        16508,
+        18524,
+        19724,
+        20394,
+        20102,
+        22656,
+        21781,
+        23400,
+        25082,
+        27831,
+        29183,
+        32357,
+        37152,
+        28298,
+        25212,
+        26838,
+        25618,
+        26433
+      ],
+      "sources": [
+        "https://statfin.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__rpk/statfin_rpk_pxt_13gw.px/"
+      ],
+      "note": "StatFin 13gw; rikosnimikkeet 50LUKU; poliisi (1)."
+    }
+  ]
+}
