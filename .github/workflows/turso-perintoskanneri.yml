@@ -1,51 +1,48 @@
-name: Turso – vie Perintöskannerin täydennykset
+name: Skannerin koko Turso-vienti
 on:
   push:
     branches: [turso-perintoskanneri-20261126]
-permissions: {}
+    paths: [.github/workflows/turso-perintoskanneri.yml]
+permissions:
+  contents: read
 jobs:
   export:
     runs-on: ubuntu-latest
-    env:
-      TURSO_TOKEN: ${{ secrets.TURSO_WRITE_TOKEN }}
+    timeout-minutes: 25
     steps:
-      - name: Vie Perintöskannerin täydennykset
+      - uses: actions/checkout@v4
+        with:
+          ref: f832947891e0d8fbd9b0de237d21c3bdffccf66d
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install numpy
+      - name: Vie lähdeaineisto Tursosta
+        env:
+          TURSO_TOKEN: ${{ secrets.TURSO_WRITE_TOKEN }}
         run: |
-          python3 - <<'PY'
-          import json
-          import os
-          import urllib.request
-          
-          endpoint = "https://murrosmatriisi-tilastomuuttujat.aws-eu-north-1.turso.io/v2/pipeline"
-          token = os.environ.get("TURSO_TOKEN")
-          if not token:
-              raise SystemExit("TURSO_WRITE_TOKEN puuttuu")
-          
-          def query(sql, args=()):
-              typed = [{"type": "integer" if isinstance(v, int) else "text", "value": str(v)} for v in args]
-              requests = [{"type": "execute", "stmt": {"sql": sql, "args": typed}}, {"type": "close"}]
-              request = urllib.request.Request(endpoint, data=json.dumps({"requests": requests}).encode(),
-                  headers={"Content-Type": "application/json", "Authorization": "Bearer " + token})
-              with urllib.request.urlopen(request, timeout=40) as response:
-                  item = json.load(response)["results"][0]
-              if item["type"] != "ok":
-                  raise RuntimeError(item["error"]["message"])
-              return item["response"]["result"]
-          
-          manifest = json.loads(r'''[["gapminder.finland.children_per_woman_total_fertility.v20261026","FI",2024,2],["fi.histlabour.lfs2019.employment_rate","FI_HIST",2019,7],["fi.historical20261026.jst.real_wage_index","FI",2021,5],["fi.distribution.gini2020.disposable","FI_REGISTER",2019,6],["crime.hcs.fi.police_manslaughter",null,2023,3],["crime.hcs.fi.police_murder",null,2023,3],["crime.hcs.fi.prison_all_daily_average",null,2023,3],["crime.hcs.fi.prison_all_dec31",null,2023,3],["crime.hcs.fi.prison_sentenced_dec31",null,2023,3],["fi.histlabour.lfs2019.unemployment_rate",null,2019,7],["statfin13gw.assault","FI",2006,20],["statfin13gw.fraud","FI",2006,20],["statfin13gw.robbery","FI",2006,20],["statfin13gw.theft_petty","FI",2006,20],["statfin13gw.narcotics","FI",2006,20]]''')
-          output = []
-          for key, group, start, count in manifest:
-              if group is None:
-                  groups = query("SELECT DISTINCT group_key FROM public__indicator_values WHERE series_key=? AND year=? AND value IS NOT NULL", [key,start-1])["rows"]
-                  if len(groups) != 1:
-                      raise SystemExit(f"Ryhmätunnus ei ole yksiselitteinen: {key}")
-                  group = groups[0][0]["value"]
-              meta = query("SELECT title FROM public__indicator_series WHERE series_key=?", [key])["rows"]
-              rows = query("SELECT year,value,source_url,validation_note FROM public__indicator_values WHERE series_key=? AND group_key=? AND year BETWEEN ? AND ? AND value_kind IN ('observed','estimate') ORDER BY year", [key,group,start,start+count-1])["rows"]
-              values = [[cell.get("value") for cell in row] for row in rows]
-              if len(meta) != 1 or [int(row[0]) for row in values] != list(range(start,start+count)) or any(not row[2] for row in values):
-                  raise SystemExit(f"Puutteellinen vienti: {key}")
-              output.append({"key":key,"title":meta[0][0]["value"],"from":start,"values":[float(row[1]) for row in values],"sources":list(dict.fromkeys(row[2] for row in values)),"note":values[-1][3]})
-          print("PERINTO_EXPORT " + json.dumps(output, ensure_ascii=True, separators=(",",":")))
-          print(f"Viety {sum(len(s['values']) for s in output)} vuosiarvoa.")
+          test -n "$TURSO_TOKEN"
+          python scripts/skannauskoe/fetch.py
+      - name: Muodosta ja tarkista scanner.json
+        run: |
+          python scripts/skannauskoe/build-scanner.py
+          python - <<'PY'
+          import json, math
+          from pathlib import Path
+          data = json.loads(Path("src/data/scanner.json").read_text())
+          series = {s["k"]:s for s in data["series"]}
+          supplement = json.loads(Path("src/data/perinto-turso.json").read_text())
+          for item in supplement["series"]:
+              s = series[item["key"]]
+              for year, expected in enumerate(item["values"],item["from"]):
+                  offset = year-s["y0"]
+                  assert 0 <= offset < len(s["v"]), (item["key"],year)
+                  observed = s["v"][offset]
+                  assert observed is not None and math.isclose(observed,float(f"{expected:.4g}"),abs_tol=1e-10), (item["key"],year,observed,expected)
+          print(f"Varmistettu {len(series)} sarjaa ja kaikki 142 täydennystä.")
           PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scanner-turso
+          path: src/data/scanner.json
+          if-no-files-found: error
