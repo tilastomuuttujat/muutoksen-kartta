@@ -142,13 +142,13 @@ export function LegacyScanner() {
         <HistoryOverview
           series={historySeries}
           selected={w.shock}
-          onPick={(p) => {
+          onPick={(p, seriesKey) => {
             setW(p);
             setLimit(20);
             setLane("");
             setKind("");
             setQ("");
-            setKey(historySeries.k);
+            setKey(seriesKey);
           }}
           onSeries={(k) => {
             setHistoryKey(k);
@@ -750,6 +750,15 @@ function DevelopmentChart({ r, w }: { r: Legacy; w: Window }) {
   );
 }
 
+const crimeGroups = [
+  ["conv_assault_1850_1926", "police_assault"],
+  ["conv_fraud_1850_1926", "police_fraud"],
+  ["conv_homicide_1850_1926", "police_manslaughter", "police_murder"],
+  ["conv_robbery_1850_1926", "police_robbery"],
+  ["conv_theft_1850_1926", "police_theft_petty"],
+].map((group) => group.map((key) => "crime.hcs.fi." + key));
+const crimeColors = ["#2563eb", "#a94326", "#0f766e"];
+
 function HistoryOverview({
   series,
   selected,
@@ -758,7 +767,7 @@ function HistoryOverview({
 }: {
   series: Legacy["s"];
   selected: number;
-  onPick: (p: Window) => void;
+  onPick: (p: Window, seriesKey: string) => void;
   onSeries: (k: string) => void;
 }) {
   const [search, setSearch] = useState("");
@@ -770,34 +779,48 @@ function HistoryOverview({
   );
   const start = 1850,
     end = 2025;
-  const values = Array.from({ length: end - start + 1 }, (_, i) => ({
-    year: start + i,
-    v: valueAt(series, start + i),
+  const crimeGroup = crimeGroups.find((group) => group.includes(series.k));
+  const companions = crimeGroup?.flatMap((key) =>
+    all.filter((item) => item.k === key),
+  );
+  const chartSeries =
+    companions?.length && companions.length > 1 ? companions : [series];
+  const paired = chartSeries.length > 1;
+  const lines = chartSeries.map((item, index) => ({
+    item,
+    color: crimeColors[index] ?? crimeColors[0]!,
+    values: Array.from({ length: end - start + 1 }, (_, i) => ({
+      year: start + i,
+      v: valueAt(item, start + i),
+    })),
   }));
-  const nums = values.flatMap((p) => (p.v === null ? [] : [p.v]));
-  const lo = Math.min(...nums),
+  const nums = lines.flatMap(({ values }) =>
+    values.flatMap((p) => (p.v === null ? [] : [p.v])),
+  );
+  const lo = paired ? 0 : Math.min(...nums),
     hi = Math.max(...nums),
     span = hi - lo || 1;
   const x = (year: number) => 76 + ((year - start) / (end - start)) * 840;
   const y = (v: number) => 242 - ((v - lo) / span) * 182;
-  const path = values
-    .map((p, i) =>
-      p.v === null
-        ? ""
-        : (i === 0 || values[i - 1]?.v === null ? "M" : "L") +
-          x(p.year) +
-          "," +
-          y(p.v),
-    )
-    .join(" ");
+  const path = (values: (typeof lines)[number]["values"]) =>
+    values
+      .map((p, i) =>
+        p.v === null
+          ? ""
+          : (i === 0 || values[i - 1]?.v === null ? "M" : "L") +
+            x(p.year) +
+            "," +
+            y(p.v),
+      )
+      .join(" ");
   return (
     <div className="mt-4 rounded-lg border bg-background p-3 sm:p-4">
       <h3 className="font-display text-xl">
         Kuusi murrosta yhdellä aikajanalla · 1850–2025
       </h3>
       <p className="mt-1 text-sm text-muted-foreground">
-        Sama mittari kaikilla kausilla. Valitse murros tarkentaaksesi alempaa
-        analyysiä. Tyhjä kohta tarkoittaa puuttuvaa havaintoa.
+        Valitse murros tarkentaaksesi alempaa analyysiä. Tyhjä kohta tarkoittaa
+        puuttuvaa havaintoa.
       </p>
       <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_2fr]">
         <input
@@ -821,7 +844,30 @@ function HistoryOverview({
         </select>
       </div>
       <p className="mt-4 text-sm font-semibold">{series.t}</p>
-      <p className="text-xs text-muted-foreground">{series.u}</p>
+      <p className="text-xs text-muted-foreground">
+        {paired ? "Lukumäärä vuodessa" : series.u}
+      </p>
+      {paired && (
+        <>
+          <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs">
+            {lines.map(({ item, color }) => (
+              <li key={item.k} className="flex items-center gap-2">
+                <span
+                  className="h-1 w-5 rounded"
+                  style={{ backgroundColor: color }}
+                  aria-hidden="true"
+                />
+                {item.t} ({item.y0}–{item.y0 + item.v.length - 1})
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Vuonna 1927 vaihtuu mittari: tuomittujen henkilöiden määrästä
+            siirrytään poliisin tietoon tulleiden rikosten määrään. Myös
+            rikosluokat voivat erota.
+          </p>
+        </>
+      )}
       <ContinuationSource seriesKey={series.k} />
       <div className="overflow-x-auto">
         <svg
@@ -880,13 +926,32 @@ function HistoryOverview({
               </text>
             </g>
           ))}
-          <path
-            d={path}
-            stroke="#2563eb"
-            strokeWidth="2.5"
-            fill="none"
-            strokeLinejoin="round"
-          />
+          {paired && (
+            <g>
+              <line
+                x1={x(1927)}
+                x2={x(1927)}
+                y1="34"
+                y2="242"
+                stroke="currentColor"
+                opacity=".55"
+                strokeDasharray="2 4"
+              />
+              <text x={x(1927) + 6} y="30" fontSize="11" fill="currentColor">
+                1927 · mittari vaihtuu
+              </text>
+            </g>
+          )}
+          {lines.map(({ item, color, values }) => (
+            <path
+              key={item.k}
+              d={path(values)}
+              stroke={color}
+              strokeWidth="2.5"
+              fill="none"
+              strokeLinejoin="round"
+            />
+          ))}
           {[1850, 1875, 1900, 1925, 1950, 1975, 2000, 2025].map((yr) => (
             <text
               key={yr}
@@ -899,29 +964,35 @@ function HistoryOverview({
               {yr}
             </text>
           ))}
-          {PERIODS.map((p) => {
-            const v = valueAt(series, p.shock);
-            return v === null ? null : (
-              <circle
-                key={p.shock}
-                cx={x(p.shock)}
-                cy={y(v)}
-                r="4"
-                fill="#2563eb"
-                stroke="white"
-                strokeWidth="1.5"
-              />
-            );
-          })}
+          {lines.flatMap(({ item, color }) =>
+            PERIODS.map((p) => {
+              const v = valueAt(item, p.shock);
+              return v === null ? null : (
+                <circle
+                  key={item.k + ":" + p.shock}
+                  cx={x(p.shock)}
+                  cy={y(v)}
+                  r="4"
+                  fill={color}
+                  stroke="white"
+                  strokeWidth="1.5"
+                />
+              );
+            }),
+          )}
         </svg>
       </div>
       <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {PERIODS.map((p) => {
-          const r = scanLegacy(series, p);
+          const r =
+            scanLegacy(series, p) ??
+            chartSeries
+              .map((item) => scanLegacy(item, p))
+              .find((result) => result !== null);
           return (
             <button
               key={p.shock}
-              onClick={() => onPick(p)}
+              onClick={() => onPick(p, r?.s.k ?? series.k)}
               aria-pressed={selected === p.shock}
               className="rounded-lg border p-3 text-left text-sm hover:bg-muted aria-pressed:ring-2 aria-pressed:ring-primary"
             >
@@ -931,6 +1002,11 @@ function HistoryOverview({
               <strong className="block">{p.label}</strong>
               {r ? (
                 <>
+                  {paired && (
+                    <span className="mt-2 block text-xs text-muted-foreground">
+                      {r.s.t}
+                    </span>
+                  )}
                   <span className="mt-2 block text-xs">
                     {fmt(r.a)} → {fmt(r.b)} → {fmt(r.c)}
                   </span>
