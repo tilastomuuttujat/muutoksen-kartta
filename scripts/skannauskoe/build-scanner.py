@@ -74,6 +74,17 @@ def main():
         pos = all(s[y] > 0 for y in ys)
         ch = {b: (s[b] / s[a] - 1 if pos else s[b] - s[a]) for a, b in zip(ys, ys[1:]) if b - a == 1}
         vals = np.array(list(ch.values()))
+        m = meta.get(k, {})
+        # Sparse observations are available on the timeline and skipped by annual detectors.
+        if m.get("frequency") == "5-year" and len(ys) >= 2:
+            y0, y1 = ys[0], ys[-1]
+            series.append({
+                "k": k, "t": m.get("title") or k, "u": m.get("unit") or "",
+                "lane": lane_of(m.get("theme")), "theme": m.get("theme") or "",
+                "y0": y0, "v": [s.get(y) for y in range(y0, y1 + 1)],
+                "f": "." * (y1 - y0 + 1), "sparse": True, "_ch": {},
+            })
+            continue
         if len(vals) < 15 or np.ptp(vals) == 0:
             continue
         lo, hi = np.quantile(vals, [0.05, 0.95])
