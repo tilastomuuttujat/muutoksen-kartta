@@ -79,7 +79,7 @@ function ScannerPage() {
   const A = search.a ?? 1991, B = search.b ?? 2009;
 
   const unique = useMemo(() => uniqueSeries(), []);
-  const ndup = SCANNER.series.length - unique.length;
+  const ndup = SCANNER.series.filter((series) => series.dup).length;
   const crises = useMemo(() => crisisYears("a"), []);
 
   return (
