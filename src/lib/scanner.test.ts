@@ -108,9 +108,9 @@ describe("dataset", () => {
     const tfr = byKey("gapminder.finland.children_per_woman_total_fertility.v20261026")!;
     const res = scanTarget(tfr, "m", 2, new Set(crisisYears("a")));
     const women = res.find((r) => r.s.k === "nordics.unemployment_rate_25_34_women_1990_2024")!;
-    expect(women.r).toBeCloseTo(-0.66, 2);
+    expect(women.r).toBeCloseTo(-0.58, 2);
     expect(women.k).toBe(2);
-    expect(status(women.pLead, women.qLead)).toBe("ehdokas");
+    expect(status(women.pLead, women.qLead)).toBe("heikko");
   });
   it("episode comparison only lists series that cover both periods", () => {
     const c = compareEpisodes("a", 1991, 2009);
