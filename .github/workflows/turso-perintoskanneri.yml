@@ -1,4 +1,4 @@
-name: Turso – tuo asumisen, perheellistymisen ja muuttoliikkeen sarjat
+name: Turso – tuo työllisyysasteet alaikäisten lasten mukaan
 on:
   push:
     branches: [turso-perintoskanneri-20261126]
@@ -9,7 +9,7 @@ jobs:
     env:
       TURSO_TOKEN: ${{ secrets.TURSO_WRITE_TOKEN }}
     steps:
-      - name: Tuo ja varmista asumisen, perheellistymisen ja muuttoliikkeen sarjat
+      - name: Tuo ja varmista työllisyysasteet alaikäisten lasten mukaan
         run: |
           python3 - <<'PY'
           import json
@@ -22,12 +22,12 @@ jobs:
               raise SystemExit("TURSO_WRITE_TOKEN puuttuu")
           
           import base64, gzip
-          specs = json.loads(gzip.decompress(base64.b64decode("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")))
+          specs = json.loads(gzip.decompress(base64.b64decode("H4sIAAAAAAACA+2WUYrbMBCGryIMfdMqkR3Ldg6w0LdCl/YhLEHbKLWILKeW5MaUQu/QK+QMvUBu0pN0ZsMutRwohWX3ZV9s9Hv0a8bW59HqW7JTQ7JMnJd+qy3zg9c8r3PGmeTles5Uszft0CjrE5p4HEmvYMJWs1o7b+RdGzpmti6d8+qv6HWHcTBFe4PxN8PplzHaDYOTziuSzn//+CkWV31ovZbaGElJo1WtPCVKE2mMIrx8eOwlMXLvtATHAG5v4O5g4U9oXXu/d8vZbH/YSC8ZlsK2evbu8FHdgfgVrjB8D/K1tg/39RpLnd3Xuj/MwM+2/iHRvtWN9MHvdBMcjXIFd/JBdR6SDt1QN6cj0aaRFnKWenc6aqdBAgvitDsdjT8dYQzXwemrc4BXFuq5v/XS1vDWtGTkJph2B3OgWHgDaKC61nspiQ1th8HgH86z0QcXh6Uo2ctOu1BvFAQTyIsMYGOlCw2aMaitd8lytUqu3yYUvlNGRUGT5JY+KgsqBCvHWo4aH2sCZjIx1goqqrFS0oKzxViraJGydKSlc4zLxhrHuHyspbTI4rgMtXEm6QL9xrmkOfrdV3FLk522G/jE7Z1TXa828GK2nfoCirQ2SAPjz6pNljYY853+A43+RdB43GOTLQQb9hWOJ4GjmsdwlCUrYjhAy2M4plpByyoGq4QVpnhUPIYDoooYDtDKGI7qAhwQl8dwVDzCGeCA7MSTwpG+QN+wUrvXvvEcaBQ8RqOYR39cQAM0EaNRTLZ8gRqfdI4s1irUqknnSCM/7ByLC51DTPqGiHFZ4Mxs0jeys9sTo9G/CBqvfeM54Ig2EeIRH3oQDx53BDE9uCAe8X8d8cgv4CEuHKziYxriUcVwlPExDfAo4+wAj2kcVFGdM/5PPG7/AKKbsr5zDAAA")))
           new_series = [(item["key"],item["template"],item["title"],item["note"],item["u"],item["freq"],item["source"],item["geo"]) for item in specs]
           batch = [[item["key"],group,year,str(value),item["kind"],item["source"],
                     item["note"] + (f" Eurostatin merkintä: {flag}." if flag else "")]
                    for item in specs for group,year,value,flag in item["vs"]]
-          assert len(new_series) == 28 and len(batch) == 791
+          assert len(new_series) == 4 and len(batch) == 52
           
           def query(sql, args=()):
               typed = [{"type": "integer" if isinstance(v, int) else "text", "value": str(v)} for v in args]
@@ -53,7 +53,7 @@ jobs:
               if len(existing) != 1:
                   raise SystemExit(f"Pohjasarjaa ei löytynyt: {template}")
               record = {field: cell.get("value") for field, cell in zip(fields, existing[0])}
-              record.update(series_key=key, title=title, _migration_key="perinto-asuminen-perheet-muutto:"+key,
+              record.update(series_key=key, title=title, _migration_key="perinto-tyo-lapset:"+key,
                             source_url=url, unit=unit, frequency=frequency,
                             source=url, source_name=url,
                             description=note, notes=note, meta=json.dumps({"source":url,"definition":note}))
@@ -77,7 +77,7 @@ jobs:
           columns = "series_key,group_key,year,value,value_kind,source_url,validation_note,_migration_key"
           parameter_group = "(" + ",".join("?" for _ in range(8)) + ")"
           payload = ",".join(parameter_group for _ in batch)
-          args = [v for row in batch for v in (*row, f"perinto-asuminen-perheet-muutto-20261126:{row[0]}:{row[1]}:{row[2]}")]
+          args = [v for row in batch for v in (*row, f"perinto-tyo-lapset-20261126:{row[0]}:{row[1]}:{row[2]}")]
           keys = [(r[0], r[1], r[2]) for r in batch]
           predicate = "(series_key,group_key,year) IN (" + ",".join("(?,?,?)" for _ in keys) + ")"
           key_args = [v for key in keys for v in key]
@@ -97,7 +97,7 @@ jobs:
           sql = f"""
           INSERT INTO {table} ({columns},is_published,imported_at,meta)
           SELECT series_key,group_key,year,value,value_kind,source_url,validation_note,_migration_key,
-                 1,datetime('now'),json_object('import_batch','perinto-asuminen-perheet-muutto-20261126')
+                 1,datetime('now'),json_object('import_batch','perinto-tyo-lapset-20261126')
           FROM (WITH batch({columns}) AS (VALUES {payload}) SELECT * FROM batch)
           WHERE true
           ON CONFLICT(series_key,year,group_key) DO UPDATE SET
@@ -107,7 +107,7 @@ jobs:
               validation_note=excluded.validation_note,
               is_published=excluded.is_published,
               imported_at=excluded.imported_at,
-              meta=json_object('import_batch','perinto-asuminen-perheet-muutto-20261126','previous_meta',meta,
+              meta=json_object('import_batch','perinto-tyo-lapset-20261126','previous_meta',meta,
                   'previous_value',value,'previous_value_kind',value_kind,'previous_source_url',source_url,
                   'previous_source_version',source_version,'previous_source_retrieved_at',source_retrieved_at),
               source_version=NULL,
