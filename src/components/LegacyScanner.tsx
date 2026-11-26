@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import indicatorData from "@/data/indicators.json";
 import { LANES, SCANNER, uniqueSeries } from "@/lib/scanner";
 import {
   LABELS,
@@ -24,6 +25,63 @@ const colors: Record<Kind, string> = {
 };
 const kinds = Object.keys(LABELS) as Kind[];
 
+// Approved continuations from the sourced indicator snapshot, for the legacy view.
+const continuations = new Map([
+  [
+    "gapminder.finland.children_per_woman_total_fertility.v20261026",
+    { from: 2024, table: "synt/12dt", note: "Tilastokeskus, StatFin 12dt" },
+  ],
+  [
+    "fi.histlabour.lfs2019.employment_rate",
+    {
+      from: 2019,
+      table: "tyti/13aj",
+      note: "Tilastokeskus, StatFin 13aj, tarkistettu työvoimatutkimus",
+    },
+  ],
+  [
+    "fi.historical20261026.jst.real_wage_index",
+    {
+      from: 2021,
+      table: "ati/14un",
+      note: "Tilastokeskus, StatFin 14un. Historiallista indeksiä jatketaan reaaliansioindeksin vuosimuutoksilla.",
+    },
+  ],
+  [
+    "fi.distribution.gini2020.disposable",
+    {
+      from: 2019,
+      table: "tjt/11x3",
+      note: "Tilastokeskus, StatFin 11x3, käytettävissä olevat rahatulot",
+    },
+  ],
+]);
+
+const legacySeries = SCANNER.series.map((series) => {
+  const source = continuations.get(series.k);
+  const indicator =
+    source &&
+    indicatorData.indicators.find(
+      (item) => item.key === series.k && item.unit === series.u,
+    );
+  if (!source || !indicator) return series;
+  const values = [...series.v];
+  for (const [year, value] of indicator.values) {
+    if (
+      typeof year !== "number" ||
+      year < source.from ||
+      year > 2025 ||
+      typeof value !== "number" ||
+      !Number.isFinite(value)
+    )
+      continue;
+    while (values.length <= year - series.y0) values.push(null);
+    values[year - series.y0] ??= value;
+  }
+  return { ...series, v: values };
+});
+const historyChoices = uniqueSeries(legacySeries);
+
 export function LegacyScanner() {
   const [w, setW] = useState<Window>(PERIODS[4]!);
   const [lane, setLane] = useState("");
@@ -38,12 +96,12 @@ export function LegacyScanner() {
     "gapminder.finland.children_per_woman_total_fertility.v20261026",
   );
   const historySeries =
-    uniqueSeries().find((s) => s.k === historyKey) ?? uniqueSeries()[0]!;
-  const rows = useMemo(() => scanAll(SCANNER.series, w), [w]);
+    historyChoices.find((s) => s.k === historyKey) ?? historyChoices[0]!;
+  const rows = useMemo(() => scanAll(legacySeries, w), [w]);
   const prior = useMemo(
     () =>
       new Map(
-        scanAll(SCANNER.series, PERIODS[comparison]!).map((r) => [r.s.k, r]),
+        scanAll(legacySeries, PERIODS[comparison]!).map((r) => [r.s.k, r]),
       ),
     [comparison],
   );
@@ -132,7 +190,7 @@ export function LegacyScanner() {
           )}
         </details>
         <p className="mt-3 text-sm text-muted-foreground">
-          {rows.length} / {uniqueSeries().length} sarjaa täyttää kattavuusehdot.
+          {rows.length} / {historyChoices.length} sarjaa täyttää kattavuusehdot.
           Puuttuvia vuosia ei arvioida.
         </p>
       </section>
@@ -389,7 +447,8 @@ export function LegacyScanner() {
           tarkista alkuperäiset lähteet ennen johtopäätöksiä.
         </p>
         <p className="mt-2 text-muted-foreground">
-          Lähde: {SCANNER.meta.source}.
+          Lähde: {SCANNER.meta.source}. Neljän sarjan viimeiset vuodet on
+          täydennetty hankkeen StatFin-aineistosta.
         </p>
       </details>
     </div>
@@ -703,7 +762,7 @@ function HistoryOverview({
   onSeries: (k: string) => void;
 }) {
   const [search, setSearch] = useState("");
-  const all = uniqueSeries();
+  const all = historyChoices;
   const choices = all.filter(
     (s) =>
       s.k === series.k ||
@@ -763,6 +822,7 @@ function HistoryOverview({
       </div>
       <p className="mt-4 text-sm font-semibold">{series.t}</p>
       <p className="text-xs text-muted-foreground">{series.u}</p>
+      <ContinuationSource seriesKey={series.k} />
       <div className="overflow-x-auto">
         <svg
           viewBox="0 0 960 280"
@@ -895,5 +955,22 @@ function HistoryOverview({
         Murrosjaksojen pituudet vaihtelevat; luokitus ei osoita syy-yhteyttä.
       </p>
     </div>
+  );
+}
+
+function ContinuationSource({ seriesKey }: { seriesKey: string }) {
+  const source = continuations.get(seriesKey);
+  if (!source) return null;
+  const [domain, table] = source.table.split("/");
+  return (
+    <p className="mt-1 text-xs text-muted-foreground">
+      Täydennys vuodesta {source.from}.{" "}
+      <a
+        className="underline"
+        href={`https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__${domain}/statfin_${domain}_pxt_${table}.px/`}
+      >
+        {source.note}
+      </a>
+    </p>
   );
 }
