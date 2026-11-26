@@ -9,7 +9,7 @@ jobs:
     env:
       TURSO_TOKEN: ${{ secrets.TURSO_WRITE_TOKEN }}
     steps:
-      - name: Tuo ja varmista 20 vuosiarvoa
+      - name: Tuo ja varmista kuusi rikoshavaintoa
         run: |
           python3 - <<'PY'
           import json
@@ -21,7 +21,7 @@ jobs:
           if not token:
               raise SystemExit("TURSO_WRITE_TOKEN puuttuu")
           
-          batch = json.loads(r'''[["gapminder.finland.children_per_woman_total_fertility.v20261026","FI",2024,"1.25","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/synt/12dt.px","Kokonaishedelmällisyysluku, Tilastokeskus."],["gapminder.finland.children_per_woman_total_fertility.v20261026","FI",2025,"1.3","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/synt/12dt.px","Kokonaishedelmällisyysluku, Tilastokeskus."],["fi.histlabour.lfs2019.employment_rate","FI_HIST",2019,"71.6","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tyti/13aj.px","Työllisyysaste, 15–64-vuotiaat, työvoimatutkimuksen tarkistetut luvut."],["fi.histlabour.lfs2019.employment_rate","FI_HIST",2020,"70.7","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tyti/13aj.px","Työllisyysaste, 15–64-vuotiaat, työvoimatutkimuksen tarkistetut luvut."],["fi.histlabour.lfs2019.employment_rate","FI_HIST",2021,"72.3","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tyti/13aj.px","Työllisyysaste, 15–64-vuotiaat, työvoimatutkimuksen tarkistetut luvut."],["fi.histlabour.lfs2019.employment_rate","FI_HIST",2022,"73.8","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tyti/13aj.px","Työllisyysaste, 15–64-vuotiaat, työvoimatutkimuksen tarkistetut luvut."],["fi.histlabour.lfs2019.employment_rate","FI_HIST",2023,"73.6","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tyti/13aj.px","Työllisyysaste, 15–64-vuotiaat, työvoimatutkimuksen tarkistetut luvut."],["fi.histlabour.lfs2019.employment_rate","FI_HIST",2024,"72.1","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tyti/13aj.px","Työllisyysaste, 15–64-vuotiaat, työvoimatutkimuksen tarkistetut luvut."],["fi.histlabour.lfs2019.employment_rate","FI_HIST",2025,"71.4","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tyti/13aj.px","Työllisyysaste, 15–64-vuotiaat, työvoimatutkimuksen tarkistetut luvut."],["fi.historical20261026.jst.real_wage_index","FI",2021,"136.384","estimate","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/ati/14un.px","Historiallinen JST R6 -sarja jatkettu Tilastokeskuksen reaaliansioindeksin vuosimuutoksilla, 2020 ankkurivuotena."],["fi.historical20261026.jst.real_wage_index","FI",2022,"130.46","estimate","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/ati/14un.px","Historiallinen JST R6 -sarja jatkettu Tilastokeskuksen reaaliansioindeksin vuosimuutoksilla, 2020 ankkurivuotena."],["fi.historical20261026.jst.real_wage_index","FI",2023,"127.827","estimate","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/ati/14un.px","Historiallinen JST R6 -sarja jatkettu Tilastokeskuksen reaaliansioindeksin vuosimuutoksilla, 2020 ankkurivuotena."],["fi.historical20261026.jst.real_wage_index","FI",2024,"130.197","estimate","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/ati/14un.px","Historiallinen JST R6 -sarja jatkettu Tilastokeskuksen reaaliansioindeksin vuosimuutoksilla, 2020 ankkurivuotena."],["fi.historical20261026.jst.real_wage_index","FI",2025,"133.619","estimate","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/ati/14un.px","Historiallinen JST R6 -sarja jatkettu Tilastokeskuksen reaaliansioindeksin vuosimuutoksilla, 2020 ankkurivuotena."],["fi.distribution.gini2020.disposable","FI_REGISTER",2019,"27.9","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tjt/11x3.px","Gini, käytettävissä olevat rahatulot, rekisteriaineisto."],["fi.distribution.gini2020.disposable","FI_REGISTER",2020,"27.7","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tjt/11x3.px","Gini, käytettävissä olevat rahatulot, rekisteriaineisto."],["fi.distribution.gini2020.disposable","FI_REGISTER",2021,"29.1","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tjt/11x3.px","Gini, käytettävissä olevat rahatulot, rekisteriaineisto."],["fi.distribution.gini2020.disposable","FI_REGISTER",2022,"28.6","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tjt/11x3.px","Gini, käytettävissä olevat rahatulot, rekisteriaineisto."],["fi.distribution.gini2020.disposable","FI_REGISTER",2023,"27.9","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tjt/11x3.px","Gini, käytettävissä olevat rahatulot, rekisteriaineisto."],["fi.distribution.gini2020.disposable","FI_REGISTER",2024,"28.4","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tjt/11x3.px","Gini, käytettävissä olevat rahatulot, rekisteriaineisto."]]''')
+          batch = json.loads(r'''[["crime.hcs.fi.police_manslaughter","AUTO",2023,"38","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/rpk/13gw.px","Tapot, StatFin 13gw, poliisi (1), rikosnimike 210101. Vuodet 2020–2022 vastaavat historiallista koostetta; vanhemmissa päällekkäisissä vuosissa on eroja."],["crime.hcs.fi.police_manslaughter","AUTO",2024,"53","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/rpk/13gw.px","Tapot, StatFin 13gw, poliisi (1), rikosnimike 210101. Vuodet 2020–2022 vastaavat historiallista koostetta; vanhemmissa päällekkäisissä vuosissa on eroja."],["crime.hcs.fi.police_manslaughter","AUTO",2025,"56","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/rpk/13gw.px","Tapot, StatFin 13gw, poliisi (1), rikosnimike 210101. Vuodet 2020–2022 vastaavat historiallista koostetta; vanhemmissa päällekkäisissä vuosissa on eroja."],["crime.hcs.fi.police_murder","AUTO",2023,"19","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/rpk/13gw.px","Murhat, StatFin 13gw, poliisi (1), rikosnimike 210201. Vuodet 2020–2022 vastaavat historiallista koostetta; vanhemmissa päällekkäisissä vuosissa on eroja."],["crime.hcs.fi.police_murder","AUTO",2024,"36","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/rpk/13gw.px","Murhat, StatFin 13gw, poliisi (1), rikosnimike 210201. Vuodet 2020–2022 vastaavat historiallista koostetta; vanhemmissa päällekkäisissä vuosissa on eroja."],["crime.hcs.fi.police_murder","AUTO",2025,"24","observed","https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/rpk/13gw.px","Murhat, StatFin 13gw, poliisi (1), rikosnimike 210201. Vuodet 2020–2022 vastaavat historiallista koostetta; vanhemmissa päällekkäisissä vuosissa on eroja."]]''')
           
           def query(sql, args=()):
               typed = [{"type": "integer" if isinstance(v, int) else "text", "value": str(v)} for v in args]
@@ -35,10 +35,17 @@ jobs:
               return item["response"]["result"]
           
           table = "public__indicator_values"
+          for key in {row[0] for row in batch}:
+              groups = query(f"SELECT DISTINCT group_key FROM {table} WHERE series_key=? AND year=2022 AND value IS NOT NULL", [key])["rows"]
+              if len(groups) != 1:
+                  raise SystemExit(f"Yksiselitteistä ryhmää ei löytynyt: {key}")
+              for row in batch:
+                  if row[0] == key:
+                      row[1] = groups[0][0]["value"]
           columns = "series_key,group_key,year,value,value_kind,source_url,validation_note,_migration_key"
           parameter_group = "(" + ",".join("?" for _ in range(8)) + ")"
           payload = ",".join(parameter_group for _ in batch)
-          args = [v for row in batch for v in (*row, f"statfin-perinto-20261126:{row[0]}:{row[1]}:{row[2]}")]
+          args = [v for row in batch for v in (*row, f"statfin-rikokset-20261126:{row[0]}:{row[1]}:{row[2]}")]
           keys = [(r[0], r[1], r[2]) for r in batch]
           predicate = "(series_key,group_key,year) IN (" + ",".join("(?,?,?)" for _ in keys) + ")"
           key_args = [v for key in keys for v in key]
@@ -58,7 +65,7 @@ jobs:
           sql = f"""
           INSERT INTO {table} ({columns},is_published,imported_at,meta)
           SELECT series_key,group_key,year,value,value_kind,source_url,validation_note,_migration_key,
-                 1,datetime('now'),json_object('import_batch','perinto-statfin-20261126')
+                 1,datetime('now'),json_object('import_batch','rikokset-statfin-20261126')
           FROM (WITH batch({columns}) AS (VALUES {payload}) SELECT * FROM batch)
           WHERE true
           ON CONFLICT(series_key,year,group_key) DO UPDATE SET
@@ -68,7 +75,7 @@ jobs:
               validation_note=excluded.validation_note,
               is_published=excluded.is_published,
               imported_at=excluded.imported_at,
-              meta=json_object('import_batch','perinto-statfin-20261126','previous_meta',meta,
+              meta=json_object('import_batch','rikokset-statfin-20261126','previous_meta',meta,
                   'previous_value',value,'previous_value_kind',value_kind,'previous_source_url',source_url,
                   'previous_source_version',source_version,'previous_source_retrieved_at',source_retrieved_at),
               source_version=NULL,
