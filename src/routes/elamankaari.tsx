@@ -21,6 +21,7 @@ export const Route = createFileRoute("/elamankaari")({
       { property: "og:title", content: "Elämänkaari – Murrosmatriisi" },
       { property: "og:description", content: "Miten 25-vuotiaan elämä on muuttunut: siirtymät ikävuosittain Tilastokeskuksen rekistereistä." },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: LifeCoursePage,

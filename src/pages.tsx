@@ -3,4 +3,7 @@ import { createRoot } from "react-dom/client";
 import { getRouter } from "./router";
 import "./styles.css";
 
-createRoot(document.getElementById("root")!).render(<RouterProvider router={getRouter()} />);
+const rootElement = document.getElementById("root");
+if (rootElement) {
+  createRoot(rootElement).render(<RouterProvider router={getRouter()} />);
+}

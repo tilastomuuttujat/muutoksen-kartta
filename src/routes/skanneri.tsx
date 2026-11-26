@@ -53,6 +53,7 @@ export const Route = createFileRoute("/skanneri")({
       { property: "og:title", content: "Skanneri – Murrosmatriisi" },
       { property: "og:description", content: "Vertaa skannauksia: mikä edeltää mitä, ja mikä erotti kriisit toisistaan. Tulokset ovat testattavia ehdokkaita, eivät syitä." },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ScannerPage,

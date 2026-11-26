@@ -23,6 +23,7 @@ export const Route = createFileRoute("/mitajos")({
       { property: "og:title", content: "Mitä jos – Murrosmatriisi" },
       { property: "og:description", content: "Suomi verrattuna synteettiseen Suomeen, joka seurasi sitä ennen murrosta: missä ero oli suuri, ja kuinka nopeasti se kurottiin kiinni." },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: WhatIfPage,

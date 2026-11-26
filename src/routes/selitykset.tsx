@@ -26,6 +26,7 @@ export const Route = createFileRoute("/selitykset")({
       { property: "og:title", content: "Miksi syntyvyys laski? Selitysten punnitus" },
       { property: "og:description", content: "Viisi selitystä syntyvyyden laskulle 2010–2024 ja mitä aineisto sanoo kustakin." },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ExplanationsPage,
