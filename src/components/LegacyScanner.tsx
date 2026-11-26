@@ -57,8 +57,29 @@ const legacySeries = SCANNER.series.map((series) => {
   return { ...series, v: values };
 });
 const unemploymentKey = "fi.histlabour.lfs2019.unemployment_rate";
+const longSeriesSources = new Map([
+  [
+    "owid.finland.mean_years_schooling_15_64",
+    "https://ourworldindata.org/grapher/mean-years-of-schooling-long-run",
+  ],
+  [
+    "owid.finland.annual_working_hours_per_worker",
+    "https://ourworldindata.org/grapher/annual-working-hours-per-worker",
+  ],
+  [
+    "wid.finland.top1_taxable_income_population_1920_1992",
+    "https://wid.world/www-site/uploads/2016/06/Jantti_Riihela_Sullstrom_Tuomala_Chapter8_2010.pdf",
+  ],
+  [
+    "wid.finland.top1_income_subject_to_tax_adults_1949_2003",
+    "https://wid.world/www-site/uploads/2016/06/Jantti_Riihela_Sullstrom_Tuomala_Chapter8_2010.pdf",
+  ],
+]);
 const historyChoices = legacySeries.filter(
-  (series) => !series.dup || series.k === unemploymentKey,
+  (series) =>
+    !series.dup ||
+    series.k === unemploymentKey ||
+    longSeriesSources.has(series.k),
 );
 
 export function LegacyScanner() {
@@ -845,6 +866,16 @@ function HistoryOverview({
         </select>
       </div>
       <p className="mt-4 text-sm font-semibold">{series.t}</p>
+      {series.sparse && (
+        <p className="text-xs text-muted-foreground">
+          Havainto viiden vuoden välein.
+        </p>
+      )}
+      {longSeriesSources.has(series.k) && (
+        <a className="text-xs underline" href={longSeriesSources.get(series.k)}>
+          Aineistolähde
+        </a>
+      )}
       <p className="text-xs text-muted-foreground">
         {useRates
           ? "Lukumäärä 100 000 asukasta kohti"
@@ -985,6 +1016,27 @@ function HistoryOverview({
               </text>
             </g>
           )}
+          {lines.flatMap(({ item, color, values }) =>
+            item.sparse
+              ? values.flatMap((point) =>
+                  point.v === null
+                    ? []
+                    : [
+                        <circle
+                          key={item.k + point.year}
+                          cx={x(point.year)}
+                          cy={y(point.v)}
+                          r="3"
+                          fill={color}
+                        >
+                          <title>
+                            {point.year}: {fmt(point.v)}
+                          </title>
+                        </circle>,
+                      ],
+                )
+              : [],
+          )}
           {lines.map(({ item, color, values }) => (
             <path
               key={item.k}
@@ -1102,7 +1154,50 @@ const livelihoodMetrics = [
   ["fi.distribution.gini2020.disposable", "Tuloerot (Gini)"],
 ] as const;
 
+const comparisonThemes = [
+  { label: "Työ ja toimeentulo", metrics: livelihoodMetrics },
+  {
+    label: "Koulunkäynti ja koulutusvuodet",
+    metrics: [
+      [
+        "owid.finland.primary-enrollment-selected-countries.v20261026",
+        "Alkeisopetuksen netto-osallistumisaste",
+      ],
+      [
+        "owid.finland.mean_years_schooling_15_64",
+        "Keskimääräiset koulutusvuodet, 15–64-vuotiaat",
+      ],
+    ],
+  },
+  {
+    label: "Työaika ja reaalipalkat",
+    metrics: [
+      [
+        "owid.finland.annual_working_hours_per_worker",
+        "Vuosityötunnit työllistä kohti",
+      ],
+      ["fi.historical20261026.jst.real_wage_index", "Reaalipalkkaindeksi"],
+    ],
+  },
+  {
+    label: "Tulojen keskittyminen ja Gini",
+    metrics: [
+      [
+        "wid.finland.top1_taxable_income_population_1920_1992",
+        "Ylimmän prosentin tulo-osuus · verotettavat tulot / väestö",
+      ],
+      [
+        "wid.finland.top1_income_subject_to_tax_adults_1949_2003",
+        "Ylimmän prosentin tulo-osuus · veronalaiset tulot / aikuiset",
+      ],
+      ["fi.distribution.gini2020.disposable", "Tuloerot (Gini)"],
+    ],
+  },
+] as const;
+
 function LivelihoodComparison() {
+  const [themeIndex, setThemeIndex] = useState(0);
+  const theme = comparisonThemes[themeIndex]!;
   const periods = PERIODS.slice(3);
   const [periodIndex, setPeriodIndex] = useState(1);
   const period = periods[periodIndex]!;
@@ -1110,14 +1205,26 @@ function LivelihoodComparison() {
   const x = (year: number) => 36 + ((year - 1850) / 175) * 306;
   return (
     <section className="rounded-xl border bg-card p-5">
-      <h2 className="font-display text-xl">
-        Palautuivatko työ ja toimeentulo samaan tahtiin?
-      </h2>
+      <h2 className="font-display text-xl">Pitkien aikasarjojen vertailu</h2>
       <p className="mt-1 text-sm text-muted-foreground">
         Kuvaajissa on sama aikajana 1850–2025 ja kullakin mittarilla oma
         asteikkonsa. Valitse murros nähdäksesi kolmen vertailuvuoden arvot.
         Puuttuvat vuodet näkyvät katkoksina.
       </p>
+      <label className="mt-3 block text-sm font-medium">
+        Vertailun aihe
+        <select
+          className="ml-2 rounded border bg-background p-2"
+          value={themeIndex}
+          onChange={(event) => setThemeIndex(Number(event.target.value))}
+        >
+          {comparisonThemes.map((item, index) => (
+            <option key={item.label} value={index}>
+              {item.label}
+            </option>
+          ))}
+        </select>
+      </label>
       <div className="my-4 flex flex-wrap gap-2">
         {periods.map((item, index) => (
           <button
@@ -1132,7 +1239,7 @@ function LivelihoodComparison() {
         ))}
       </div>
       <div className="grid gap-3 md:grid-cols-2">
-        {livelihoodMetrics.map(([key, label], index) => {
+        {theme.metrics.map(([key, label], index) => {
           const series = legacySeries.find((item) => item.k === key);
           if (!series) return null;
           const values = series.v.filter(
@@ -1156,7 +1263,18 @@ function LivelihoodComparison() {
           return (
             <article key={key} className="rounded-lg border bg-background p-3">
               <h3 className="font-medium">{label}</h3>
-              <p className="text-xs text-muted-foreground">{series.u}</p>
+              <p className="text-xs text-muted-foreground">
+                {series.u}
+                {series.sparse ? " · viiden vuoden välein" : ""}
+              </p>
+              {longSeriesSources.has(key) && (
+                <a
+                  className="text-xs underline"
+                  href={longSeriesSources.get(key)}
+                >
+                  Aineistolähde
+                </a>
+              )}
               <svg
                 viewBox="0 0 355 120"
                 className="mt-2 w-full"
@@ -1200,6 +1318,22 @@ function LivelihoodComparison() {
                     </text>
                   </g>
                 ))}
+                {series.sparse &&
+                  series.v.map((value, index) =>
+                    value === null ? null : (
+                      <circle
+                        key={index}
+                        cx={x(series.y0 + index)}
+                        cy={y(value)}
+                        r="2"
+                        fill={colors[1]}
+                      >
+                        <title>
+                          {series.y0 + index}: {fmt(value)}
+                        </title>
+                      </circle>
+                    ),
+                  )}
                 <path
                   d={path}
                   fill="none"
