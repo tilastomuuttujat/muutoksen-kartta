@@ -57,7 +57,83 @@ const continuations = new Map([
   ],
 ]);
 
+const statfinCrime = [
+  {
+    key: "assault",
+    title: "Pahoinpitelyt (lievät, perusmuotoiset ja törkeät)",
+    values: [
+      30158, 33751, 34003, 32080, 32315, 39319, 37425, 34680, 32145, 33133,
+      32972, 33053, 33150, 33426, 32778, 33620, 37647, 40712, 40466, 44013,
+    ],
+  },
+  {
+    key: "fraud",
+    title: "Petokset (lievät, perusmuotoiset ja törkeät)",
+    values: [
+      11615, 12777, 14864, 16267, 14518, 16409, 19023, 20245, 20041, 22516,
+      21752, 20386, 21978, 25518, 31720, 34580, 36591, 40391, 38404, 33112,
+    ],
+  },
+  {
+    key: "robbery",
+    title: "Ryöstöt ja ryöstön yritykset",
+    values: [
+      1700, 1784, 1696, 1640, 1508, 1622, 1616, 1523, 1687, 1548, 1670, 1643,
+      1707, 1808, 2000, 1901, 2336, 2732, 2592, 2433,
+    ],
+  },
+  {
+    key: "theft_petty",
+    title: "Varkaudet, törkeät varkaudet ja näpistykset",
+    values: [
+      135880, 135425, 137388, 142763, 139531, 142513, 130928, 133751, 135282,
+      130522, 124060, 118464, 116275, 120074, 131312, 121283, 122411, 123849,
+      124304, 142069,
+    ],
+  },
+  {
+    key: "narcotics",
+    title: "Huumausainerikokset (rikoslain 50. luku)",
+    values: [
+      14226, 16293, 16508, 18524, 19724, 20394, 20102, 22656, 21781, 23400,
+      25082, 27831, 29183, 32357, 37152, 28298, 25212, 26838, 25618, 26433,
+    ],
+  },
+  {
+    key: "manslaughter",
+    title: "Tapot",
+    values: [
+      74, 69, 85, 73, 72, 64, 46, 57, 59, 48, 55, 45, 59, 45, 53, 47, 52, 38,
+      53, 56,
+    ],
+  },
+  {
+    key: "murder",
+    title: "Murhat",
+    values: [
+      37, 58, 47, 40, 38, 49, 43, 38, 41, 36, 21, 27, 28, 27, 33, 36, 26, 19,
+      36, 24,
+    ],
+  },
+];
+const crimeSourceUrl =
+  "https://statfin.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__rpk/statfin_rpk_pxt_13gw.px/";
+const population = SCANNER.series.find(
+  (series) => series.k === "fi.statfin15ai.total.ep.fe4e7bf6af",
+);
+
 const legacySeries = SCANNER.series.map((series) => {
+  const crime = statfinCrime.find(
+    (item) => series.k === "crime.hcs.fi.police_" + item.key,
+  );
+  if (crime && ["manslaughter", "murder"].includes(crime.key)) {
+    const values = [...series.v];
+    for (let year = 2023; year <= 2025; year++) {
+      while (values.length <= year - series.y0) values.push(null);
+      values[year - series.y0] ??= crime.values[year - 2006] ?? null;
+    }
+    return { ...series, v: values };
+  }
   const source = continuations.get(series.k);
   const indicator =
     source &&
@@ -757,7 +833,7 @@ const crimeGroups = [
   ["conv_robbery_1850_1926", "police_robbery"],
   ["conv_theft_1850_1926", "police_theft_petty"],
 ].map((group) => group.map((key) => "crime.hcs.fi." + key));
-const crimeColors = ["#2563eb", "#a94326", "#0f766e"];
+const crimeColors = ["#2563eb", "#a94326", "#0f766e", "#7c3aed"];
 
 function HistoryOverview({
   series,
@@ -771,6 +847,7 @@ function HistoryOverview({
   onSeries: (k: string) => void;
 }) {
   const [search, setSearch] = useState("");
+  const [perCapita, setPerCapita] = useState(false);
   const all = historyChoices;
   const choices = all.filter(
     (s) =>
@@ -783,15 +860,43 @@ function HistoryOverview({
   const companions = crimeGroup?.flatMap((key) =>
     all.filter((item) => item.k === key),
   );
-  const chartSeries =
+  const baseSeries =
     companions?.length && companions.length > 1 ? companions : [series];
+  const official = statfinCrime.filter(
+    (item) =>
+      !["manslaughter", "murder"].includes(item.key) &&
+      baseSeries.some((base) => base.k === "crime.hcs.fi.police_" + item.key),
+  );
+  const chartSeries = [
+    ...baseSeries,
+    ...official.map((item) => ({
+      ...series,
+      k: "statfin13gw." + item.key,
+      t: item.title + " · StatFin 13gw",
+      y0: 2006,
+      v: item.values,
+    })),
+  ];
+  const crimeView =
+    series.k.startsWith("crime.hcs.fi.conv_") ||
+    series.k.startsWith("crime.hcs.fi.police_");
+  const useRates = perCapita && crimeView;
+  const hasSource =
+    official.length > 0 ||
+    baseSeries.some((item) => /police_(manslaughter|murder)$/.test(item.k));
+  const chartValue = (item: Legacy["s"], year: number) => {
+    const count = valueAt(item, year);
+    if (!useRates || count === null) return count;
+    const base = population ? valueAt(population, year) : null;
+    return base && base > 0 ? (count * 100) / base : null;
+  };
   const paired = chartSeries.length > 1;
   const lines = chartSeries.map((item, index) => ({
     item,
     color: crimeColors[index] ?? crimeColors[0]!,
     values: Array.from({ length: end - start + 1 }, (_, i) => ({
       year: start + i,
-      v: valueAt(item, start + i),
+      v: chartValue(item, start + i),
     })),
   }));
   const nums = lines.flatMap(({ values }) =>
@@ -845,8 +950,39 @@ function HistoryOverview({
       </div>
       <p className="mt-4 text-sm font-semibold">{series.t}</p>
       <p className="text-xs text-muted-foreground">
-        {paired ? "Lukumäärä vuodessa" : series.u}
+        {useRates
+          ? "Lukumäärä 100 000 asukasta kohti"
+          : crimeView
+            ? "Lukumäärä vuodessa"
+            : series.u}
       </p>
+      {crimeView && (
+        <label className="mt-2 flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={perCapita}
+            onChange={(event) => setPerCapita(event.target.checked)}
+          />
+          Näytä kuvaaja 100 000 asukasta kohti
+        </label>
+      )}
+      {useRates && (
+        <p className="mt-1 text-xs text-muted-foreground">
+          Jakajana käytetään keskiväkilukua vuodesta 1860. Kortit näyttävät
+          lukumäärät.
+        </p>
+      )}
+      {hasSource && (
+        <p className="mt-1 text-xs text-muted-foreground">
+          <a href={crimeSourceUrl} className="underline">
+            Tilastokeskus, StatFin 13gw
+          </a>
+          , tutkiva viranomainen poliisi.{" "}
+          {official.length
+            ? "Uudempi tilasto näkyy omana viivanaan."
+            : "Vuodet 2023–2025 jatkavat historiallisia sarjoja."}
+        </p>
+      )}
       {paired && (
         <>
           <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs">
@@ -861,11 +997,13 @@ function HistoryOverview({
               </li>
             ))}
           </ul>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Vuonna 1927 vaihtuu mittari: tuomittujen henkilöiden määrästä
-            siirrytään poliisin tietoon tulleiden rikosten määrään. Myös
-            rikosluokat voivat erota.
-          </p>
+          {baseSeries.length > 1 && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Vuonna 1927 vaihtuu mittari: tuomittujen henkilöiden määrästä
+              siirrytään poliisin tietoon tulleiden rikosten määrään. Myös
+              rikosluokat voivat erota.
+            </p>
+          )}
         </>
       )}
       <ContinuationSource seriesKey={series.k} />
@@ -926,7 +1064,7 @@ function HistoryOverview({
               </text>
             </g>
           ))}
-          {paired && (
+          {baseSeries.length > 1 && (
             <g>
               <line
                 x1={x(1927)}
@@ -966,7 +1104,7 @@ function HistoryOverview({
           ))}
           {lines.flatMap(({ item, color }) =>
             PERIODS.map((p) => {
-              const v = valueAt(item, p.shock);
+              const v = chartValue(item, p.shock);
               return v === null ? null : (
                 <circle
                   key={item.k + ":" + p.shock}
@@ -986,7 +1124,7 @@ function HistoryOverview({
         {PERIODS.map((p) => {
           const r =
             scanLegacy(series, p) ??
-            chartSeries
+            baseSeries
               .map((item) => scanLegacy(item, p))
               .find((result) => result !== null);
           return (
