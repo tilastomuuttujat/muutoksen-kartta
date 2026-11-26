@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import indicatorData from "@/data/indicators.json";
-import { LANES, SCANNER, uniqueSeries } from "@/lib/scanner";
+import tursoSupplement from "@/data/perinto-turso.json";
+import { LANES, SCANNER } from "@/lib/scanner";
 import {
   LABELS,
   PERIODS,
@@ -25,203 +25,41 @@ const colors: Record<Kind, string> = {
 };
 const kinds = Object.keys(LABELS) as Kind[];
 
-// Approved continuations from the sourced indicator snapshot, for the legacy view.
-const continuations = new Map([
-  [
-    "gapminder.finland.children_per_woman_total_fertility.v20261026",
-    { from: 2024, table: "synt/12dt", note: "Tilastokeskus, StatFin 12dt" },
-  ],
-  [
-    "fi.histlabour.lfs2019.employment_rate",
-    {
-      from: 2019,
-      table: "tyti/13aj",
-      note: "Tilastokeskus, StatFin 13aj, tarkistettu työvoimatutkimus",
-    },
-  ],
-  [
-    "fi.historical20261026.jst.real_wage_index",
-    {
-      from: 2021,
-      table: "ati/14un",
-      note: "Tilastokeskus, StatFin 14un. Historiallista indeksiä jatketaan reaaliansioindeksin vuosimuutoksilla.",
-    },
-  ],
-  [
-    "fi.distribution.gini2020.disposable",
-    {
-      from: 2019,
-      table: "tjt/11x3",
-      note: "Tilastokeskus, StatFin 11x3, käytettävissä olevat rahatulot",
-    },
-  ],
-]);
-
-const statfinCrime = [
-  {
-    key: "assault",
-    title: "Pahoinpitelyt (lievät, perusmuotoiset ja törkeät)",
-    values: [
-      30158, 33751, 34003, 32080, 32315, 39319, 37425, 34680, 32145, 33133,
-      32972, 33053, 33150, 33426, 32778, 33620, 37647, 40712, 40466, 44013,
-    ],
-  },
-  {
-    key: "fraud",
-    title: "Petokset (lievät, perusmuotoiset ja törkeät)",
-    values: [
-      11615, 12777, 14864, 16267, 14518, 16409, 19023, 20245, 20041, 22516,
-      21752, 20386, 21978, 25518, 31720, 34580, 36591, 40391, 38404, 33112,
-    ],
-  },
-  {
-    key: "robbery",
-    title: "Ryöstöt ja ryöstön yritykset",
-    values: [
-      1700, 1784, 1696, 1640, 1508, 1622, 1616, 1523, 1687, 1548, 1670, 1643,
-      1707, 1808, 2000, 1901, 2336, 2732, 2592, 2433,
-    ],
-  },
-  {
-    key: "theft_petty",
-    title: "Varkaudet, törkeät varkaudet ja näpistykset",
-    values: [
-      135880, 135425, 137388, 142763, 139531, 142513, 130928, 133751, 135282,
-      130522, 124060, 118464, 116275, 120074, 131312, 121283, 122411, 123849,
-      124304, 142069,
-    ],
-  },
-  {
-    key: "narcotics",
-    title: "Huumausainerikokset (rikoslain 50. luku)",
-    values: [
-      14226, 16293, 16508, 18524, 19724, 20394, 20102, 22656, 21781, 23400,
-      25082, 27831, 29183, 32357, 37152, 28298, 25212, 26838, 25618, 26433,
-    ],
-  },
-  {
-    key: "manslaughter",
-    title: "Tapot",
-    values: [
-      74, 69, 85, 73, 72, 64, 46, 57, 59, 48, 55, 45, 59, 45, 53, 47, 52, 38,
-      53, 56,
-    ],
-  },
-  {
-    key: "murder",
-    title: "Murhat",
-    values: [
-      37, 58, 47, 40, 38, 49, 43, 38, 41, 36, 21, 27, 28, 27, 33, 36, 26, 19,
-      36, 24,
-    ],
-  },
-];
 const crimeSourceUrl =
   "https://statfin.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__rpk/statfin_rpk_pxt_13gw.px/";
 const population = SCANNER.series.find(
   (series) => series.k === "fi.statfin15ai.total.ep.fe4e7bf6af",
 );
-
-const recentValues = [
-  {
-    key: "crime.hcs.fi.prison_all_daily_average",
-    from: 2023,
-    values: [3143, 3356, 3545],
-    urls: [
-      "https://www.rikosseuraamus.fi/app/uploads/sites/11/2026/05/RISE-Tilastollinen-vuosikirja-2025.pdf",
-      "https://www.rikosseuraamus.fi/app/uploads/sites/11/2026/05/RISE-Tilastollinen-vuosikirja-2025.pdf",
-      "https://www.rikosseuraamus.fi/app/uploads/sites/11/2026/05/RISE-Tilastollinen-vuosikirja-2025.pdf",
-    ],
-    note: "Rikosseuraamuslaitos, vuosikirja 2025, taulukko 2. Vankien päivittäinen keskimäärä.",
-  },
-  {
-    key: "crime.hcs.fi.prison_all_dec31",
-    from: 2023,
-    values: [3166, 3406, 3598],
-    urls: [
-      "https://www.rikosseuraamus.fi/app/uploads/sites/11/2024/11/RISE-Tilastollinen-vuosikirja-2023.pdf",
-      "https://www.rikosseuraamus.fi/app/uploads/sites/11/2024/11/RISE-Tilastollinen-vuosikirja-2024.pdf",
-      "https://www.rikosseuraamus.fi/app/uploads/sites/11/2026/05/RISE-Tilastollinen-vuosikirja-2025.pdf",
-    ],
-    note: "Rikosseuraamuslaitos, taulukko 1, kaikki laitokset, vuoden lopussa.",
-  },
-  {
-    key: "crime.hcs.fi.prison_sentenced_dec31",
-    from: 2023,
-    values: [2325, 2500, 2602],
-    urls: [
-      "https://www.rikosseuraamus.fi/app/uploads/sites/11/2024/11/RISE-Tilastollinen-vuosikirja-2023.pdf",
-      "https://www.rikosseuraamus.fi/app/uploads/sites/11/2024/11/RISE-Tilastollinen-vuosikirja-2024.pdf",
-      "https://www.rikosseuraamus.fi/app/uploads/sites/11/2026/05/RISE-Tilastollinen-vuosikirja-2025.pdf",
-    ],
-    note: "Rikosseuraamuslaitos, taulukko 1, vankeusvangit vuoden lopussa; sakkovangit ja tutkintavangit tilastoitu erikseen.",
-  },
-  {
-    key: "fi.histlabour.lfs2019.unemployment_rate",
-    from: 2019,
-    values: [6.8, 7.7, 7.7, 6.8, 7.2, 8.4, 9.7],
-    urls: [
-      "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__tyti/statfin_tyti_pxt_13aj.px/",
-      "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__tyti/statfin_tyti_pxt_13aj.px/",
-      "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__tyti/statfin_tyti_pxt_13aj.px/",
-      "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__tyti/statfin_tyti_pxt_13aj.px/",
-      "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__tyti/statfin_tyti_pxt_13aj.px/",
-      "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__tyti/statfin_tyti_pxt_13aj.px/",
-      "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__tyti/statfin_tyti_pxt_13aj.px/",
-    ],
-    note: "Tilastokeskus, työvoimatutkimus 13aj, 15–74-vuotiaat, koko maa. Tarkistettu sarja.",
-  },
-];
-
+const supplements = new Map(
+  tursoSupplement.series.map((item) => [item.key, item]),
+);
+const officialCrimeSeries: Legacy["s"][] = tursoSupplement.series
+  .filter((item) => item.key.startsWith("statfin13gw."))
+  .map((item) => ({
+    k: item.key,
+    t: item.title,
+    y0: item.from,
+    v: item.values,
+    u: "lukumäärä",
+    lane: "Rikollisuus ja kontrolli",
+    theme: "Rikollisuus",
+    f: "",
+  }));
 const legacySeries = SCANNER.series.map((series) => {
-  const recent = recentValues.find((item) => item.key === series.k);
-  if (recent) {
-    const values = [...series.v];
-    recent.values.forEach((value, index) => {
-      const offset = recent.from + index - series.y0;
-      while (values.length <= offset) values.push(null);
-      values[offset] ??= value;
-    });
-    // The rate and the number of unemployed answer different questions.
-    if (recent.key === "fi.histlabour.lfs2019.unemployment_rate") {
-      return { ...series, dup: undefined, v: values } as Legacy["s"];
-    }
-    return { ...series, v: values };
-  }
-  const crime = statfinCrime.find(
-    (item) => series.k === "crime.hcs.fi.police_" + item.key,
-  );
-  if (crime && ["manslaughter", "murder"].includes(crime.key)) {
-    const values = [...series.v];
-    for (let year = 2023; year <= 2025; year++) {
-      while (values.length <= year - series.y0) values.push(null);
-      values[year - series.y0] ??= crime.values[year - 2006] ?? null;
-    }
-    return { ...series, v: values };
-  }
-  const source = continuations.get(series.k);
-  const indicator =
-    source &&
-    indicatorData.indicators.find(
-      (item) => item.key === series.k && item.unit === series.u,
-    );
-  if (!source || !indicator) return series;
+  const supplement = supplements.get(series.k);
+  if (!supplement) return series;
   const values = [...series.v];
-  for (const [year, value] of indicator.values) {
-    if (
-      typeof year !== "number" ||
-      year < source.from ||
-      year > 2025 ||
-      typeof value !== "number" ||
-      !Number.isFinite(value)
-    )
-      continue;
-    while (values.length <= year - series.y0) values.push(null);
-    values[year - series.y0] ??= value;
-  }
+  supplement.values.forEach((value, index) => {
+    const offset = supplement.from + index - series.y0;
+    while (values.length <= offset) values.push(null);
+    values[offset] ??= value;
+  });
   return { ...series, v: values };
 });
-const historyChoices = uniqueSeries(legacySeries);
+const unemploymentKey = "fi.histlabour.lfs2019.unemployment_rate";
+const historyChoices = legacySeries.filter(
+  (series) => !series.dup || series.k === unemploymentKey,
+);
 
 export function LegacyScanner() {
   const [w, setW] = useState<Window>(PERIODS[4]!);
@@ -335,6 +173,7 @@ export function LegacyScanner() {
           Puuttuvia vuosia ei arvioida.
         </p>
       </section>
+      <LivelihoodComparison />
       <section className="rounded-xl border bg-card p-5">
         <h2 className="font-display text-xl">1. Missä muutos jäi elämään?</h2>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -588,8 +427,8 @@ export function LegacyScanner() {
           tarkista alkuperäiset lähteet ennen johtopäätöksiä.
         </p>
         <p className="mt-2 text-muted-foreground">
-          Lähde: {SCANNER.meta.source}. Neljän sarjan viimeiset vuodet on
-          täydennetty hankkeen StatFin-aineistosta.
+          Lähde: {SCANNER.meta.source}. Viimeisimmät täydennykset on julkaistu
+          erillisestä Turso-viennistä.
         </p>
       </details>
     </div>
@@ -927,21 +766,13 @@ function HistoryOverview({
   );
   const baseSeries =
     companions?.length && companions.length > 1 ? companions : [series];
-  const official = statfinCrime.filter(
-    (item) =>
-      !["manslaughter", "murder"].includes(item.key) &&
-      baseSeries.some((base) => base.k === "crime.hcs.fi.police_" + item.key),
+  const official = officialCrimeSeries.filter((item) =>
+    baseSeries.some(
+      (base) =>
+        base.k === item.k.replace("statfin13gw.", "crime.hcs.fi.police_"),
+    ),
   );
-  const chartSeries = [
-    ...baseSeries,
-    ...official.map((item) => ({
-      ...series,
-      k: "statfin13gw." + item.key,
-      t: item.title + " · StatFin 13gw",
-      y0: 2006,
-      v: item.values,
-    })),
-  ];
+  const chartSeries = [...baseSeries, ...official];
   const crimeView =
     series.k.startsWith("crime.hcs.fi.conv_") ||
     series.k.startsWith("crime.hcs.fi.police_");
@@ -1071,21 +902,9 @@ function HistoryOverview({
           )}
         </>
       )}
-      <ContinuationSource seriesKey={series.k} />
-      {recentValues
-        .filter((item) => item.key === series.k)
-        .map((item) => (
-          <p key={item.key} className="mt-1 text-xs text-muted-foreground">
-            {item.note}{" "}
-            {[...new Set(item.urls)].map((url, index) => (
-              <a key={url} href={url} className="mr-2 underline">
-                {item.urls.length === new Set(item.urls).size
-                  ? String(item.from + index)
-                  : "Lähde"}
-              </a>
-            ))}
-          </p>
-        ))}
+      {chartSeries.map((item) => (
+        <ContinuationSource key={item.k} seriesKey={item.k} />
+      ))}
       {baseSeries.some((item) => item.k.endsWith("police_murder")) && (
         <p className="mt-1 text-xs text-muted-foreground">
           Lähdevertailu 2006–2022: tapoissa 2 ja murhissa 4 vuosieroa. Vuonna
@@ -1259,18 +1078,166 @@ function HistoryOverview({
 }
 
 function ContinuationSource({ seriesKey }: { seriesKey: string }) {
-  const source = continuations.get(seriesKey);
+  const source = supplements.get(seriesKey);
   if (!source) return null;
-  const [domain, table] = source.table.split("/");
   return (
     <p className="mt-1 text-xs text-muted-foreground">
-      Täydennys vuodesta {source.from}.{" "}
-      <a
-        className="underline"
-        href={`https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__${domain}/statfin_${domain}_pxt_${table}.px/`}
-      >
-        {source.note}
-      </a>
+      {source.from}–{source.from + source.values.length - 1} · {source.note}{" "}
+      {source.sources.map((url, index) => (
+        <a key={url} href={url} className="mr-2 underline">
+          Lähde{source.sources.length > 1 ? " " + (index + 1) : ""}
+        </a>
+      ))}
     </p>
+  );
+}
+
+const livelihoodMetrics = [
+  ["fi.histlabour.lfs2019.unemployment_rate", "Työttömyysaste, 15–74-vuotiaat"],
+  ["fi.historical20261026.jst.real_wage_index", "Reaalipalkkaindeksi"],
+  [
+    "fi.turning.index1975.household_disposable_real_per_capita",
+    "Kotitalouksien reaalitulo asukasta kohti",
+  ],
+  ["fi.distribution.gini2020.disposable", "Tuloerot (Gini)"],
+] as const;
+
+function LivelihoodComparison() {
+  const periods = PERIODS.slice(3);
+  const [periodIndex, setPeriodIndex] = useState(1);
+  const period = periods[periodIndex]!;
+  const colors = ["#2563eb", "#a94326", "#0f766e", "#7c3aed"];
+  const x = (year: number) => 36 + ((year - 1850) / 175) * 306;
+  return (
+    <section className="rounded-xl border bg-card p-5">
+      <h2 className="font-display text-xl">
+        Palautuivatko työ ja toimeentulo samaan tahtiin?
+      </h2>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Kuvaajissa on sama aikajana 1850–2025 ja kullakin mittarilla oma
+        asteikkonsa. Valitse murros nähdäksesi kolmen vertailuvuoden arvot.
+        Puuttuvat vuodet näkyvät katkoksina.
+      </p>
+      <div className="my-4 flex flex-wrap gap-2">
+        {periods.map((item, index) => (
+          <button
+            key={item.shock}
+            type="button"
+            aria-pressed={index === periodIndex}
+            className="rounded-full border px-3 py-2 text-sm aria-pressed:bg-primary aria-pressed:text-primary-foreground"
+            onClick={() => setPeriodIndex(index)}
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+      <div className="grid gap-3 md:grid-cols-2">
+        {livelihoodMetrics.map(([key, label], index) => {
+          const series = legacySeries.find((item) => item.k === key);
+          if (!series) return null;
+          const values = series.v.filter(
+            (value): value is number => value !== null,
+          );
+          if (!values.length) return null;
+          const min = Math.min(...values);
+          const max = Math.max(...values);
+          const y = (value: number) =>
+            94 - ((value - min) / (max - min || 1)) * 78;
+          const path = series.v
+            .map((value, offset) =>
+              value === null
+                ? ""
+                : (offset === 0 || series.v[offset - 1] === null ? "M" : "L") +
+                  x(series.y0 + offset) +
+                  "," +
+                  y(value),
+            )
+            .join(" ");
+          return (
+            <article key={key} className="rounded-lg border bg-background p-3">
+              <h3 className="font-medium">{label}</h3>
+              <p className="text-xs text-muted-foreground">{series.u}</p>
+              <svg
+                viewBox="0 0 355 120"
+                className="mt-2 w-full"
+                role="img"
+                aria-label={label + " aikajanalla 1850–2025"}
+              >
+                <rect
+                  x={x(period.start)}
+                  y="12"
+                  width={x(period.end) - x(period.start)}
+                  height="82"
+                  fill={colors[index]}
+                  opacity=".13"
+                />
+                <line
+                  x1={x(period.shock)}
+                  x2={x(period.shock)}
+                  y1="12"
+                  y2="94"
+                  stroke={colors[index]}
+                  strokeDasharray="3 3"
+                />
+                {[min, (min + max) / 2, max].map((value, tick) => (
+                  <g key={tick}>
+                    <line
+                      x1="36"
+                      x2="342"
+                      y1={y(value)}
+                      y2={y(value)}
+                      stroke="currentColor"
+                      opacity=".15"
+                    />
+                    <text
+                      x="32"
+                      y={y(value) + 3}
+                      textAnchor="end"
+                      fill="currentColor"
+                      fontSize="9"
+                    >
+                      {fmt(value)}
+                    </text>
+                  </g>
+                ))}
+                <path
+                  d={path}
+                  fill="none"
+                  stroke={colors[index]}
+                  strokeWidth="2"
+                />
+                {[1850, 1900, 1950, 2000, 2025].map((year) => (
+                  <text
+                    key={year}
+                    x={x(year)}
+                    y="111"
+                    textAnchor="middle"
+                    fill="currentColor"
+                    fontSize="9"
+                  >
+                    {year}
+                  </text>
+                ))}
+              </svg>
+              <dl className="grid grid-cols-3 gap-1 text-center text-sm">
+                {[period.start, period.shock, period.end].map((year, i) => {
+                  const value = valueAt(series, year);
+                  return (
+                    <div key={year} className="rounded bg-muted/60 p-2">
+                      <dt className="text-xs text-muted-foreground">
+                        {["Ennen", "Murros", "Jälkeen"][i]} · {year}
+                      </dt>
+                      <dd className="font-medium">
+                        {value === null ? "Ei tietoa" : fmt(value)}
+                      </dd>
+                    </div>
+                  );
+                })}
+              </dl>
+            </article>
+          );
+        })}
+      </div>
+    </section>
   );
 }
