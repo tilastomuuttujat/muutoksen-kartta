@@ -67,8 +67,20 @@ const addedSeries: Legacy["s"][] = tursoSupplement.series
     f: "",
   }));
 const legacySeries = [...baseLegacySeries, ...addedSeries];
-const isCohort = (key: string) => supplements.get(key)?.yearBasis === "birth";
-const calendarSeries = legacySeries.filter((series) => !isCohort(series.k));
+const timeBases = {
+  birth: { title: "Syntymäkohortit", axis: "naisten syntymävuosi" },
+  graduation: { title: "Valmistumisvuosikerrat", axis: "tutkinnon suorittamisvuosi" },
+  arrival: { title: "Ruotsiin muuttaneet", axis: "Ruotsiin tulovuosi" },
+} as const;
+
+function timeBasis(key: string) {
+  const basis = supplements.get(key)?.yearBasis;
+  return basis && basis in timeBases ? timeBases[basis as keyof typeof timeBases] : undefined;
+}
+const calendarSeries = legacySeries.filter((series) => {
+  const group = supplements.get(series.k)?.group;
+  return !timeBasis(series.k) && (!group || group === "FI");
+});
 const unemploymentKey = "fi.histlabour.lfs2019.unemployment_rate";
 const longSeriesSources = new Map([
   [
@@ -706,7 +718,7 @@ function HistoryOverview({
 }) {
   const [search, setSearch] = useState("");
   const [perCapita, setPerCapita] = useState(false);
-  const cohort = isCohort(series.k);
+  const basis = timeBasis(series.k);
   const all = historyChoices;
   const choices = all.filter(
     (s) => s.k === series.k || s.t.toLocaleLowerCase("fi").includes(search.toLocaleLowerCase("fi")),
@@ -757,11 +769,11 @@ function HistoryOverview({
   return (
     <div className="mt-4 rounded-lg border bg-background p-3 sm:p-4">
       <h3 className="font-display text-xl">
-        {cohort ? "Syntymäkohortit · 1850–2025" : "Kuusi murrosta yhdellä aikajanalla · 1850–2025"}
+        {basis ? basis.title + " · 1850–2025" : "Kuusi murrosta yhdellä aikajanalla · 1850–2025"}
       </h3>
       <p className="mt-1 text-sm text-muted-foreground">
-        {cohort
-          ? "Vaaka-akseli näyttää naisten syntymävuoden. Kunkin kohortin luku kuvaa myöhemmin toteutunutta lapsilukua tai lapsettomuutta."
+        {basis
+          ? "Vaaka-akseli: " + basis.axis + ". Tyhjä kohta tarkoittaa puuttuvaa havaintoa."
           : "Valitse murros tarkentaaksesi alempaa analyysiä. Tyhjä kohta tarkoittaa puuttuvaa havaintoa."}
       </p>
       <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_2fr]">
@@ -865,11 +877,10 @@ function HistoryOverview({
           className="mt-2 w-full min-w-[700px]"
           role="img"
           aria-label={
-            series.t +
-            (cohort ? " syntymävuoden mukaan" : " 1850–2025 ja kuusi historiallista murrosta")
+            series.t + (basis ? " · " + basis.axis : " 1850–2025 ja kuusi historiallista murrosta")
           }
         >
-          {!cohort &&
+          {!basis &&
             PERIODS.map((p) => (
               <g key={p.shock}>
                 <rect
@@ -972,7 +983,7 @@ function HistoryOverview({
               {yr}
             </text>
           ))}
-          {!cohort &&
+          {!basis &&
             lines.flatMap(({ item, color }) =>
               PERIODS.map((p) => {
                 const v = chartValue(item, p.shock);
@@ -991,7 +1002,7 @@ function HistoryOverview({
             )}
         </svg>
       </div>
-      {!cohort && (
+      {!basis && (
         <>
           <div className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {PERIODS.map((p) => {
@@ -1067,6 +1078,28 @@ const livelihoodMetrics = [
 
 const comparisonThemes = [
   { label: "Työ ja toimeentulo", metrics: livelihoodMetrics },
+  {
+    label: "Tuotanto ja työn palautuminen",
+    metrics: [
+      ["statfin.ntp.productionwork.sss.real_gva", "Reaalinen arvonlisä · koko kansantalous"],
+      ["statfin.ntp.productionwork.c.hours", "Teollisuuden työtunnit"],
+      ["statfin.ntp.productionwork.gtt.employed", "Palveluiden työlliset"],
+      ["kehakeskus.12ta.sss.over52w.count", "Pitkäaikaistyöttömyys · 2009–2025"],
+      ["tem.hist.long_unemployment.over1y", "Pitkäaikaistyöttömyys · 1991–2010"],
+    ],
+  },
+  {
+    label: "Työttömyys ja kotitalouksien toimeentulo",
+    metrics: [
+      ["statfin.tjt12ci.81.ekvikvkturaha_med", "Työttömien kotitalouksien reaalinen mediaanitulo"],
+      ["statfin.tjt12ci.2.ekvikvkturaha_med", "Palkansaajakotitalouksien reaalinen mediaanitulo"],
+      ["statfin.eot13wm.81.pt_aste60", "Työttömien pienituloisuusaste"],
+      [
+        "thl.sotkanet.4022.count",
+        "Kotitaloudet, joille maksettiin toimeentulotukea 10–12 kuukautena",
+      ],
+    ],
+  },
   {
     label: "Pienet asunnot, tulot ja muuttoliike",
     note: "Vuokrat ovat nimellisiä neliövuokria. Asuntojen hinnat ja tulot on oikaistu inflaatiolla. Muuttoluvut koskevat koko 25–34-vuotiaiden ikäryhmää. Tulot koskevat alle 35-vuotiaita yksin asuvia vuokralaisia.",
