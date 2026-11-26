@@ -1,0 +1,36 @@
+name: Turso – tarkista tuontierä
+on:
+  push:
+    branches: [turso-perintoskanneri-20261126]
+permissions: {}
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    env:
+      TURSO_TOKEN: ${{ secrets.TURSO_WRITE_TOKEN }}
+    steps:
+      - name: Tarkista sarakkeet ja vuosiarvot
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.request
+          token = os.environ.get("TURSO_TOKEN")
+          if not token:
+              raise SystemExit("TURSO_WRITE_TOKEN puuttuu.")
+          queries = [
+              "PRAGMA table_info(public__indicator_values)",
+              "PRAGMA index_list(public__indicator_values)",
+              "SELECT series_key, group_key, value_kind, max(year), count(*) FROM public__indicator_values WHERE series_key IN ('gapminder.finland.children_per_woman_total_fertility.v20261026','fi.histlabour.lfs2019.employment_rate','fi.historical20261026.jst.real_wage_index','fi.distribution.gini2020.disposable') GROUP BY series_key, group_key, value_kind"
+          ]
+          requests = [{"type":"execute","stmt":{"sql":sql}} for sql in queries] + [{"type":"close"}]
+          req = urllib.request.Request("https://murrosmatriisi-tilastomuuttujat.aws-eu-north-1.turso.io/v2/pipeline",data=json.dumps({"requests":requests}).encode(),headers={"Content-Type":"application/json","Authorization":"Bearer "+token})
+          with urllib.request.urlopen(req,timeout=30) as res:
+              data=json.load(res)
+          with open(os.environ["GITHUB_STEP_SUMMARY"],"a") as out:
+              print("### Turso – tuontierän tarkistus",file=out)
+              for item in data["results"][:-1]:
+                  if item["type"]!="ok":
+                      raise SystemExit("Tietokantakysely epäonnistui.")
+                  result=item["response"]["result"]
+                  for row in result["rows"]:
+                      print(" | ".join(str(cell.get("value","")) for cell in row),file=out)
+          PY
