@@ -14,6 +14,7 @@ export type ScanSeries = {
   v: (number | null)[];
   f: string;
   dup?: string;
+  sparse?: boolean;
 };
 type National = { threshold: number; base: number; years: number[]; share: number[]; n: number[] };
 type ScannerData = {
@@ -30,7 +31,7 @@ export const DETECTORS: Record<Det, { label: string; short: string; kinds: strin
 };
 
 /** Sarjat, joilla ei ole kaksoiskappaleen merkintää. Kaksoiskappaleet voimistaisivat samanaikaisia tapahtumia. */
-export const uniqueSeries = (all: ScanSeries[] = SCANNER.series) => all.filter((s) => !s.dup);
+export const uniqueSeries = (all: ScanSeries[] = SCANNER.series) => all.filter((s) => !s.dup && !s.sparse);
 export const byKey = (k: string, all: ScanSeries[] = SCANNER.series) => all.find((s) => s.k === k);
 /** Saman ilmiön ryhmä: sarja itse ja sen kaksoiskappaleet. */
 export const dupGroup = (s: ScanSeries) => s.dup ?? s.k;
