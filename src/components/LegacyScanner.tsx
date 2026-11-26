@@ -122,7 +122,72 @@ const population = SCANNER.series.find(
   (series) => series.k === "fi.statfin15ai.total.ep.fe4e7bf6af",
 );
 
+const recentValues = [
+  {
+    key: "crime.hcs.fi.prison_all_daily_average",
+    from: 2023,
+    values: [3143, 3356, 3545],
+    urls: [
+      "https://www.rikosseuraamus.fi/app/uploads/sites/11/2026/05/RISE-Tilastollinen-vuosikirja-2025.pdf",
+      "https://www.rikosseuraamus.fi/app/uploads/sites/11/2026/05/RISE-Tilastollinen-vuosikirja-2025.pdf",
+      "https://www.rikosseuraamus.fi/app/uploads/sites/11/2026/05/RISE-Tilastollinen-vuosikirja-2025.pdf",
+    ],
+    note: "Rikosseuraamuslaitos, vuosikirja 2025, taulukko 2. Vankien päivittäinen keskimäärä.",
+  },
+  {
+    key: "crime.hcs.fi.prison_all_dec31",
+    from: 2023,
+    values: [3166, 3406, 3598],
+    urls: [
+      "https://www.rikosseuraamus.fi/app/uploads/sites/11/2024/11/RISE-Tilastollinen-vuosikirja-2023.pdf",
+      "https://www.rikosseuraamus.fi/app/uploads/sites/11/2024/11/RISE-Tilastollinen-vuosikirja-2024.pdf",
+      "https://www.rikosseuraamus.fi/app/uploads/sites/11/2026/05/RISE-Tilastollinen-vuosikirja-2025.pdf",
+    ],
+    note: "Rikosseuraamuslaitos, taulukko 1, kaikki laitokset, vuoden lopussa.",
+  },
+  {
+    key: "crime.hcs.fi.prison_sentenced_dec31",
+    from: 2023,
+    values: [2325, 2500, 2602],
+    urls: [
+      "https://www.rikosseuraamus.fi/app/uploads/sites/11/2024/11/RISE-Tilastollinen-vuosikirja-2023.pdf",
+      "https://www.rikosseuraamus.fi/app/uploads/sites/11/2024/11/RISE-Tilastollinen-vuosikirja-2024.pdf",
+      "https://www.rikosseuraamus.fi/app/uploads/sites/11/2026/05/RISE-Tilastollinen-vuosikirja-2025.pdf",
+    ],
+    note: "Rikosseuraamuslaitos, taulukko 1, vankeusvangit vuoden lopussa; sakkovangit ja tutkintavangit tilastoitu erikseen.",
+  },
+  {
+    key: "fi.histlabour.lfs2019.unemployment_rate",
+    from: 2019,
+    values: [6.8, 7.7, 7.7, 6.8, 7.2, 8.4, 9.7],
+    urls: [
+      "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__tyti/statfin_tyti_pxt_13aj.px/",
+      "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__tyti/statfin_tyti_pxt_13aj.px/",
+      "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__tyti/statfin_tyti_pxt_13aj.px/",
+      "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__tyti/statfin_tyti_pxt_13aj.px/",
+      "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__tyti/statfin_tyti_pxt_13aj.px/",
+      "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__tyti/statfin_tyti_pxt_13aj.px/",
+      "https://pxdata.stat.fi/PxWeb/pxweb/fi/StatFin/StatFin__tyti/statfin_tyti_pxt_13aj.px/",
+    ],
+    note: "Tilastokeskus, työvoimatutkimus 13aj, 15–74-vuotiaat, koko maa. Tarkistettu sarja.",
+  },
+];
+
 const legacySeries = SCANNER.series.map((series) => {
+  const recent = recentValues.find((item) => item.key === series.k);
+  if (recent) {
+    const values = [...series.v];
+    recent.values.forEach((value, index) => {
+      const offset = recent.from + index - series.y0;
+      while (values.length <= offset) values.push(null);
+      values[offset] ??= value;
+    });
+    // The rate and the number of unemployed answer different questions.
+    if (recent.key === "fi.histlabour.lfs2019.unemployment_rate") {
+      return { ...series, dup: undefined, v: values } as Legacy["s"];
+    }
+    return { ...series, v: values };
+  }
   const crime = statfinCrime.find(
     (item) => series.k === "crime.hcs.fi.police_" + item.key,
   );
@@ -1007,6 +1072,27 @@ function HistoryOverview({
         </>
       )}
       <ContinuationSource seriesKey={series.k} />
+      {recentValues
+        .filter((item) => item.key === series.k)
+        .map((item) => (
+          <p key={item.key} className="mt-1 text-xs text-muted-foreground">
+            {item.note}{" "}
+            {[...new Set(item.urls)].map((url, index) => (
+              <a key={url} href={url} className="mr-2 underline">
+                {item.urls.length === new Set(item.urls).size
+                  ? String(item.from + index)
+                  : "Lähde"}
+              </a>
+            ))}
+          </p>
+        ))}
+      {baseSeries.some((item) => item.k.endsWith("police_murder")) && (
+        <p className="mt-1 text-xs text-muted-foreground">
+          Lähdevertailu 2006–2022: tapoissa 2 ja murhissa 4 vuosieroa. Vuonna
+          2015 historiallisessa koosteessa on 48 murhaa ja StatFinissä 36. Eron
+          syy jää avoimeksi. Vuosien 2020–2022 luvut täsmäävät.
+        </p>
+      )}
       <div className="overflow-x-auto">
         <svg
           viewBox="0 0 960 280"
