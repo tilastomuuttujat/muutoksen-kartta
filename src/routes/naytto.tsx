@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Kaksikymmentäkaksi hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Kaksikymmentäkolme hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Seitsemän väitettä kumoutui, kaksi on tuettu, viisi on ehdokkaita ja kahdeksan näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Kahdeksan väitettä kumoutui, kaksi on tuettu, viisi on ehdokkaita ja kahdeksan näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -227,6 +227,9 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h5" && t.id === "pysyvyys" && <PersistenceDots detail={t.detail as Persist} />}
       {h.id === "h11" && t.id === "annos" && <ChecksTable detail={t.detail as { b: number; p: number; checks: Record<string, { b: number; p: number }> }} />}
       {h.id === "h10" && t.id === "katkos" && <NeetChart a18={(t.detail as { series: [number, number][] }).series} a21={(h.tests[1]!.detail as { series: [number, number][] }).series} />}
+      {h.id === "h17" && t.id !== "kontrolli" && <BreakChart detail={t.detail as Break} cfg={t.id === "imevaiset"
+        ? { trend: [1927, 1938], win: [1946, 1951], from: 1915, label: "neuvolalaki", ticks: [1915, 1927, 1946, 1975], zeroTicks: [0, 50, 100], caption: "Imeväiskuolleisuus, kuolleita alle 1-vuotiaita 1 000 elävänä syntynyttä kohden (StatFin 12aq). Katkoviiva: vuosien 1927–1938 trendi jatkettuna vuosiin 1946–1951." }
+        : { trend: [1927, 1938], win: [1946, 1951], from: 1915, label: "neuvolalaki", ticks: [1915, 1927, 1946, 1975], zeroTicks: [0, 200, 400], caption: "Äitiyskuolleisuus, kuolleita äitejä 100 000 synnytystä kohden (OWID). Katkoviiva: vuosien 1927–1938 trendi jatkettuna vuosiin 1946–1951." }} />}
       {h.id === "h16" && <ProhibitionChart detail={t.detail as { series: [number, number][] }} what={t.id === "kumoaminen" ? "Tapot ja murhat" : "Pahoinpitelyt"} />}
       {h.id === "h15" && <EuroBars detail={t.detail as { diff: [number, number][] }} what={t.id === "ravintolat" ? "Ravintoloiden ja kahviloiden hintojen" : "Kuluttajahintojen"} />}
       {h.id === "h14" && t.id === "katkos" && <BreakChart detail={t.detail as Break} cfg={{ trend: [1976, 1987], win: [1988, 1991], from: 1960, label: "laki voimaan 1/1988", ticks: [1960, 1976, 1988, 2000, 2025], zeroTicks: [0, 1, 2, 3], caption: "Avioerot 1 000 asukasta kohden (StatFin 121v). Katkoviiva: vuosien 1976–1987 trendi jatkettuna. Poikkeama 1988–1991 oli suurempi kuin kaikissa tavallisissa jaksoissa." }} />}

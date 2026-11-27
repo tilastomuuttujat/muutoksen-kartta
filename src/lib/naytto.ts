@@ -76,7 +76,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h16: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h16: { tests: Test[]; predictions: Prediction[] }; h17: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -372,6 +372,19 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Tappoja ja murhia oli kumoamisen jälkeisinä vuosina 1933–1937 kolmannes vähemmän kuin kieltolain viimeisinä vuosina, ja lasku oli jyrkempi kuin yhdessäkään tavallisessa viisivuotisjaksossa sotien jälkeen. Pahoinpitelyt eivät kuitenkaan vähentyneet. Tämä sopii ajatukseen, että kuolemaan johtanut väkivalta liittyi salakauppaan ja trokaukseen eikä alkoholinkäyttöön yleensä, mutta sitä ei ole testattu. Henkirikokset olivat huipussaan jo 1929, joten lama ja muut 1930-luvun muutokset voivat selittää osan laskusta.",
     next: "Mekanismin testi: jos laskun takana on laittomien markkinoiden väheneminen, henkirikosten pitäisi vähentyä eniten alueilla, joilla salakuljetus oli yleisintä (rannikko ja satamakaupungit), ja salakuljetusrikosten määrän pitäisi pudota kumoamisen jälkeen.",
+  },
+  {
+    id: "h17",
+    title: "Neuvolalaki 1944 → imeväis- ja äitiyskuolleisuus",
+    claim: "Kunnallisten äitiys- ja lastenneuvoloiden perustaminen (1944) vähensi imeväis- ja äitiyskuolleisuutta enemmän kuin aiempi kehitys ja sodan jälkeinen yleinen terveyden paraneminen selittävät.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. Uusi teema.",
+    map: { edge: "Kunnallinen äitiys- ja lastenneuvola 1944 (solmu)", confidence: null },
+    tests: NAYTTO.hypotheses.h17.tests,
+    predictions: [],
+    reading:
+      "Imeväiskuolleisuus ei laskenut neuvolalain jälkeen sotaa edeltänyttä kehitystä nopeammin: vuosina 1946–1951 se oli suunnilleen siinä, mihin 1920–30-lukujen lasku olisi vienyt. Äitiyskuolleisuus sen sijaan romahti: 1946–1951 se oli keskimäärin 179 / 100 000 synnytystä, kun se 1927–1938 oli 340 (−47 %). Trendiin verrattu −68 % liioittelee, koska äitiyskuolleisuus oli 1930-luvulla nousussa. Muun väestön kuolleisuus pysyi ennallaan, joten parannus koski nimenomaan äitejä. Äitien kohdalla neuvolat, antibiootit lapsivuodekuumeeseen ja sairaalasynnytysten yleistyminen osuvat samaan aikaan, eikä tämä asetelma erota niitä.",
+    next: "Erottava testi: jos neuvolat vaikuttivat, äitiyskuolleisuuden pitäisi laskea ensin niissä kunnissa, joihin neuvola perustettiin aikaisin (laki antoi siirtymäajan). Antibioottien vaikutus olisi ollut samanaikainen kaikkialla.",
   },
   {
     id: "h2",

@@ -917,3 +917,27 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 
 - **Rajoite:** antibiootit (penisilliini 1940-luvulla) ja sodan päättyminen osuvat samaan aikaan. T3
   erottaa vain sen, mikä koski kaikkia ikäryhmiä.
+
+## H17: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Imeväiskuolleisuus: kumoaa.** 1946–1951 +6 % vuosien 1927–1938 trendistä, jyrkempi kuin
+  32:ssa 69 lumejaksosta. Imeväiskuolleisuus palasi sodan jälkeen suunnilleen sotaa edeltäneelle
+  uralleen, mutta ei laskenut sitä nopeammin.
+- **T2 Äitiyskuolleisuus: tukee.** −68 % trendistä, jyrkempi kuin kaikissa 69 lumejaksossa. Tasot:
+  1944: 443 → 1947: 214 → 1950: 146 / 100 000.
+- **T3 Negatiivinen kontrolli: kumoaa (sääntö).** Muun väestön kuolleisuus −2 % trendistä. Sääntö
+  merkitsee kumoavaksi, koska kontrollin poikkeama (−2 %) on jyrkempi kuin imeväiskuolleisuuden
+  (+6 %). Kontrolli ei kuitenkaan laskenut poikkeuksellisesti (persentiili 41/69).
+- **Tila:** kumottu, koska vahva asetelma (T1) kumoaa.
+- **Tulkinta:**
+  - Neuvolalain jälkeen imeväiskuolleisuus ei laskenut sotaa edeltänyttä kehitystä nopeammin.
+  - Äitiyskuolleisuus sen sijaan romahti, ja parannus koski nimenomaan äitejä.
+  - Äitien kohdalla neuvolat, antibiootit (lapsivuodekuume) ja sairaalasynnytysten yleistyminen
+    osuvat samaan aikaan, eikä tämä asetelma erota niitä.
+- **Huomio kuvaajasta (kirjattu tuloksen jälkeen):**
+  - Äitiyskuolleisuuden trendi 1927–1938 oli nouseva, joten trendiin verrattu −68 % liioittelee
+    muutosta.
+  - Tasoihin verrattuna äitiyskuolleisuus oli 1946–1951 keskimäärin 179 / 100 000, kun se 1927–1938
+    oli 340. Lasku on −47 %, edelleen suuri.
+  - Kirjattua tulosta ei muuteta.

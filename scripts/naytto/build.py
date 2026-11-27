@@ -1475,6 +1475,58 @@ def h16():
     return {"tests": [t1, t2], "predictions": []}
 
 
+def h17():
+    """H17 (docs/naytto-rekisteri.md): neuvolalaki 1944 → imeväis- ja äitiyskuolleisuus."""
+    imr, mat = {}, {}
+    for line in open(os.path.join(D, "values.ndjson")):
+        k, y, g_, v, kind = json.loads(line)
+        if v is None or kind not in ("observed", "estimate"):
+            continue
+        if k == "statfin.12aq.v20261019.imr.sexSSS":
+            imr[int(y)] = float(v)
+        elif k == "owid.finland.maternal-mortality.v20261026":
+            mat[int(y)] = float(v)
+    ids, d = px("ssaaty/121v.px", [("timeperiod_y", "*"), ("contentscode", ["ssaaty-vm01", "ssaaty-vm11", "ssaaty-vaesto"])])
+    iy, ic = ids.index("timeperiod_y"), ids.index("contentscode")
+    T = {}
+    for k, v in d.items():
+        if v:
+            T.setdefault(k[ic], {})[int(k[iy])] = v
+    births, deaths, pop = T["ssaaty-vm01"], T["ssaaty-vm11"], T["ssaaty-vaesto"]
+    other = {y: (deaths[y] - imr[y] / 1000 * births[y]) / pop[y] * 1000 for y in imr if y in births and y in deaths and y in pop}
+    WARS = [(1914, 1922), (1939, 1951)]
+
+    def dev(series, s0):
+        pre = [(y, math.log(series[y])) for y in range(s0 - 19, s0 - 7) if y in series and series[y] > 0]
+        if len(pre) < 10 or not all(y in series for y in range(s0, s0 + 6)):
+            return None
+        b = np.polyfit([q[0] for q in pre], [q[1] for q in pre], 1)
+        return float(np.mean([math.log(series[y]) - np.polyval(b, y) for y in range(s0, s0 + 6)]))
+
+    starts = [s0 for s0 in range(1880, 2011) if all(s0 + 5 < a or s0 - 19 > b for a, b in WARS)]
+
+    def test(series):
+        obs = dev(series, 1946)
+        plac = [v for v in (dev(series, s0) for s0 in starts) if v is not None]
+        steeper = sum(1 for v in plac if v > obs)
+        return {"dev": round(obs, 4), "pct": round((math.exp(obs) - 1) * 100, 1), "steeper": steeper, "placebo": len(plac),
+                "series": sorted((y, round(v, 2)) for y, v in series.items() if 1900 <= y <= 1975)}
+    a, m, c = test(imr), test(mat), test(other)
+    res = lambda x: "tukee" if x["dev"] < 0 and x["steeper"] / x["placebo"] >= 0.95 else "kumoaa" if x["dev"] >= 0 else "ei-ratkea"
+    r1, r2_ = res(a), res(m)
+    if c["dev"] <= a["dev"]:
+        r3 = "kumoaa"
+    elif r1 == "tukee" and c["steeper"] / c["placebo"] < 0.95:
+        r3 = "tukee"
+    else:
+        r3 = "ei-ratkea"
+    txt = lambda name, x: f"{name} 1946–1951 {x['pct']:+.0f} % vuosien 1927–1938 trendistä; jyrkempi kuin {x['steeper']}:ssä {x['placebo']} lumejaksosta"
+    t1 = {"id": "imevaiset", "design": "luonnollinen", "result": r1, "date": str(date.today()), "summary": txt("Imeväiskuolleisuus", a), "detail": a}
+    t2 = {"id": "aidit", "design": "tasmallisyys", "result": r2_, "date": str(date.today()), "summary": txt("Äitiyskuolleisuus", m), "detail": m}
+    t3 = {"id": "kontrolli", "design": "tasmallisyys", "result": r3, "date": str(date.today()), "summary": txt("Muun väestön kuolleisuus", c), "detail": c}
+    return {"tests": [t1, t2, t3], "predictions": []}
+
+
 def h11():
     """H11 (docs/naytto-rekisteri.md): ulkomaan kansalaisten osuus → Suomen kansalaisten työllisyys ja työttömyys."""
     regions = ["MK01", "MK02", "MK04", "MK05", "MK06", "MK07", "MK08", "MK09", "MK10", "MK11", "MK12", "MK13", "MK14", "MK15", "MK16", "MK17", "MK18", "MK19"]
@@ -1645,6 +1697,7 @@ def main():
     out["hypotheses"]["h14"] = h14()
     out["hypotheses"]["h15"] = h15()
     out["hypotheses"]["h16"] = h16()
+    out["hypotheses"]["h17"] = h17()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
@@ -1702,6 +1755,7 @@ def main():
         for t in out["hypotheses"][hk]["tests"]:
             print(hk, t["id"], t["result"], "|", t["summary"]); print("   ", t["detail"].get("countries", ""))
     d7 = out["hypotheses"]["h7"]["tests"][1]["detail"]; print("  miehet", d7["men"], "naiset", d7["women"]); print("  sarja", [x for x in d7["series"] if x[0] <= 2005])
+    for t in out["hypotheses"]["h17"]["tests"]: print("h17", t["id"], t["result"], "|", t["summary"])
     for t in out["hypotheses"]["h16"]["tests"]: print("h16", t["id"], t["result"], "|", t["summary"]); print("   ", [x for x in t["detail"]["series"] if x[0] <= 1940])
     for t in out["hypotheses"]["h15"]["tests"]: print("h15", t["id"], t["result"], "|", t["summary"]); print("   ", {k: v for k, v in t["detail"].items() if k != "diff"})
     for t in out["hypotheses"]["h14"]["tests"]: print("h14", t["id"], t["result"], "|", t["summary"])
