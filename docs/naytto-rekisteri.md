@@ -638,3 +638,19 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 |---|---|---|
 | T1 Annos–vaste | Suomen kansalaisten työllisyysaste 18–64 (työlliset / väestö, %) vuonna t vs. ulkomaan kansalaisten osuus 18–64-vuotiaista (%) vuonna t − 1. Kiinteät alue- ja vuosivaikutukset, 2001–2024. Permutaatio: maakuntien osuussarjojen sekoitus 2 000 kertaa. | Tukee: kerroin < 0 ja yksisuuntainen p < 0,05. Kumoaa: kerroin ≥ 0. Muuten: ei ratkea |
 | T2 Täsmällisyys | Sama asetelma, seurauksena Suomen kansalaisten työttömyysaste 18–64 (työttömät / työvoima) | Tukee: kerroin > 0 ja p < 0,05. Kumoaa: kerroin ≤ 0. Muuten: ei ratkea |
+
+## H11: päätestien tulos ja tarkistukset
+
+- **Laskettu:** 27.11.2026.
+- **T1: tukee.** Kerroin −0,99 %-yks. (p = 0,003).
+- **T2: tukee.** Kerroin +0,78 %-yks. (p = 0,003).
+- **Tarkistukset:** kirjattu päätestien jälkeen ja ennen tarkistusten laskentaa. Vaikutus on
+  epätavallisen suuri (lähes prosenttiyksikkö työllisyyttä osuuden prosenttiyksikköä kohden), ja
+  tunnetaan kaksi syytä, jotka voivat tuottaa saman tuloksen ilman vaikutusta.
+
+| Tarkistus | Asetelma | Seuraus |
+|---|---|---|
+| R1 Ennakkotesti | Selittäjänä osuus vuonna t + 2. Tulevaisuuden osuus ei voi vaikuttaa nykyiseen työllisyyteen. | Jos kerroin on samaa merkkiä, p < 0,05 ja vähintään puolet T1:n kertoimesta, yhteys johtuu alueiden pitkistä kehityssuunnista. T1 ja T2 merkitään "ei ratkea" |
+| R2 Aluekohtaiset trendit | T1:n malliin lisätään kunkin maakunnan oma lineaarinen trendi | Jos kerroin ei ole enää negatiivinen yksisuuntaisella p < 0,05, T1 merkitään "ei ratkea" |
+| R3 Poikkeusvuodet pois | T1 ilman vuosia 2015–2017 (turvapaikanhakijat) ja 2022–2024 (Ukrainan tilapäinen suojelu) | Lisätieto, ei muuta tulosta |
+| R4 Kansalaisuuden saaminen | Ei voi testata tällä aineistolla, koska alueittaista syntyperää tai kieltä ei ole | Kirjataan rajoitteeksi |
