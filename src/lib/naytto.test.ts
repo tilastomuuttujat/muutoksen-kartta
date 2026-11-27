@@ -276,6 +276,16 @@ describe("pilot results", () => {
     expect(c["excluded"]!.b).toBeCloseTo(-1.08, 2);
     expect(statusOfHypothesis(hypothesis("h11")!)).toBe("oletus");
   });
+  it("standard regional checks ran and changed nothing", () => {
+    const H = NAYTTO.hypotheses as unknown as Record<string, { tests: { id: string; result: string; detail?: { checks?: { changed: boolean; lead: { p: number }; trends: { p: number } } } }[] }>;
+    for (const hk of ["h1", "h1e", "h1g", "h7"]) {
+      const t = H[hk]!.tests.find((x) => x.id === "annos")!;
+      expect(t.detail?.checks).toBeDefined();
+      expect(t.detail!.checks!.changed).toBe(false);
+      expect(t.detail!.checks!.trends.p).toBeGreaterThan(0.05);
+    }
+    expect(H["h7"]!.tests.find((x) => x.id === "annos")!.detail!.checks!.trends.p).toBeCloseTo(0.18, 2);
+  });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
       expect(p.lo).toBeLessThan(p.point);

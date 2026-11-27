@@ -440,9 +440,12 @@ def h1e(fi_tfr):
     p = (ge + 1) / (R + 1)
     result = "tukee" if b > 0 and p < 0.05 else "kumoaa" if b <= 0 else "ei-ratkea"
     pct = (math.exp(b) - 1) * 100
+    Ylog = {r: {t: math.log(v) for t, v in tfr[r].items()} for r in regions}
+    chk, result = panel_checks(Ylog, emp, regions, years, b, 2, 1, result, 21)
+    pctf = lambda v: f"{(math.exp(v) - 1) * 100:+.2f} %"
     t2 = {"id": "annos", "design": "annos", "result": result, "date": str(date.today()),
-          "summary": f"1 %-yks. suurempi työllisyysnousu kuin muualla → syntyvyys {pct:+.2f} % kahden vuoden päästä (p = {p:.3f}, {len(regions)} maakuntaa, {years[0]}–{years[-1]})",
-          "detail": {"b": round(b, 5), "pctPerPoint": round(pct, 2), "p": round(p, 4), "n": n, "regions": len(regions), "years": [years[0], years[-1]]}}
+          "summary": f"1 %-yks. suurempi työllisyysnousu kuin muualla → syntyvyys {pct:+.2f} % kahden vuoden päästä (p = {p:.3f}, {len(regions)} maakuntaa, {years[0]}–{years[-1]})." + checks_text(chk, pctf),
+          "detail": {"b": round(b, 5), "pctPerPoint": round(pct, 2), "p": round(p, 4), "n": n, "regions": len(regions), "years": [years[0], years[-1]], "checks": chk}}
 
     # E2 ennuste: Pohjoismaiden yhdistetty malli
     E = {c: {} for c in COUNTRIES}; T = {c: {} for c in COUNTRIES}
@@ -639,9 +642,12 @@ def h1g(fi_tfr):
     p = (ge + 1) / (R + 1)
     res3 = "tukee" if b > 0 and p < 0.05 else "kumoaa" if b <= 0 else "ei-ratkea"
     per10 = (math.exp(b * math.log(1.1)) - 1) * 100  # 10 % suurempi tulo → syntyvyyden muutos %
+    Ylog = {r: {t: math.log(v) for t, v in tfr[r].items()} for r in regions}
+    chk, res3 = panel_checks(Ylog, lin, regions, years, b, 2, 1, res3, 31)
+    p10 = lambda v: f"{(math.exp(v * math.log(1.1)) - 1) * 100:+.1f} %"
     t3 = {"id": "annos", "design": "annos", "result": res3, "date": str(date.today()),
-          "summary": f"10 % muita suurempi tulojen nousu → syntyvyys {per10:+.1f} % kahden vuoden päästä (p = {p:.3f}, {len(regions)} maakuntaa, {years[0]}–{years[-1]})",
-          "detail": {"b": round(b, 4), "per10pct": round(per10, 2), "p": round(p, 4), "n": n, "regions": len(regions), "years": [years[0], years[-1]]}}
+          "summary": f"10 % muita suurempi tulojen nousu → syntyvyys {per10:+.1f} % kahden vuoden päästä (p = {p:.3f}, {len(regions)} maakuntaa, {years[0]}–{years[-1]})." + checks_text(chk, p10),
+          "detail": {"b": round(b, 4), "per10pct": round(per10, 2), "p": round(p, 4), "n": n, "regions": len(regions), "years": [years[0], years[-1]], "checks": chk}}
 
     # Kuvaileva osa
     base = lambda d, y0: {y: round(v / d[y0] * 100, 1) for y, v in d.items() if y >= 2000} if y0 in d else {}
@@ -1007,9 +1013,11 @@ def h7():
     p = (ge + 1) / (R + 1)
     pct = (math.exp(b) - 1) * 100
     r1 = "tukee" if b > 0 and p < 0.05 else "kumoaa" if b <= 0 else "ei-ratkea"
+    chk, r1 = panel_checks(rate, une, regions, years, b, 1, 1, r1, 71)
+    pctf = lambda v: f"{(math.exp(v) - 1) * 100:+.1f} %"
     t1 = {"id": "annos", "design": "annos", "result": r1, "date": str(date.today()),
-          "summary": f"1 %-yks. suurempi työttömyys kuin muualla → itsemurhat {pct:+.1f} % seuraavana vuonna (p = {p:.3f}, {len(regions)} maakuntaa, {years[0]}–{years[-1]})",
-          "detail": {"b": round(b, 5), "pctPerPoint": round(pct, 2), "p": round(p, 4), "n": n, "regions": len(regions), "years": [years[0], years[-1]]}}
+          "summary": f"1 %-yks. suurempi työttömyys kuin muualla → itsemurhat {pct:+.1f} % seuraavana vuonna (p = {p:.3f}, {len(regions)} maakuntaa, {years[0]}–{years[-1]})." + checks_text(chk, pctf),
+          "detail": {"b": round(b, 5), "pctPerPoint": round(pct, 2), "p": round(p, 4), "n": n, "regions": len(regions), "years": [years[0], years[-1]], "checks": chk}}
 
     # T2 koko maa
     ids2, s2 = px("ksyyt/11by.px", [("ikaryhma_10_20180101", ["25-44", "45-64"]), ("timeperiod_y", "*"), ("sukupuoli_9_20180101", ["SSS", "1", "2"])])
@@ -1189,6 +1197,32 @@ def perm_p(Y, X, regions, years, b, side, seed, R=2000, lag=1, trends=False):
     return (hits + 1) / (R + 1)
 
 
+def panel_checks(Y, X, regions, years, b, lag, side, result, seed):
+    """Vakiotarkistukset (docs/naytto-rekisteri.md, sääntölisäys): ennakkotesti ja aluekohtaiset trendit.
+    side = ennustettu etumerkki (+1 / −1). Palauttaa tarkistukset ja mahdollisesti muutetun tuloksen."""
+    lead_years = [t for t in years if all(t + 2 in X[r] for r in regions)]
+    bl, _ = fe_panel(Y, X, regions, lead_years, lag=-2)
+    pl = perm_p(Y, X, regions, lead_years, bl, -1 if bl < 0 else 1, seed, R=1000, lag=-2)
+    bt, _ = fe_panel(Y, X, regions, years, lag=lag, trends=True)
+    pt = perm_p(Y, X, regions, years, bt, side, seed + 1, R=1000, lag=lag, trends=True)
+    lead_fail = bl * b > 0 and pl < 0.05 and abs(bl) >= 0.5 * abs(b)
+    trend_support = bt * side > 0 and pt < 0.05
+    new = result
+    if result == "tukee" and (lead_fail or not trend_support):
+        new = "ei-ratkea"
+    elif result == "kumoaa" and trend_support:
+        new = "ei-ratkea"
+    checks = {"lead": {"b": round(bl, 5), "p": round(pl, 6), "fails": bool(lead_fail)},
+              "trends": {"b": round(bt, 5), "p": round(pt, 6), "supports": bool(trend_support)},
+              "original": result, "changed": new != result}
+    return checks, new
+
+
+def checks_text(c, scale=lambda v: f"{v:+.4f}"):
+    return (f" Vakiotarkistukset: ennakkotesti {scale(c['lead']['b'])} (p = {c['lead']['p']:.3f}), aluekohtaiset trendit {scale(c['trends']['b'])} "
+            f"(p = {c['trends']['p']:.3f})" + (f"; tulos muuttui ({c['original']} → ei ratkea)." if c["changed"] else "; tulos ei muuttunut."))
+
+
 def h11():
     """H11 (docs/naytto-rekisteri.md): ulkomaan kansalaisten osuus → Suomen kansalaisten työllisyys ja työttömyys."""
     regions = ["MK01", "MK02", "MK04", "MK05", "MK06", "MK07", "MK08", "MK09", "MK10", "MK11", "MK12", "MK13", "MK14", "MK15", "MK16", "MK17", "MK18", "MK19"]
@@ -1286,9 +1320,12 @@ def h1_regional():
     p = (ge + 1) / (R + 1)
     result = "tukee" if b < 0 and p < 0.05 else "kumoaa" if b >= 0 else "ei-ratkea"
     pct = (math.exp(b) - 1) * 100
+    Ylog = {r: {t: math.log(v) for t, v in tfr[r].items()} for r in regions}
+    chk, result = panel_checks(Ylog, une, regions, years, b, 2, -1, result, 11)
+    pctf = lambda v: f"{(math.exp(v) - 1) * 100:+.2f} %"
     return {"result": result, "b": round(b, 5), "pctPerPoint": round(pct, 2), "p": round(p, 4), "n": n,
-            "regions": len(regions), "years": [years[0], years[-1]],
-            "summary": f"1 %-yks. suurempi työttömyysnousu kuin muualla → syntyvyys {pct:+.2f} % kahden vuoden päästä (p = {p:.3f}, {len(regions)} maakuntaa)"}
+            "regions": len(regions), "years": [years[0], years[-1]], "checks": chk,
+            "summary": f"1 %-yks. suurempi työttömyysnousu kuin muualla → syntyvyys {pct:+.2f} % kahden vuoden päästä (p = {p:.3f}, {len(regions)} maakuntaa)." + checks_text(chk, pctf)}
 
 
 # ——— H3: kansanterveystyö 1972 ———
@@ -1408,6 +1445,9 @@ def main():
         for t in out["hypotheses"][hk]["tests"]:
             print(hk, t["id"], t["result"], "|", t["summary"]); print("   ", t["detail"].get("countries", ""))
     d7 = out["hypotheses"]["h7"]["tests"][1]["detail"]; print("  miehet", d7["men"], "naiset", d7["women"]); print("  sarja", [x for x in d7["series"] if x[0] <= 2005])
+    for hk, tid in (("h1", "annos"), ("h1e", "annos"), ("h1g", "annos"), ("h7", "annos")):
+        t = next(x for x in out["hypotheses"][hk]["tests"] if x["id"] == tid)
+        print("TARKISTUS", hk, t["result"], "|", t["detail"].get("checks"))
     print("malli", out["hypotheses"]["h1"]["model"])
     print("toisto maittain", json.dumps(out["hypotheses"]["h1"]["tests"][0]["detail"]["countries"]))
     print("miehet maittain", json.dumps(out["hypotheses"]["h1"]["tests"][2]["detail"]["menCountries"]))

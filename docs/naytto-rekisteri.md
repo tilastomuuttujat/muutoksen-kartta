@@ -698,3 +698,19 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   kehityssuunnat ovat voineet peittää vaikutuksen.
 - **Jos päätesti ei ratkea:** tulos ei muutu.
 - Kaikkien tarkistusten luvut näytetään aina. Permutaatiot tehdään 1 000 kertaa.
+
+## Vakiotarkistukset: tulos
+
+- **Laskettu:** 27.11.2026. Yksikään tulos ei muuttunut.
+
+| Testi | Päätesti | Ennakkotesti (t + 2) | Aluekohtaiset trendit |
+|---|---|---|---|
+| H1 / T2 | kumoaa | −0,09 % (p = 0,32) | +0,26 % (ennustettu −, p = 0,94) |
+| H1e / T2 | ei ratkea | +0,09 % (p = 0,33) | −0,27 % (ennustettu +, p = 0,89) |
+| H1g / T3 | kumoaa | 10 % → −3,1 % (p = 0,19) | 10 % → −4,4 % (ennustettu +, p = 0,95) |
+| H7 / T1 | kumoaa | +0,4 % (p = 0,35) | +0,7 % (ennustettu +, p = 0,18) |
+
+- **Tulkinta:**
+  - Toisin kuin H11:ssä, näissä testeissä alueiden pitkät kehityssuunnat eivät selitä tuloksia eivätkä
+    peitä vaikutuksia.
+  - H7:ssä trendimallin suunta on ennustettu, mutta ei merkitsevä. Kumoava tulos jää voimaan.
