@@ -1352,3 +1352,32 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
     idänkaupan supistuminen öljyn hinnan laskiessa 1986, mitä ei ole testattu.
 - **Tulkinta:** kahden vuoden vaikutus (H24) oli johdonmukainen. Kesto vaihteli tapauksittain, eikä
   aineisto riitä erottamaan devalvaatiokierrettä muista syistä.
+
+## H24c. Inflaatio ja palkat söivät devalvaation edun
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Jatkoa H24b:lle.
+- **Väite:** devalvaation vientietu kului niissä tapauksissa, joissa hinnat ja palkat nousivat
+  devalvaation jälkeen nopeimmin (devalvaatiokierre).
+  - H24b:ssä etu säilyi 1967 ja 1991 mutta hävisi 1957 ja 1982.
+- **Aineisto:**
+  - Elinkustannusindeksi, vuosikeskiarvot (StatFin 11xp, 1939–).
+  - Nimellinen palkkaindeksi (Turso: JST-makrohistoria, wage, 1870–2020).
+  - Kulumisen mittari on H24b:n T2-suure, eli viennin BKT-osuuden log-muutos t0 + 2 → t0 + 5.
+- **Altiste:**
+  - Hintojen log-muutos t0 → t0 + 3 (T1).
+  - Palkkojen log-muutos t0 → t0 + 3 (T2).
+- **Menetelmä:** Spearmanin järjestyskorrelaatio viiden tapahtuman välillä (1957, 1967, 1977, 1982,
+  1991). Yksisuuntainen tarkka p lasketaan kaikista 120 järjestyksestä.
+  - Viidellä tapauksella p ≤ 0,05 vaatii rho ≤ −0,9.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Annos | Inflaatio t0 → t0 + 3 vs. kuluminen | Tukee: rho ≤ −0,9 (p ≤ 0,05). Kumoaa: rho ≥ 0. Muuten: ei ratkea |
+| T2 Annos | Palkkojen nousu t0 → t0 + 3 vs. kuluminen | Sama sääntö |
+
+- **Rajaus:**
+  - Kotimaista inflaatiota ja palkkoja ei verrata kauppakumppaneiden vastaaviin, koska
+    kauppakumppanien sarjoja ei ole aineistossa. 1970-luvun inflaatio oli korkeaa kaikkialla, joten
+    mittari on karkea.
+  - Viidellä havainnolla testi on hyvin heikko. Tulos voi korkeintaan nostaa hypoteesin
+    ehdokkaaksi.
