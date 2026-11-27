@@ -1095,3 +1095,29 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
     - Suuri osa kasvusta tapahtui kuitenkin jo 1965–1975, kun vankiluku oli vasta alkanut laskea.
     - Vuoden 2000 jälkeen ryöstöt vähenivät, vaikka vankiluku pysyi lähes ennallaan.
   - Yhteisiä pitkiä trendejä ei testattu, koska ne eivät erota syitä toisistaan.
+
+## H22. EU-jäsenyys laski ruoan hintaa
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Uusi teema.
+- **Väite:** EU-jäsenyys 1.1.1995 laski ruoan suhteellista hintaa Suomessa pysyvästi.
+  - Maatalouden rajasuoja purkautui ja tuottajahinnat laskivat EU:n tasolle.
+- **Aineisto:** kotitalouksien kulutusmenot käyvin hinnoin ja kiintein hinnoin (Eurostat
+  nama_10_co3_p3).
+  - Ruoka (CP011) ja kaikki kulutus (TOTAL).
+  - Suomi 1980–, Tanska ja Norja 1975–.
+- **Mittari:** ruoan suhteellinen hinta, eli ruoan hintaindeksin ja kaikkien kulutusmenojen
+  hintaindeksin suhde (log). Hintaindeksi = käypä hinta / kiinteä hinta.
+- **Vertailumaat:** Tanska (EU-jäsen jo 1973) ja Norja (ei jäsen).
+  - Ruotsi liittyi samaan aikaan, ja sen tiedot alkavat vasta 1993, joten se esitetään vain
+    kuvailevasti.
+- **Lumevuodet:** kaikki muut vuodet, joilta kaikkien maiden tiedot ovat saatavilla.
+  - Ruoan arvonlisäverojen muutokset (2009, 2010, 2012, 2013) jätetään lumevuosiin, mikä tekee
+    testistä tiukemman.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Luonnollinen koe | Suomen suhteellisen ruoanhinnan muutos 1994→1995 miinus Tanskan ja Norjan keskiarvo, verrattuna saman erotuksen lumevuosiin | Tukee: ero < 0 ja pienempi kuin 95 %:ssa lumevuosista. Kumoaa: ero ≥ 0. Muuten: ei ratkea |
+| T2 Pysyvyys | Sama erotus 1994→1999 (viisi vuotta), verrattuna kaikkiin muihin viiden vuoden jaksoihin, jotka eivät sisällä vuotta 1995 | Tukee: ero < 0 ja pienempi kuin 95 %:ssa lumejaksoista. Kumoaa: ero ≥ 0, eli lasku palautui. Muuten: ei ratkea |
+
+- **Rajaus:** vuoden 1994 liikevaihtoverosta arvonlisäveroon siirtyminen osuu edeltävään vuoteen.
+  Ruoan verokanta pysyi tiettävästi ennallaan, mutta tätä ei ole tarkistettu aineistosta.
