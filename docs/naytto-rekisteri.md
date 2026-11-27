@@ -18,6 +18,20 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 | T3 Täsmällisyys | Sama kuin T1, miesten 25–34 työttömyys | Naisten yhteys vähintään yhtä vahva kuin miesten | Tukee: naisten yhdistetty r on negatiivisempi. Muuten: ei ratkea (yleinen nuorten epävarmuus) |
 | E1 Ennuste | Pohjoismaiden yhdistetty malli: Δlog TFR(t) = a + b · ΔU(t−2) | TFR 2026 ja 2027 Suomessa, 80 %:n väli | Osuma: toteutunut arvo välillä |
 
+## H1b. Kansallinen talousepävarmuus → syntyvyys (tarkennus)
+
+- **Kirjattu:** 27.11.2026, H1:n testien jälkeen. Tämä merkintä ei siksi ole ennalta kirjattu suhteessa
+  H1:n tuloksiin, vaan vain suhteessa alla oleviin ennusteisiin ja tuleviin testeihin.
+- **Syy:** H1:n toisto Pohjoismaissa piti, mutta annos–vaste maakunnittain ei. Yhteys näyttää kulkevan
+  koko maan tilanteen kautta, ei kunkin naisen tai alueen oman työttömyyden kautta.
+- **Väite:** syntyvyys reagoi koko maan talousnäkymiin, joita nuorten aikuisten työttömyys mittaa,
+  noin kahden vuoden viiveellä. Alueiden välisiä eroja se ei selitä.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| E1 Ennuste | TFR 2026 ja 2027 (H1:n Pohjoismaiden malli) | Osuma: toteutunut 80 %:n välillä |
+| T4 Odotukset (ei vielä tehty) | Kuluttajien luottamus (Tilastokeskus) edeltää syntyvyyttä Pohjoismaissa | Tukee: viivekorrelaatio vahvempi kuin työttömyyden |
+
 ## H2. 1990-luvun lama osui teollisuusalueisiin
 
 - **Kirjattu:** 25.11.2026 (`docs/skannauskoe.md`, koe 2). **Kartassa:** ei omaa yhteyttä.
