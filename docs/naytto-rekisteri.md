@@ -235,3 +235,23 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
     heikommin kuin työllisyys samoilla vuosilla ja samoissa maissa.
   - Asuntomarkkinat eivät näillä mittareilla selitä työllisyyden ja syntyvyyden yhteyttä.
   - Hintatesti on heikkovoimainen (2005–).
+
+## H1g. Rahan riittävyys → syntyvyys
+
+- **Kirjattu:** 27.11.2026, ennen alla olevien testien laskentaa.
+- **Kysymys (käyttäjältä):** vähensikö finanssikriisi kotitalouksien käytössä olevaa rahaa, ja
+  näkyykö se syntyvyydessä?
+- **Väite:** kun kotitalouksien käytettävissä olevat reaalitulot tai luotonsaanti kasvavat, syntyvyys
+  nousee noin 1–2 vuoden päästä. Yhteys on vähintään yhtä vahva kuin työllisyyden.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Reaalitulot | Eurostat nasa_10_ki B7G_R_HAB_GR (kotitalouksien oikaistu reaalinen käytettävissä oleva tulo asukasta kohti, vuosimuutos %, S14_S15). Suomi, Ruotsi ja Tanska 1996–, Norjan tieto puuttuu. Vuosimuutos on jo muutos, joten sitä käytetään sellaisenaan (rajaus, AR(1)). Viive 1–2 v, Šidák, maat yhdessä. Vertailu työllisyyteen 30–34 samoissa maissa ja samoina vuosina. | Tukee: r > 0, p < 0,05 ja \|r\| ≥ työllisyyden \|r\|. Kumoaa: r ≤ 0. Muuten: ei ratkea |
+| T2 Luotto | Eurostat nasa_10_ki DIR_S14_S15 (kotitalouksien velka / tulot), muutos %-yks. Muuten kuten T1. | Kuten T1 |
+| T3 Annos–vaste | 18 maakuntaa (ilman Ahvenanmaata): StatFin 14ww, käytettävissä oleva rahatulo kulutusyksikköä kohden, mediaani, log. Kiinteät alue- ja vuosivaikutukset (vuosivaikutus poistaa yhteisen hintatason), viive 2 v, syntyvyys 12du, 1997–2025. Permutaatio 2 000 kertaa. | Tukee: kerroin > 0 ja p < 0,05. Kumoaa: kerroin ≤ 0. Muuten: ei ratkea |
+
+- **Kuvaileva osa (ei testi):** Suomen rahan määrä ja pankkiluotot (JST, –2020) sekä kotitalouksien
+  reaalitulot asukasta kohti Suomessa, Ruotsissa ja Tanskassa vuoden 2008 tasoon verrattuna.
+  Merkitään finanssikriisi (2008) ja EKP:n määrällisen keventämisen alku (3/2015).
+- **Rajoite:** määrällisen keventämisen vaikutusta ei voi tällä aineistolla erottaa muista samaan
+  aikaan tapahtuneista asioista. Se näytetään vain ajoituksena.
