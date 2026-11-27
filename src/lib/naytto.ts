@@ -219,15 +219,15 @@ export const HYPOTHESES: Hypothesis[] = [
   {
     id: "h5",
     title: "Nuorten aikuisten työttömyys pitkittyy",
-    claim: "Työttömyysaalto jättää jäljen: 30–34-vuotiaiden pitkäaikaistyöttömien osuus nousee ja on vielä kolmen vuoden päästä koholla.",
+    claim: "Työttömyysaalto jättää jäljen: pitkäaikaistyöttömien osuus nousee ja pysyy koholla, ja huonona aikana työmarkkinoille tulleet ikäluokat ovat vielä 33–37-vuotiaina muita harvemmin töissä.",
     registered: "2026-11-27",
-    preregistered: "Seulan jyvä (maajako). Pysyvyystesti kirjattiin ennen laskentaa.",
+    preregistered: "Seulan jyvä (maajako). Pysyvyys- ja ikäluokkatesti kirjattiin ennen laskentaa.",
     map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
     tests: NAYTTO.hypotheses.h5.tests,
     predictions: [],
     reading:
-      "Työttömyyden nousua seuraa pitkäaikaistyöttömyyden kasvu, joka ei purkaudu vuodessa: osuus on kolmen vuoden päästä yhä koholla. Suunta on sama kaikissa neljässä Pohjoismaassa. Tämä sopii ajatukseen, että työttömyysaalto jättää osalle nuorista aikuisista pysyvämmän jäljen.",
-    next: "Vahva asetelma: annos–vaste ikäluokittain. Laman aikana työmarkkinoille tulleiden ikäluokkien työllisyyden pitäisi olla vielä vuosia myöhemmin muita heikompi (aineisto: StatFin 115c, ikävuosittain 1987–).",
+      "Työttömyyden nousua seuraa pitkäaikaistyöttömyyden kasvu, joka on vielä kolmen vuoden päästä koholla kaikissa neljässä Pohjoismaassa. Pitkän aikavälin jälki ei kuitenkaan näy: 1990-luvun laman aikana työmarkkinoille tulleet ikäluokat olivat 33–37-vuotiaina työllisyydeltään muiden tasolla. Työllisyydellä mitattuna jälki haalistuu noin kymmenessä vuodessa. Tulot, terveys ja perheen perustaminen ovat eri kysymyksiä, joita tämä testi ei mittaa.",
+    next: "Tarkennus: jälki voi näkyä muualla kuin työllisyydessä. Seuraavaksi kannattaisi testata laman ikäluokkien tulot ja esikoisen saamisen ikä samalla ikäluokka-asetelmalla (aineisto: StatFin tulonjako ja 12dm).",
   },
   {
     id: "h2",

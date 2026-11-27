@@ -739,7 +739,58 @@ def h5():
     t2 = {"id": "pysyvyys", "design": "tasmallisyys", "result": res, "date": str(date.today()),
           "summary": f"Työttömyyden nousu vuonna t → pitkäaikaistyöttömien osuus 30–34 kolmen vuoden päästä: r = {r2(r)} (n = {n}, efektiivinen {neff}, p = {p1s:.3f}); neljä maata",
           "detail": {"r": round(r, 3), "n": n, "neff": neff, "p": round(p1s, 4), "countries": per}}
-    return {"tests": [t1, t2], "predictions": []}
+    return {"tests": [t1, t2, h5_cohorts()], "predictions": []}
+
+
+def h5_cohorts():
+    """H5 / T3 (docs/naytto-rekisteri.md): ikäluokan työmarkkinoille tulon aikainen työttömyys → työllisyys 33–37-v."""
+    ages = [f"{a:03d}" for a in range(21, 55)]
+    ids, d = px("tyokay/115c.px", [("paaasial_toimin_3_20180101", ["SSS", "11", "12"]), ("sukupuoli_9_20180101", ["SSS", "1", "2"]),
+                                  ("ikaryhma_10_20180101", ages), ("timeperiod_y", "*")])
+    ia, isx, iy, it = (ids.index(x) for x in ("ikaryhma_10_20180101", "sukupuoli_9_20180101", "timeperiod_y", "paaasial_toimin_3_20180101"))
+    tab = {}
+    for k, v in d.items():
+        tab[(k[isx], int(k[ia]), int(k[iy]), k[it])] = v
+    years = sorted({k[2] for k in tab})
+
+    def rate(sex, a0, a1, y, num, den):
+        n = sum(tab.get((sex, a, y, c), 0) for a in range(a0, a1 + 1) for c in num)
+        m = sum(tab.get((sex, a, y, c), 0) for a in range(a0, a1 + 1) for c in den)
+        return n / m if m else None
+
+    def run(sex):
+        # altistus vuosittain: 25–54-vuotiaiden työttömyysaste
+        un = {y: rate(sex, 25, 54, y, ["12"], ["11", "12"]) for y in years}
+        rows = []
+        for b in range(1900, 2010):
+            ex_y = [b + a for a in range(21, 25)]
+            out_y = [b + a for a in range(33, 38)]
+            if not all(y in un for y in ex_y) or not all(y in years for y in out_y):
+                continue
+            ex = sum(un[y] for y in ex_y) / len(ex_y)
+            emp = sum(rate(sex, y - b, y - b, y, ["11"], ["SSS"]) for y in out_y) / len(out_y)
+            ref = sum(rate(sex, 30, 44, y, ["11"], ["SSS"]) for y in out_y) / len(out_y)
+            rows.append((b, ex * 100, (emp - ref) * 100))
+        bs = np.array([r[0] for r in rows], float)
+        X = np.array([r[1] for r in rows]); Y = np.array([r[2] for r in rows])
+        detr = lambda v: v - np.polyval(np.polyfit(bs, v, 1), bs)
+        x, y = detr(X), detr(Y)
+        r = float(np.corrcoef(x, y)[0, 1])
+        m = len(x)
+        null = [float(np.corrcoef(np.roll(x, s_), y)[0, 1]) for s_ in range(1, m)]
+        p = (1 + sum(1 for v in null if v <= r)) / m
+        slope = float(np.polyfit(x, y, 1)[0])
+        return {"r": round(r, 3), "p": round(p, 4), "n": m, "cohorts": [int(bs[0]), int(bs[-1])], "slope": round(slope, 3),
+                "per5": round(slope * 5, 2),
+                "rows": [{"born": int(b_), "exposure": round(e, 2), "outcome": round(o, 2)} for b_, e, o in rows]}
+
+    tot = run("SSS")
+    res = "tukee" if tot["r"] < 0 and tot["p"] < 0.05 else "kumoaa" if tot["r"] >= 0 else "ei-ratkea"
+    women, men = run("2"), run("1")
+    return {"id": "ikaluokat", "design": "annos", "result": res, "date": str(date.today()),
+            "summary": (f"Syntyneet {tot['cohorts'][0]}–{tot['cohorts'][1]}: työmarkkinoille tulon aikainen työttömyys → työllisyys 33–37-vuotiaana "
+                        f"r = {r2(tot['r'])} (p = {tot['p']:.3f}, {tot['n']} ikäluokkaa); 5 %-yks. huonompi tulovaihe → {tot['per5']:+.1f} %-yks. työllisyyttä"),
+            "detail": {**tot, "women": {k: women[k] for k in ("r", "p", "per5")}, "men": {k: men[k] for k in ("r", "p", "per5")}}}
 
 
 def h1_regional():

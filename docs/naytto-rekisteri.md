@@ -365,3 +365,20 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Tulos naisille ja miehille erikseen.
   - Ennustettu ero ikäluokkien välillä: työllisyys 33–37-vuotiaana prosenttiyksikköinä, kun
     altistuksen ero on 5 prosenttiyksikköä.
+
+## H5 / T3: tulos
+
+- **Laskettu:** 27.11.2026.
+- **Tulos:** kumoaa.
+  - r = +0,42 (permutaatio-p yksisuuntaisesti = 0,77, 22 ikäluokkaa, syntyneet 1966–1987).
+  - 5 %-yksikköä huonompi tulovaihe vastasi +0,3 %-yksikköä työllisyyttä 33–37-vuotiaana, eli
+    vaikutus on käytännössä nolla ja väärän suuntainen.
+  - Naiset r = +0,42 ja miehet r = +0,43.
+  - Laman aikana 21–24-vuotiaat (syntyneet 1969–1975, altistus 12,6–17,7 %) olivat 33–37-vuotiaina
+    työllisyydeltään samalla tasolla kuin muut ikäluokat.
+- **Tila:** H5 kumottu, koska vahva asetelma kumoaa.
+- **Tulkinta:**
+  - Pitkäaikaistyöttömyyden kasvu kesti noin kolme vuotta (T2).
+  - Laman ikäluokat olivat kuitenkin kymmenen vuoden päästä työllisyydeltään muiden tasolla.
+  - Työllisyydessä mitattuna jälki haalistui, eikä se jäänyt pysyväksi.
+  - Muita seurauksia (tulot, terveys, perheen perustaminen) tämä testi ei mittaa.

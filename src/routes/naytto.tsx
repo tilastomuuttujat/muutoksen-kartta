@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Kolme väitettä kumoutui, yksi on tuettu, kolme on ehdokkaita ja neljän näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Neljä väitettä kumoutui, yksi on tuettu, kaksi on ehdokkaita ja neljän näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -225,6 +225,7 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h4" && t.id === "toisto-maat" && <SimpleDots rows={toDots(t.detail as Pooled, "Palvelut")} side="neg" band="H4:n ennuste: vasemmalla" note="Työttömyyden muutos ja julkisten palvelujen (D63) reaalikasvu 1–2 vuotta myöhemmin. Yhdistetty Ruotsi ja Tanska; Suomi näytetään vertailuksi." />}
       {h.id === "h4" && t.id === "palvelut-vs-rahat" && <ServicesVsCash detail={t.detail as SvC} />}
       {h.id === "h5" && t.id === "pysyvyys" && <PersistenceDots detail={t.detail as Persist} />}
+      {h.id === "h5" && t.id === "ikaluokat" && <CohortChart detail={t.detail as Cohorts} />}
       {(t.id === "hinnat" || t.id === "korot" || t.id === "tulot" || t.id === "luotto") && <HousingDots h={h.id} id={t.id} detail={t.detail as Housing} />}
     </li>
   );
@@ -355,6 +356,40 @@ function PersistenceDots({ detail }: { detail: Persist }) {
   return (
     <CompareDots rows={rows} side="pos" band="H5:n ennuste: oikealla" lead="Korrelaatio:"
       note={`Työttömyyden muutos vuonna t ja pitkäaikaistyöttömien osuuden muutos vuodesta t vuoteen t + 3. Maittaisille ei laskettu p-arvoa, koska havaintoja on vähän (Norja ${detail.countries["NO"]?.n ?? 0}). Yhdistetyn p-arvo efektiivisellä otoskoolla ${detail.neff}.`} />
+  );
+}
+
+type Cohorts = { r: number; p: number; n: number; per5: number; rows: { born: number; exposure: number; outcome: number }[]; women: { r: number }; men: { r: number } };
+
+function CohortChart({ detail }: { detail: Cohorts }) {
+  const rows = detail.rows;
+  const W = 620, L = 46, R = 600, H1 = 120, H2 = 120;
+  const b0 = rows[0]!.born, b1 = rows.at(-1)!.born;
+  const x = (b: number) => L + ((b - b0) / (b1 - b0)) * (R - L);
+  const ex = rows.map((r) => r.exposure), ou = rows.map((r) => r.outcome);
+  const y1 = (v: number) => 12 + (1 - (v - 0) / (Math.max(...ex) + 1)) * (H1 - 28);
+  const omin = Math.min(...ou, -1.5), omax = Math.max(...ou, 0.6);
+  const y2 = (v: number) => H1 + 12 + (1 - (v - omin) / (omax - omin)) * (H2 - 34);
+  const lama = rows.filter((r) => r.born >= 1969 && r.born <= 1975);
+  return (
+    <div className="mt-2 overflow-x-auto">
+      <svg viewBox={`0 0 ${W} ${H1 + H2}`} className="h-auto w-full min-w-[460px] max-w-2xl" role="img"
+        aria-label={`Ikäluokat ${b0}–${b1}: työttömyys työmarkkinoille tullessa ja työllisyysero 33–37-vuotiaana`}>
+        <rect x={x(1969) - 6} y={4} width={x(1975) - x(1969) + 12} height={H1 + H2 - 24} fill="var(--primary)" fillOpacity={0.07} />
+        <text x={x(1972)} y={H1 + H2 - 26} textAnchor="middle" className="fill-primary text-[10px]">laman ikäluokat</text>
+        <text x={L} y={10} className="fill-muted-foreground text-[10px]">Työttömyys (25–54 v), kun ikäluokka oli 21–24-vuotias, %</text>
+        {rows.map((r) => <rect key={r.born} x={x(r.born) - 5} y={y1(r.exposure)} width={10} height={y1(0) - y1(r.exposure)} fill="var(--muted-foreground)" fillOpacity={0.55} />)}
+        <text x={L} y={H1 + 8} className="fill-muted-foreground text-[10px]">Työllisyys 33–37-vuotiaana miinus 30–44-vuotiaat samoina vuosina, %-yks.</text>
+        <line x1={L} x2={R} y1={y2(0)} y2={y2(0)} stroke="var(--foreground)" strokeOpacity={0.4} />
+        <text x={L - 6} y={y2(0) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">0</text>
+        <path d={rows.map((r, i) => `${i ? "L" : "M"}${x(r.born).toFixed(1)},${y2(r.outcome).toFixed(1)}`).join(" ")} fill="none" stroke="var(--primary)" strokeWidth={2.2} />
+        {lama.map((r) => <circle key={r.born} cx={x(r.born)} cy={y2(r.outcome)} r={3} fill="var(--primary)" />)}
+        {[b0, 1970, 1975, 1980, b1].map((t) => <text key={t} x={x(t)} y={H1 + H2 - 6} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
+      </svg>
+      <p className="text-xs text-muted-foreground">
+        Syntymävuosi vaaka-akselilla. Jos huono tulovaihe jättäisi pysyvän jäljen, alemman käyrän pitäisi painua alas laman ikäluokkien kohdalla. Testissä molemmista poistettiin ikäluokkien suora trendi. Naiset r = {nf(detail.women.r)}, miehet r = {nf(detail.men.r)}.
+      </p>
+    </div>
   );
 }
 

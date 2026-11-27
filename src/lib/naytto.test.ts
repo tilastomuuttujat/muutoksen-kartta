@@ -43,7 +43,7 @@ describe("pilot results", () => {
     expect(statusOfHypothesis(hypothesis("h1f")!)).toBe("oletus");
     expect(statusOfHypothesis(hypothesis("h1g")!)).toBe("kumottu");
     expect(statusOfHypothesis(hypothesis("h4")!)).toBe("ristiriita");
-    expect(statusOfHypothesis(hypothesis("h5")!)).toBe("ehdokas");
+    expect(statusOfHypothesis(hypothesis("h5")!)).toBe("kumottu");
     expect(statusOfHypothesis(hypothesis("h2")!)).toBe("kumottu");
     expect(statusOfHypothesis(hypothesis("h3")!)).toBe("tuettu");
   });
@@ -146,6 +146,21 @@ describe("pilot results", () => {
     expect(d.r).toBeCloseTo(0.39, 2);
     expect(d.p).toBeLessThan(0.05);
     for (const c of Object.values(d.countries)) expect(c.r).toBeGreaterThan(0);
+  });
+  it("H5 cohort test numbers quoted in the register", () => {
+    const c = NAYTTO.hypotheses.h5.tests.find((t) => t.id === "ikaluokat")!;
+    expect(c.result).toBe("kumoaa");
+    const d = c.detail as { r: number; p: number; n: number; per5: number; cohorts: number[]; women: { r: number }; men: { r: number }; rows: { born: number; exposure: number }[] };
+    expect(d.r).toBeCloseTo(0.42, 2);
+    expect(d.p).toBeCloseTo(0.77, 2);
+    expect(d.n).toBe(22);
+    expect(d.cohorts).toEqual([1966, 1987]);
+    expect(d.per5).toBeCloseTo(0.27, 2);
+    expect(d.women.r).toBeCloseTo(0.42, 2);
+    expect(d.men.r).toBeCloseTo(0.43, 2);
+    const lama = d.rows.filter((r) => r.born >= 1969 && r.born <= 1975).map((r) => r.exposure);
+    expect(Math.min(...lama)).toBeGreaterThan(12.5);
+    expect(Math.max(...lama)).toBeLessThan(18);
   });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
