@@ -76,7 +76,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h16: { tests: Test[]; predictions: Prediction[] }; h17: { tests: Test[]; predictions: Prediction[] }; h18: { tests: Test[]; predictions: Prediction[] }; h19: { tests: Test[]; predictions: Prediction[] }; h20: { tests: Test[]; predictions: Prediction[] }; h21: { tests: Test[]; predictions: Prediction[] }; h22: { tests: Test[]; predictions: Prediction[] }; h23: { tests: Test[]; predictions: Prediction[] }; h24: { tests: Test[]; predictions: Prediction[] }; h24b: { tests: Test[]; predictions: Prediction[] }; h24c: { tests: Test[]; predictions: Prediction[] }; h24d: { tests: Test[]; predictions: Prediction[] }; h24e: { tests: Test[]; predictions: Prediction[] }; h24f: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h16: { tests: Test[]; predictions: Prediction[] }; h17: { tests: Test[]; predictions: Prediction[] }; h18: { tests: Test[]; predictions: Prediction[] }; h19: { tests: Test[]; predictions: Prediction[] }; h20: { tests: Test[]; predictions: Prediction[] }; h21: { tests: Test[]; predictions: Prediction[] }; h22: { tests: Test[]; predictions: Prediction[] }; h23: { tests: Test[]; predictions: Prediction[] }; h24: { tests: Test[]; predictions: Prediction[] }; h24b: { tests: Test[]; predictions: Prediction[] }; h24c: { tests: Test[]; predictions: Prediction[] }; h24d: { tests: Test[]; predictions: Prediction[] }; h24e: { tests: Test[]; predictions: Prediction[] }; h24f: { tests: Test[]; predictions: Prediction[] }; h25: { tests: Test[]; predictions: Prediction[] }; h25b: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -541,6 +541,32 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Kilpaileva selitys ei pitänyt: reaalinen BKT kasvoi kriisin jälkeisinä viitenä vuotena tyypillisesti aivan tavalliseen tapaan (mediaanipoikkeama −0,2 %), joten osuuden nousu ei johtunut BKT:n supistumisesta. Viennin arvo kasvoi tavallista enemmän 44 tapauksessa 74:stä (mediaani +6 %), mutta kirjattu merkitsevyysraja jäi niukasti saavuttamatta. Väite jää oletukseksi, vaikka suunta on sen mukainen.",
     next: "Viennin määrä kiintein hinnoin erottaisi määrän ja hinnan; se vaatii toisen lähteen (esimerkiksi Penn World Table tai Eurostat 1995–).",
+  },
+  {
+    id: "h25",
+    title: "Euro poisti Suomen korkopreemion",
+    claim: "Euroon sitoutuminen (ERM 1996, EMU 1999) poisti Suomen pitkien korkojen preemion Saksaan nähden enemmän kuin omavaluuttaisten maiden yleinen korkojen lähentyminen.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. Uusi teema: mitä euro merkitsi Suomelle.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h25.tests,
+    predictions: [],
+    reading:
+      "Suomen korkoero Saksaan pieneni lähes kolme prosenttiyksikköä, enemmän kuin yhdenkään omavaluuttaisen vertailumaan, ja jäi euroaikana Ruotsia pienemmäksi. Väite on säännön mukaan tuettu, mutta vaikutus on pieni: Ruotsi, jolla oli samanlainen 1990-luvun kriisi, sai lähes saman lähentymisen ilman euroa. Suurin osa preemion poistumisesta oli kriisin riskilisän purkautumista; euron oma osuus Ruotsiin verrattuna on noin 0,1–0,3 prosenttiyksikköä.",
+    next: "Lyhyet korot ja reaalikorot: euro toi Suomeen EKP:n yhteisen ohjauskoron, joka oli 2000-luvun alussa Suomen tilanteeseen nähden matala. Näkyikö se luotonannossa ja asuntohinnoissa?",
+  },
+  {
+    id: "h25b",
+    title: "Ilman omaa valuuttaa sopeutuminen finanssikriisiin oli raskaampaa",
+    claim: "Finanssikriisissä omavaluuttaisten maiden reaaliset valuuttakurssit heikkenivät ja helpottivat sopeutumista; euromaissa näin ei käynyt, ja niiden kasvu jäi heikommaksi.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. 11 euromaata ja 10 omavaluuttaista maata; Suomi ja Tanska erikseen.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h25b.tests,
+    predictions: [],
+    reading:
+      "Mekanismin ensimmäinen osa toteutui selvästi: omavaluuttaisten maiden reaalikurssit heikkenivät 2007–2009 (mediaani −6 %), euromaiden eivät (+2 %; Suomi +3 %). Kasvuero oli ennustetun suuntainen, noin 3 prosenttiyksikköä vuoteen 2015, mutta jäi niukasti kirjatun rajan alle. Suomen BKT asukasta kohden oli 2015 lähes 8 % vuoden 2007 alapuolella, kolmanneksi heikoin 23 maasta; siihen vaikuttivat myös Nokian ja metsäteollisuuden rakennemuutos ja Venäjän kauppa (ei testattu). Euromaiden sisällä hajonta oli suurta (Irlanti +23 %, Kreikka −25 %).",
+    next: "Erota valuuttakurssi ja velkakriisi: vertaa euromaita, joiden korot eivät nousseet 2010–2012 (Saksa, Alankomaat, Itävalta, Suomi), omavaluuttaisiin maihin.",
   },
   {
     id: "h2",

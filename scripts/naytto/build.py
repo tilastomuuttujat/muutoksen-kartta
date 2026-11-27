@@ -1801,6 +1801,75 @@ def h24f():
     return {"tests": [t1, t2], "predictions": []}
 
 
+def h25():
+    """H25 korkopreemio ja H25b sopeutuminen finanssikriisiin (docs/naytto-rekisteri.md), Global Macro Database 2026_09."""
+    import pandas as pd
+    path = os.environ.get("GMD_DTA", os.path.join("/tmp", "GMD_2026_09.dta"))
+    if not os.path.exists(path):
+        urllib.request.urlretrieve(GMD_URL, path)
+    d = pd.read_stata(path, columns=["ISO3", "year", "ltrate", "REER", "rGDP_pc"])
+    S = {iso: g.set_index("year") for iso, g in d.groupby("ISO3")}
+    NAMES_ = {"FIN": "Suomi", "SWE": "Ruotsi", "NOR": "Norja", "DNK": "Tanska", "AUS": "Australia", "CAN": "Kanada", "CHE": "Sveitsi",
+              "GBR": "Iso-Britannia", "ISL": "Islanti", "JPN": "Japani", "NZL": "Uusi-Seelanti", "USA": "Yhdysvallat", "AUT": "Itävalta",
+              "BEL": "Belgia", "DEU": "Saksa", "ESP": "Espanja", "FRA": "Ranska", "GRC": "Kreikka", "IRL": "Irlanti", "ITA": "Italia",
+              "LUX": "Luxemburg", "NLD": "Alankomaat", "PRT": "Portugali"}
+    # H25
+    lt = lambda c, y: S[c]["ltrate"].get(y)
+    spread = lambda c, ys: float(np.mean([lt(c, y) - lt("DEU", y) for y in ys]))
+    COMP = ["AUS", "CAN", "CHE", "GBR", "JPN", "NOR", "NZL", "SWE", "USA"]
+    pre, post = range(1990, 1996), range(1999, 2008)
+    ch = {c: spread(c, post) - spread(c, pre) for c in COMP + ["FIN"]}
+    fin = ch["FIN"]
+    r1 = "tukee" if all(fin < ch[c] for c in COMP) else "kumoaa" if fin >= float(np.median([ch[c] for c in COMP])) else "ei-ratkea"
+    fs, ss = spread("FIN", post), spread("SWE", post)
+    r2 = "tukee" if fs - ss < 0 else "kumoaa"
+    sp_series = {c: sorted((int(y), round(lt(c, y) - lt("DEU", y), 2)) for y in range(1985, 2020) if pd.notna(lt(c, y)) and pd.notna(lt("DEU", y))) for c in ("FIN", "SWE", "DNK", "ITA")}
+    a1 = {"id": "korkoero", "design": "luonnollinen", "result": r1, "date": str(date.today()),
+          "summary": f"Korkoero Saksaan, muutos 1990–95 → 1999–2007: Suomi {fin:+.2f} %-yks. ({spread('FIN', pre):.2f} → {spread('FIN', post):.2f}); vertailumaiden mediaani {float(np.median([ch[c] for c in COMP])):+.2f}, suurin pieneneminen {NAMES_[min(COMP, key=lambda c: ch[c])]} {min(ch[c] for c in COMP):+.2f}",
+          "detail": {"changes": {NAMES_[c]: round(v, 2) for c, v in sorted(ch.items(), key=lambda kv: kv[1])}, "spreads": sp_series,
+                     "finPre": round(spread("FIN", pre), 2), "finPost": round(fs, 2)}}
+    a2 = {"id": "ruotsi", "design": "tasmallisyys", "result": r2, "date": str(date.today()),
+          "summary": f"Korkoero Saksaan 1999–2007: Suomi {fs:.2f}, Ruotsi {ss:.2f} %-yks.; ero {fs - ss:+.2f} (1990–95: Suomi {spread('FIN', pre):.2f}, Ruotsi {spread('SWE', pre):.2f})",
+          "detail": {"fin": round(fs, 2), "swe": round(ss, 2), "finPre": round(spread("FIN", pre), 2), "swePre": round(spread("SWE", pre), 2)}}
+    # H25b
+    EURO = ["AUT", "BEL", "DEU", "ESP", "FRA", "GRC", "IRL", "ITA", "LUX", "NLD", "PRT"]
+    FLOAT = ["AUS", "CAN", "CHE", "GBR", "ISL", "JPN", "NOR", "NZL", "SWE", "USA"]
+    reer = {c: math.log(S[c]["REER"][2009] / S[c]["REER"][2007]) for c in EURO + FLOAT + ["FIN", "DNK"]}
+    gdp = {c: math.log(S[c]["rGDP_pc"][2015] / S[c]["rGDP_pc"][2007]) for c in EURO + FLOAT + ["FIN", "DNK"]}
+    rng = np.random.default_rng(1)
+    def group_test(v, lower, higher):
+        diff = float(np.median([v[c] for c in higher]) - np.median([v[c] for c in lower]))
+        pool = [v[c] for c in lower + higher]; k = len(lower)
+        draws = []
+        for _ in range(10000):
+            q = rng.permutation(pool); draws.append(np.median(q[k:]) - np.median(q[:k]))
+        return diff, float(np.mean(np.array(draws) >= diff))
+    d1, p1 = group_test(reer, FLOAT, EURO)   # odotus: omavaluuttaisten REER laski enemmän (pienempi)
+    d2, p2 = group_test(gdp, EURO, FLOAT)    # odotus: euromaiden kasvu pienempi
+    rb1 = "tukee" if d1 > 0 and p1 < 0.05 else "kumoaa" if d1 <= 0 else "ei-ratkea"
+    rb2 = "tukee" if d2 > 0 and p2 < 0.05 else "kumoaa" if d2 <= 0 else "ei-ratkea"
+    allc = EURO + FLOAT
+    def rk(v):
+        o = np.argsort(v, kind="stable"); r_ = np.empty(len(v)); r_[o] = np.arange(len(v)); return r_
+    rx, ry = rk(np.array([reer[c] for c in allc])), rk(np.array([gdp[c] for c in allc]))
+    rho = float(np.corrcoef(rx, ry)[0, 1])
+    p3 = float(np.mean(np.array([np.corrcoef(rx, rng.permutation(ry))[0, 1] for _ in range(10000)]) <= rho))
+    rb3 = "tukee" if rho < 0 and p3 < 0.05 else "kumoaa" if rho >= 0 else "ei-ratkea"
+    pc = lambda v: round((math.exp(v) - 1) * 100, 1)
+    med = lambda v, g: pc(float(np.median([v[c] for c in g])))
+    pts = [{"iso": c, "name": NAMES_[c], "group": "euro" if c in EURO else "oma" if c in FLOAT else c, "reer": pc(reer[c]), "gdp": pc(gdp[c])} for c in allc + ["FIN", "DNK"]]
+    b1 = {"id": "kurssi", "design": "tasmallisyys", "result": rb1, "date": str(date.today()),
+          "summary": f"Reaalikurssi 2007 → 2009: omavaluuttaiset mediaani {med(reer, FLOAT):+.1f} %, euromaat {med(reer, EURO):+.1f} % (p = {p1:.4f}); Suomi {pc(reer['FIN']):+.1f} %",
+          "detail": {"p": round(p1, 4), "floatMedian": med(reer, FLOAT), "euroMedian": med(reer, EURO), "fin": pc(reer["FIN"]), "dnk": pc(reer["DNK"])}}
+    b2 = {"id": "kasvu", "design": "luonnollinen", "result": rb2, "date": str(date.today()),
+          "summary": f"BKT asukasta kohden 2007 → 2015: euromaat mediaani {med(gdp, EURO):+.1f} %, omavaluuttaiset {med(gdp, FLOAT):+.1f} % (p = {p2:.4f}); Suomi {pc(gdp['FIN']):+.1f} %, Tanska {pc(gdp['DNK']):+.1f} %",
+          "detail": {"p": round(p2, 4), "euroMedian": med(gdp, EURO), "floatMedian": med(gdp, FLOAT), "fin": pc(gdp["FIN"]), "dnk": pc(gdp["DNK"]), "points": pts}}
+    b3 = {"id": "annos", "design": "annos", "result": rb3, "date": str(date.today()),
+          "summary": f"21 maata: reaalikurssin muutos 2007 → 2009 vs. BKT asukasta kohden 2007 → 2015, rho = {rho:.2f} (permutaatio-p = {p3:.4f})",
+          "detail": {"rho": round(rho, 3), "p": round(p3, 4), "n": len(allc)}}
+    return {"tests": [a1, a2], "predictions": []}, {"tests": [b1, b2, b3], "predictions": []}
+
+
 def pension_age(c):
     """Alin vanhuuseläkeikä vuosina syntymävuoden mukaan (vuoden 2017 uudistus)."""
     if c <= 1954:
@@ -2206,6 +2275,7 @@ def main():
     out["hypotheses"]["h24d"] = out["hypotheses"]["h24"].pop("reaali")
     out["hypotheses"]["h24e"] = h24e()
     out["hypotheses"]["h24f"] = h24f()
+    out["hypotheses"]["h25"], out["hypotheses"]["h25b"] = h25()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.

@@ -524,6 +524,27 @@ describe("pilot results", () => {
     expect(t2!.detail["p"] as number).toBeCloseTo(0.15, 2);
     expect(statusOfHypothesis(hypothesis("h24f")!)).toBe("oletus");
   });
+  it("H25 and H25b numbers quoted in the register", () => {
+    const [a1, a2] = NAYTTO.hypotheses.h25.tests as { result: string; detail: Record<string, unknown> }[];
+    expect(a1!.result).toBe("tukee");
+    expect(a1!.detail).toMatchObject({ finPre: 2.99, finPost: 0.12, changes: { Suomi: -2.86, Ruotsi: -2.6, "Iso-Britannia": -1.08, Yhdysvallat: 0.89 } });
+    expect(a2!.result).toBe("tukee");
+    expect(a2!.detail).toMatchObject({ fin: 0.12, swe: 0.26 });
+    expect(statusOfHypothesis(hypothesis("h25")!)).toBe("tuettu");
+    const [b1, b2, b3] = NAYTTO.hypotheses.h25b.tests as { result: string; detail: Record<string, unknown> }[];
+    expect(b1!.result).toBe("tukee");
+    expect(b1!.detail).toMatchObject({ floatMedian: -6.1, euroMedian: 1.7, fin: 2.6, dnk: 4 });
+    expect(b1!.detail["p"] as number).toBeCloseTo(0.002, 3);
+    expect(b2!.result).toBe("ei-ratkea");
+    expect(b2!.detail).toMatchObject({ euroMedian: 0.8, floatMedian: 3.6, fin: -7.9, dnk: -1.9 });
+    expect(b2!.detail["p"] as number).toBeCloseTo(0.06, 2);
+    const pts = b2!.detail["points"] as { iso: string; gdp: number }[];
+    expect([...pts].sort((x, y) => x.gdp - y.gdp).slice(0, 3).map((x) => x.iso)).toEqual(["GRC", "ITA", "FIN"]);
+    expect(b3!.result).toBe("ei-ratkea");
+    expect(b3!.detail).toMatchObject({ n: 21 });
+    expect(Math.abs((b3!.detail["rho"] as number) + 0.31)).toBeLessThanOrEqual(0.0051);
+    expect(statusOfHypothesis(hypothesis("h25b")!)).toBe("ehdokas");
+  });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
       expect(p.lo).toBeLessThan(p.point);

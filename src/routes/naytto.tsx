@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Kolmekymmentäviisi hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Kolmekymmentäseitsemän hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Yhdeksän väitettä kumoutui, viisi on tuettu, kahdeksan on ehdokkaita ja kolmetoista näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Yhdeksän väitettä kumoutui, kuusi on tuettu, yhdeksän on ehdokkaita ja kolmetoista näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -270,6 +270,13 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h24f" && t.id === "hajotelma" && <PointScatter dots
         pts={(t.detail as unknown as { events: { iso: string; t: number; e: number; g: number }[] }).events.map((e) => ({ label: `${e.iso} ${e.t}`, x: e.g, y: e.e }))}
         xLabel="reaalinen BKT viidessä vuodessa, poikkeama maan tavallisesta, %" yLabel="viennin arvo (BKT-deflaattorilla), poikkeama maan tavallisesta, %" />}
+      {h.id === "h25" && t.id === "korkoero" && <LinesChart from={1985} to={2019} event={1999} eventLabel="EMU 1999" marks={[1996]}
+        lines={Object.entries((t.detail as unknown as { spreads: Record<string, [number, number][]> }).spreads).map(([c, s]) => ({ label: { FIN: "Suomi", SWE: "Ruotsi", DNK: "Tanska", ITA: "Italia" }[c] ?? c, s, main: c === "FIN" }))} min={-1}
+        caption="Pitkän koron ero Saksaan, %-yks. (Global Macro Database); 0 = sama korko kuin Saksassa. 1996: Suomi ERM:ään." />}
+      {h.id === "h25b" && t.id === "kasvu" && <PointScatter dots={false}
+        legend={["euromaat", "oma valuutta"]}
+        pts={(t.detail as unknown as { points: { iso: string; name: string; group: string; reer: number; gdp: number }[] }).points.map((p) => ({ label: p.name, x: p.reer, y: p.gdp, muted: p.group === "oma", show: ["FIN", "DNK", "ISL", "GBR", "IRL", "GRC", "ITA", "JPN", "SWE", "DEU"].includes(p.iso) }))}
+        xLabel="reaalikurssin muutos 2007 → 2009, % (− = heikkeni)" yLabel="BKT asukasta kohden 2007 → 2015, %" />}
       {h.id === "h14" && t.id === "katkos" && <BreakChart detail={t.detail as Break} cfg={{ trend: [1976, 1987], win: [1988, 1991], from: 1960, label: "laki voimaan 1/1988", ticks: [1960, 1976, 1988, 2000, 2025], zeroTicks: [0, 1, 2, 3], caption: "Avioerot 1 000 asukasta kohden (StatFin 121v). Katkoviiva: vuosien 1976–1987 trendi jatkettuna. Poikkeama 1988–1991 oli suurempi kuin kaikissa tavallisissa jaksoissa." }} />}
       {h.id === "h13" && t.id === "suomi" && <DecouplingChart detail={t.detail as { co2: [number, number][]; gdp: [number, number][] }} />}
       {h.id === "h12" && t.id === "toisto" && <CountryCorr h="h12" detail={t.detail as Pooled & Rc} />}
@@ -727,7 +734,7 @@ function MigrationChart({ detail }: { detail: { toSweden: [number, number][]; fr
   );
 }
 
-function PointScatter({ pts, xLabel, yLabel, dots = false }: { pts: { label: string; x: number; y: number }[]; xLabel: string; yLabel: string; dots?: boolean }) {
+function PointScatter({ pts, xLabel, yLabel, dots = false, legend }: { pts: { label: string; x: number; y: number; show?: boolean; muted?: boolean }[]; xLabel: string; yLabel: string; dots?: boolean; legend?: [string, string] }) {
   const W = 620, H = 210, L = 50, R = 580, TOP = 18, BOT = 170;
   const nice = (v: number) => Math.ceil(Math.abs(v) / 10) * 10 * Math.sign(v);
   const x0 = Math.min(0, nice(Math.min(...pts.map((p) => p.x)) - 2)), x1 = Math.max(0, nice(Math.max(...pts.map((p) => p.x)) + 2));
@@ -748,10 +755,14 @@ function PointScatter({ pts, xLabel, yLabel, dots = false }: { pts: { label: str
         {ticks(x0, x1).map((t) => <text key={t} x={x(t)} y={BOT + 16} textAnchor="middle" className="fill-muted-foreground text-[10px]">{sgn(t)}</text>)}
         <text x={(L + R) / 2} y={H - 6} textAnchor="middle" className="fill-muted-foreground text-[10px]">{xLabel}</text>
         <text x={L + 4} y={TOP - 6} className="fill-muted-foreground text-[10px]">{yLabel}</text>
+        {legend && <g>
+          <circle cx={R - 150} cy={TOP - 9} r={4} fill="var(--primary)" /><text x={R - 142} y={TOP - 5} className="fill-muted-foreground text-[10px]">{legend[0]}</text>
+          <circle cx={R - 70} cy={TOP - 9} r={4} fill="var(--muted-foreground)" fillOpacity={0.7} /><text x={R - 62} y={TOP - 5} className="fill-muted-foreground text-[10px]">{legend[1]}</text>
+        </g>}
         {pts.map((p, i) => (
           <g key={`${p.label}-${i}`}>
-            <circle cx={x(p.x)} cy={y(p.y)} r={dots ? 3.5 : 5} fill="var(--primary)" fillOpacity={dots ? 0.6 : 1}><title>{`${p.label}: ${p.x} %, ${p.y} %`}</title></circle>
-            {!dots && <text x={x(p.x) + 8} y={y(p.y) + 4} className="fill-foreground text-[11px]">{p.label}</text>}
+            <circle cx={x(p.x)} cy={y(p.y)} r={dots ? 3.5 : 5} fill={p.muted ? "var(--muted-foreground)" : "var(--primary)"} fillOpacity={dots ? 0.6 : p.muted ? 0.7 : 1}><title>{`${p.label}: ${p.x} %, ${p.y} %`}</title></circle>
+            {!dots && p.show !== false && <text x={x(p.x) + 8} y={y(p.y) + 4} className={p.label === "Suomi" ? "fill-primary text-[11px] font-semibold" : "fill-foreground text-[11px]"}>{p.label}</text>}
           </g>
         ))}
       </svg>
@@ -825,12 +836,14 @@ function LinesChart({ lines, from, to, event, eventLabel, caption, min = 0, mark
   const y = (v: number) => BOT - ((v - min) / (hi - min)) * (BOT - TOP);
   const raw = (hi - min) / 4, mag = 10 ** Math.floor(Math.log10(raw));
   const step = [1, 2, 5, 10].map((m) => m * mag).find((v) => v >= raw)!;
-  const ticks = Array.from({ length: Math.floor((hi - min) / step) + 1 }, (_, i) => min + i * step);
+  const t0 = Math.ceil(min / step) * step;
+  const ticks = Array.from({ length: Math.floor((hi - t0) / step) + 1 }, (_, i) => t0 + i * step);
   const ends = cut.map((l) => ({ ...l, ly: y(l.s.at(-1)![1]) })).sort((a, b) => a.ly - b.ly);
   for (let i = 1; i < ends.length; i++) if (ends[i]!.ly - ends[i - 1]!.ly < 12) ends[i]!.ly = ends[i - 1]!.ly + 12;
   return (
     <div className="mt-2 overflow-x-auto">
       <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[460px] max-w-2xl" role="img" aria-label={caption}>
+        {min < 0 && <line x1={L} x2={R} y1={y(0)} y2={y(0)} stroke="var(--foreground)" strokeOpacity={0.3} />}
         <line x1={x(event)} x2={x(event)} y1={TOP} y2={BOT} stroke="var(--primary)" strokeOpacity={0.4} strokeDasharray="3 3" />
         <text x={x(event) + 4} y={TOP + 8} className="fill-primary text-[10px]">{eventLabel}</text>
         {marks.map((m) => <g key={m}><line x1={x(m)} x2={x(m)} y1={TOP} y2={BOT} stroke="var(--primary)" strokeOpacity={0.4} strokeDasharray="3 3" />

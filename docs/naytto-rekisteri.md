@@ -1628,3 +1628,54 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Euromaiden kasvua heikensi myös vuosien 2010–2012 velkakriisi, joka liittyy euroon mutta ei
     pelkästään valuuttakurssiin.
   - Kumpikaan testi ei erottele näitä kahta mekanismia.
+
+## H25: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Korkoero: tukee.** Suomen korkoero Saksaan pieneni 2,86 %-yks. (2,99 → 0,12), enemmän kuin
+  yhdenkään vertailumaan.
+
+  | Maa | Korkoeron muutos |
+  |---|---|
+  | Suomi | −2,86 |
+  | Ruotsi | −2,60 |
+  | Iso-Britannia | −1,08 |
+  | Australia | −0,80 |
+  | Kanada | −0,50 |
+  | Japani | −0,35 |
+  | Norja | −0,29 |
+  | Uusi-Seelanti | +0,58 |
+  | Sveitsi | +0,59 |
+  | Yhdysvallat | +0,89 |
+
+- **T2 Ruotsi: tukee.** Korkoero 1999–2007 oli Suomella 0,12 ja Ruotsilla 0,26 %-yks.; ero −0,13.
+- **Tila:** tuettu. Kaksi asetelmaa tukee, ja niistä yksi on vahva.
+- **Tulkinta (suuruus):**
+  - Euron ulkopuolelle jäänyt Ruotsi, jolla oli samanlainen kriisi, sai lähes saman korkojen
+    lähentymisen (−2,60) ilman euroa.
+  - Suurin osa Suomen korkopreemion poistumisesta oli siis 1990-luvun kriisin riskilisän
+    purkautumista.
+  - Euron oma osuus Ruotsiin verrattuna on noin 0,1–0,3 %-yks.
+  - Säännön mukaan väite on tuettu, mutta vaikutus on pieni.
+
+## H25b: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Reaalikurssi: tukee.** Reaalikurssin muutos 2007 → 2009:
+  - Omavaluuttaisten maiden mediaani −6,1 %, euromaiden +1,7 % (p = 0,002).
+  - Suomi +2,6 % ja Tanska +4,0 %.
+  - Suurimmat heikkenemiset: Islanti −37 %, Iso-Britannia −22 %, Uusi-Seelanti −14 %, Ruotsi −12 %.
+- **T2 Kasvu: ei ratkea.** BKT asukasta kohden 2007 → 2015:
+  - Euromaiden mediaani +0,8 %, omavaluuttaisten +3,6 % (p = 0,06).
+  - Suomi −7,9 %, kolmanneksi heikoin 23 maasta (Kreikka −25 %, Italia −10 %). Tanska −1,9 %.
+- **T3 Annos: ei ratkea.** rho = −0,31 (p = 0,09, 21 maata).
+  - Suunta oli ennustettu: kurssin heikkeneminen ja parempi kasvu kulkivat yhdessä.
+  - Islanti ja Iso-Britannia heikensivät kurssiaan eniten mutta kasvoivat vain keskinkertaisesti.
+- **Tila:** ehdokas. Yksi asetelma tukee.
+- **Tulkinta:**
+  - Mekanismin ensimmäinen osa toteutui selvästi: omavaluuttaisten maiden kurssit joustivat ja
+    euromaiden eivät.
+  - Kasvuero oli ennustetun suuntainen (noin 3 %-yks.) mutta jäi niukasti kirjatun rajan alle.
+  - Euromaiden sisällä hajonta oli suurta: Irlanti +23 % ja Saksa +7 %, Kreikka −25 %.
+  - Suomen heikkoa kehitystä selittävät myös muut tekijät, kuten Nokian ja metsäteollisuuden
+    rakennemuutos sekä Venäjän kaupan supistuminen. Niitä ei ole testattu.
