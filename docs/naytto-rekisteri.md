@@ -88,3 +88,19 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 - **Muuten:** ei ratkea.
 - **Lisätieto, ei vaikuta tulokseen:** sama laskenta koko luottamussarjan ajalta (1985–) näytetään
   erikseen.
+
+## Sääntölisäys: ristiriitainen näyttö
+
+- **Kirjattu:** 27.11.2026, H1b:n odotustestin jälkeen. Alkuperäiset säännöt eivät määritelleet tätä
+  tapausta.
+- **Ristiriitainen:** vähintään yksi testi tukee ja yksi heikko testi kumoaa, mutta kumoavat eivät
+  riitä kumoamaan (ei vahvaa asetelmaa eikä kahta kumoavaa testiä). Aiemmin tällainen yhteys olisi
+  näkynyt tilana "oletus", mikä kertoisi virheellisesti, ettei sitä ole testattu.
+
+## H1b / T4: tulos
+
+- **Laskettu:** 27.11.2026.
+- **Tulos:** kumoaa.
+  - Luottamuksen yhdistetty r = −0,23 (viive 1 v, p = 0,08) eli väärä etumerkki.
+  - Naisten 25–34 työttömyys samoissa maissa ja samoina vuosina: r = −0,41.
+- **Tulkinta:** syntyvyys ei näytä seuraavan yleistä talousmielialaa vaan työmarkkinatilannetta.
