@@ -1679,3 +1679,43 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Euromaiden sisällä hajonta oli suurta: Irlanti +23 % ja Saksa +7 %, Kreikka −25 %.
   - Suomen heikkoa kehitystä selittävät myös muut tekijät, kuten Nokian ja metsäteollisuuden
     rakennemuutos sekä Venäjän kaupan supistuminen. Niitä ei ole testattu.
+
+## H25c. Yhteinen ohjauskorko paisutti asuntohintoja siellä, missä se oli liian matala
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Jatkoa H25:lle.
+- **Väite:** euroalueen yhteinen nimellinen korko tarkoitti nopean inflaation maissa matalaa
+  reaalikorkoa. Matala reaalikorko kiihdytti asuntojen reaalihintojen nousua 1999–2007.
+  - Suomessa reaalikorko oli matalampi kuin omaa korkoaan päättäneessä Ruotsissa.
+- **Aineisto:** Global Macro Database 2026_09.
+  - Lyhyt korko (strate), inflaatio (infl) ja asuntojen reaalihintaindeksi (rHPI).
+- **Mittarit:**
+  - Reaalikorko = strate − infl, keskiarvo 1999–2007.
+  - Asuntojen reaalihinnan log-muutos 1998 → 2007.
+- **Maat:** euromaat vuoden 2001 kokoonpanossa Suomi mukaan lukien (12).
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Annos | Euromaat: reaalikorko vs. asuntojen reaalihinnan muutos. Spearman, yksisuuntainen permutaatio-p (10 000, siemen 1) | Tukee: rho < 0 ja p < 0,05. Kumoaa: rho ≥ 0. Muuten: ei ratkea |
+| T2 Täsmällisyys | Suomi verrattuna Ruotsiin | Edellytys: Suomen reaalikorko oli matalampi kuin Ruotsin. Jos edellytys ei täyty, tulos on "ei ratkea". Tukee: Suomen asuntojen reaalihinnat nousivat enemmän kuin Ruotsin. Kumoaa: ne nousivat enintään yhtä paljon |
+
+- **Rajaus:** luotonantoa ei ole Global Macro Databasessa, joten väitteen luotto-osa jää testaamatta.
+
+## H25d. Heikompi kasvu johtui valuutasta eikä vain velkakriisistä
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Jatkoa H25b:lle.
+- **Väite:** myös ne euromaat, joihin velkakriisi ei osunut, kasvoivat 2007–2015 hitaammin kuin
+  omavaluuttaiset maat.
+  - Jos vain velkakriisimaat jäivät jälkeen, valuuttamekanismi ei selitä H25b:n eroa.
+- **Ydinmaiden määritelmä** (sääntö kirjataan ennen tuloksia):
+  - Euromaa kuuluu ydinmaihin, jos sen pitkän koron ero Saksaan ei ylittänyt 1,5 %-yks. minään
+    vuonna 2010–2012.
+  - Saksa kuuluu ydinmaihin määritelmän mukaan.
+  - Suomi ei kuulu ydinryhmään, vaan se esitetään erikseen.
+- **Aineisto:** Global Macro Database 2026_09 (ltrate, rGDP_pc).
+- **Vertailuryhmä:** samat 10 omavaluuttaista maata kuin H25b:ssä.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Luonnollinen koe | BKT asukasta kohden, log-muutos 2007 → 2015: ydineuromaat vs. omavaluuttaiset. Ryhmämediaanien ero, yksisuuntainen permutaatiotesti (10 000, siemen 1) | Tukee: ydinmaiden mediaani < omavaluuttaisten mediaani ja p < 0,05. Kumoaa: ydinmaiden mediaani ≥ omavaluuttaisten mediaani. Muuten: ei ratkea |
+
+- **Kuvaileva:** velkakriisimaiden mediaani ja Suomen sijainti.
