@@ -182,3 +182,21 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 | T1 Toisto (seula) | Seulan maajako, ks. yllä | Tehty seulassa: tukee |
 | T2 Annos–vaste | 18 maakuntaa: rekisteriperusteinen työllisyysaste 30–34 (115w: työlliset / koko väestö, molemmat sukupuolet) ja kokonaishedelmällisyys (12du). Kiinteät alue- ja vuosivaikutukset, log TFR, viive 2 v, 1992–2025. Permutaatio: maakuntien työllisyyssarjojen sekoitus 2 000 kertaa. Asetelma on sama kuin H1:n annos–vaste-testissä. | Tukee: kerroin > 0 ja p < 0,05. Kumoaa: kerroin ≤ 0. Muuten: ei ratkea |
 | E2 Ennuste | Pohjoismaiden yhdistetty malli Δlog TFR(t) = a + b · ΔE(t−2), jossa E on Turson työllisyysaste 30–34, maat FI, SE, NO ja DK | TFR 2026 ja 2027 Suomessa, 80 %:n väli. Osuma: toteutunut arvo välillä |
+
+## H1e: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T2 Annos–vaste: ei ratkea.**
+  - Kerroin +0,03 % syntyvyyttä työllisyysasteen prosenttiyksikköä kohden (p = 0,45, 18 maakuntaa,
+    1992–2025).
+  - Suunta oli ennustettu, mutta yhteys on käytännössä nolla.
+- **E2 Ennusteet:** TFR 2026 = 1,27 (1,23–1,32) ja 2027 = 1,26 (1,19–1,33). Ne ovat lähes samat kuin
+  H1:n työttömyysmallin ennusteet.
+- **Tulkinta:**
+  - Sama kuvio kuin H1:ssä: työmarkkinat ja syntyvyys liikkuvat yhdessä maiden tasolla, mutta eivät
+    maakuntien välillä.
+  - Yhteys ei siis näytä kulkevan oman alueen työtilanteen kautta.
+  - Vaihtoehdot ovat koko maan tilanne (esim. ilmapiiri, asuntomarkkinat, politiikka) tai jokin
+    kolmas kansallinen tekijä.
+  - Muuttoliike voi myös hämärtää alue-eroja: ihmiset muuttavat töiden perässä ennen lasten
+    saamista.

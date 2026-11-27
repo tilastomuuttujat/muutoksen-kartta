@@ -39,6 +39,7 @@ describe("pilot results", () => {
     expect(statusOfHypothesis(hypothesis("h1b")!)).toBe("ristiriita");
     expect(statusOfHypothesis(hypothesis("h1c")!)).toBe("oletus");
     expect(statusOfHypothesis(hypothesis("h1d")!)).toBe("ehdokas");
+    expect(statusOfHypothesis(hypothesis("h1e")!)).toBe("ehdokas");
     expect(statusOfHypothesis(hypothesis("h2")!)).toBe("kumottu");
     expect(statusOfHypothesis(hypothesis("h3")!)).toBe("tuettu");
   });
@@ -88,6 +89,16 @@ describe("pilot results", () => {
     expect(d.later.p).toBeCloseTo(0.2, 2);
     expect(d.countries["FI"]!.first.r).toBeCloseTo(-0.55, 2);
     expect(d.countries["DK"]!.first.r).toBeCloseTo(0.16, 2);
+  });
+  it("H1e numbers quoted in the register", () => {
+    const h = NAYTTO.hypotheses.h1e;
+    const reg = h.tests.find((t) => t.id === "annos")!;
+    expect(reg.result).toBe("ei-ratkea");
+    const d = reg.detail as { pctPerPoint: number; p: number; regions: number };
+    expect(d.pctPerPoint).toBeCloseTo(0.03, 2);
+    expect(d.p).toBeCloseTo(0.45, 2);
+    expect(d.regions).toBe(18);
+    expect(h.predictions.map((p) => p.point)).toEqual([1.273, 1.257]);
   });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {

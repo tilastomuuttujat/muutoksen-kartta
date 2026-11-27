@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Pilotti: kuusi hypoteesia. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Pilotti: seitsemän hypoteesia, joista yksi tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Kaksi väitettä kumoutui, yksi on tuettu, yksi nousi ehdokkaaksi ja kahden näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Kaksi väitettä kumoutui, yksi on tuettu, kaksi on ehdokkaita ja kahden näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -335,6 +335,7 @@ function Predictions({ list }: { list: Prediction[] }) {
   return (
     <div className="mt-4 rounded-lg border p-3">
       <h3 className="text-sm font-semibold">Päivätyt ennusteet</h3>
+      <p className="text-xs text-muted-foreground">{list[0]?.basis.startsWith("Työllisyys") ? "Malli: syntyvyyden muutos 30–34-vuotiaiden työllisyysasteen muutoksesta kaksi vuotta aiemmin." : "Malli: syntyvyyden muutos naisten 25–34 työttömyyden muutoksesta kaksi vuotta aiemmin."}</p>
       <div className="mt-2 overflow-x-auto">
         <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[460px]" role="img"
           aria-label={`Suomen kokonaishedelmällisyysluku 2010–${last[0]} ja ennusteet ${list.map((p) => `${p.year}: ${nf(p.point)} (${nf(p.lo)}–${nf(p.hi)})`).join(", ")}`}>
@@ -371,7 +372,7 @@ function Predictions({ list }: { list: Prediction[] }) {
         </tbody>
       </table>
       <p className="mt-2 text-xs text-muted-foreground">
-        Malli: Pohjoismaiden yhdistetty regressio, syntyvyyden muutos naisten 25–34 työttömyyden muutoksesta kaksi vuotta aiemmin ({NAYTTO.hypotheses.h1.model.n} havaintoa).
+        Pohjoismaiden yhdistetty regressio (Suomi, Ruotsi, Norja, Tanska).
         Ennuste ratkeaa, kun Tilastokeskus julkaisee vuoden syntyvyyden (ennakkotieto keväällä). Ohi mennyt ennuste heikentää hypoteesia, osunut voi nostaa sen vahvasti tuetuksi.
       </p>
     </div>

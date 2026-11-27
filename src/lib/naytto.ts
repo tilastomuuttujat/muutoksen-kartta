@@ -68,7 +68,7 @@ type H1Data = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] } };
+  hypotheses: { h1: H1Data; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -143,6 +143,19 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Esikoisten syntyvyys seurasi työttömyyttä selvästi, myöhempien lasten heikommin, kuten lykkääntyminen ennustaa. Ero esikoisten ja myöhempien lasten välillä ei kuitenkaan ole itsessään merkitsevä, ja maittain kuva vaihtelee: Suomessa ja Ruotsissa molemmat reagoivat, Norjassa ja Tanskassa yhteys on heikko. Hypoteesi on ehdokas, ei vielä tuettu.",
     next: "Vahvempi asetelma: annos–vaste ikäryhmittäin. Jos lykkääntyminen pitää, 25–29-vuotiaiden esikoisten pitäisi reagoida enemmän kuin yli 35-vuotiaiden, joilla lykkäämisen varaa on vähemmän. Lisäksi ennuste: esikoisten osuuden pitäisi laskea vuoteen 2026, koska työttömyys nousi 2024.",
+  },
+  {
+    id: "h1e",
+    title: "Nuorten aikuisten työllisyys → syntyvyys",
+    claim: "Kun 30–34-vuotiaiden työllisyys paranee, syntyvyys nousee noin kahden vuoden päästä.",
+    registered: "2026-11-27",
+    preregistered: "Seulan jyvä. Seulan vahvistus tehtiin ennen tätä merkintää. Annos–vaste ja ennusteet kirjattiin ennen laskentaa.",
+    map: { edge: "Globaali finanssikriisi → Historiallisen matalan syntyvyyden aika", confidence: "heikko" },
+    tests: NAYTTO.hypotheses.h1e.tests,
+    predictions: NAYTTO.hypotheses.h1e.predictions,
+    reading:
+      "Seula löysi yhteyden Suomesta, ja se vahvistui Ruotsissa, Norjassa ja Tanskassa. Maakuntien välillä se ei kuitenkaan näy: alueilla, joissa nuorten aikuisten työllisyys parani muita enemmän, syntyvyys ei noussut muita enemmän. Sama kuvio toistui työttömyydellä (H1). Työmarkkinat ja syntyvyys liikkuvat yhdessä koko maan tasolla, mutta oman alueen työtilanne ei näytä olevan reitti.",
+    next: "Koko maan tasolla vaikuttavien tekijöiden testi: jos yhteys kulkee asuntomarkkinoiden kautta, asuntojen hintojen ja korkojen pitäisi ennustaa syntyvyyttä vähintään yhtä hyvin kuin työllisyyden. Muuttoliikkeen vaikutuksen voi tarkistaa vertaamalla maakuntia, joista muutetaan vähän.",
   },
   {
     id: "h3",

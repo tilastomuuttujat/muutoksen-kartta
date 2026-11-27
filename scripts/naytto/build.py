@@ -389,6 +389,93 @@ def h1d_firstborn(nordic, tfr):
             "date": str(date.today())}
 
 
+def h1e(fi_tfr):
+    """H1e (docs/naytto-rekisteri.md): työllisyys 30–34 → syntyvyys. Toisto seulasta, annos–vaste maakunnittain, ennuste."""
+    seula = json.load(open(os.path.join(ROOT, "src", "data", "seula.json")))["designs"]["maa"]
+    g = next(r for r in seula["rows"] if r["x"] == "safe_corridor.employment_rate_30_34" and r["y"] == "nordics.tfr_1950_2024")
+    t1 = {"id": "toisto", "design": "toisto", "result": "tukee" if g["status"] == "jyva" else "ei-ratkea", "date": "2026-11-27",
+          "summary": f"Seula: löytö Suomessa r = {g['rD']:.2f}, vahvistus Ruotsissa, Norjassa ja Tanskassa r = {g['rC']:.2f} (viive {g['lag']} v, p = {g['pC']:.4f})",
+          "detail": g}
+
+    # T2 annos–vaste: rekisterityöllisyys 30–34 maakunnittain
+    ids_t, tf = px("synt/12du.px", [("alue_23_20260101", "*"), ("contentscode", ["tfr"]), ("timeperiod_y", "*")])
+    ids_w, pop = px("tyokay/115w.px", [("alue_28_20250101", "*"), ("timeperiod_y", "*"), ("paaasial_toimin_3_20180101", ["SSS", "11"]),
+                                      ("ikaryhma_10_20180101", ["30-34"]), ("sukupuoli_9_20180101", ["SSS"])])
+    regions = sorted({k[0] for k in tf if k[0].startswith("MK") and k[0] != "MK21"})
+    yi = ids_t.index("timeperiod_y")
+    tfr = {r: {int(k[yi]): v for k, v in tf.items() if k[0] == r} for r in regions}
+    emp = {}
+    for r in regions:
+        e = {}
+        for k, v in pop.items():
+            if k[0] != r:
+                continue
+            y = int(k[ids_w.index("timeperiod_y")]); e.setdefault(y, [0, 0])
+            e[y][0 if k[ids_w.index("paaasial_toimin_3_20180101")] == "11" else 1] += v
+        emp[r] = {y: 100 * a / b for y, (a, b) in e.items() if b}
+    regions = [r for r in regions if emp.get(r)]
+    years = [t for t in range(1992, 2026) if all(t in tfr[r] and t - 2 in emp[r] for r in regions)]
+
+    def fe(E):
+        rows = [(r, t, math.log(tfr[r][t]), E[r][t - 2]) for r in regions for t in years]
+        a = np.array([[x[2], x[3]] for x in rows])
+        ri = [regions.index(x[0]) for x in rows]; ti = [years.index(x[1]) for x in rows]
+        for col in (0, 1):
+            v = a[:, col].copy()
+            for _ in range(20):
+                for idx, n in ((ri, len(regions)), (ti, len(years))):
+                    s_ = np.bincount(idx, v, n) / np.maximum(np.bincount(idx, None, n), 1)
+                    v = v - s_[idx]
+            a[:, col] = v
+        return float((a[:, 0] @ a[:, 1]) / (a[:, 1] @ a[:, 1])), len(rows)
+
+    b, n = fe(emp)
+    rng = random.Random(2); R = 2000; ge = 0
+    for _ in range(R):
+        perm = regions[:]; rng.shuffle(perm)
+        if fe({r: emp[p] for r, p in zip(regions, perm)})[0] >= b:
+            ge += 1
+    p = (ge + 1) / (R + 1)
+    result = "tukee" if b > 0 and p < 0.05 else "kumoaa" if b <= 0 else "ei-ratkea"
+    pct = (math.exp(b) - 1) * 100
+    t2 = {"id": "annos", "design": "annos", "result": result, "date": str(date.today()),
+          "summary": f"1 %-yks. suurempi työllisyysnousu kuin muualla → syntyvyys {pct:+.2f} % kahden vuoden päästä (p = {p:.3f}, {len(regions)} maakuntaa, {years[0]}–{years[-1]})",
+          "detail": {"b": round(b, 5), "pctPerPoint": round(pct, 2), "p": round(p, 4), "n": n, "regions": len(regions), "years": [years[0], years[-1]]}}
+
+    # E2 ennuste: Pohjoismaiden yhdistetty malli
+    E = {c: {} for c in COUNTRIES}; T = {c: {} for c in COUNTRIES}
+    for line in open(os.path.join(D, "values.ndjson")):
+        k, y, g_, v, kind = json.loads(line)
+        if g_ in COUNTRIES and v is not None and kind in ("observed", "estimate"):
+            if k == "safe_corridor.employment_rate_30_34":
+                E[g_][int(y)] = float(v)
+            elif k == "nordics.tfr_1950_2024" and int(y) >= 1990:
+                T[g_][int(y)] = float(v)
+    T["FI"].update({y: v for y, v in fi_tfr.items() if y >= 1990})
+    xs, ys = [], []
+    for c in COUNTRIES:
+        de, dt = changes(E[c], False), changes(T[c], True)
+        for t in dt:
+            if t - 2 in de:
+                xs.append(de[t - 2]); ys.append(dt[t])
+    X = np.column_stack([np.ones(len(xs)), xs])
+    coef, *_ = np.linalg.lstsq(X, np.array(ys), rcond=None)
+    sd = float(np.std(np.array(ys) - X @ coef, ddof=2))
+    de_fi = changes(E["FI"], False)
+    last = max(T["FI"]); level = T["FI"][last]; preds = []
+    for target in (last + 1, last + 2):
+        if target - 2 not in de_fi:
+            continue
+        steps = target - last
+        level = level * math.exp(float(coef[0] + coef[1] * de_fi[target - 2]))
+        half = 1.2816 * sd * math.sqrt(steps)
+        preds.append({"id": f"h1e-tfr-{target}", "target": "Kokonaishedelmällisyysluku, Suomi (Tilastokeskus 12dt)", "year": target,
+                      "point": round(level, 3), "lo": round(level * math.exp(-half), 3), "hi": round(level * math.exp(half), 3),
+                      "registered": str(date.today()), "basis": f"Työllisyysasteen 30–34 muutos {target - 2}: {de_fi[target - 2]:+.1f} %-yks.", "actual": None})
+    return {"tests": [t1, t2], "predictions": preds,
+            "model": {"a": round(float(coef[0]), 4), "b": round(float(coef[1]), 4), "sd": round(sd, 4), "n": len(xs)}}
+
+
 def h1_regional():
     ids_t, tf = px("synt/12du.px", [("alue_23_20260101", "*"), ("contentscode", ["tfr"]), ("timeperiod_y", "*")])
     ids_w, pop = px("tyokay/115w.px", [("alue_28_20250101", "*"), ("timeperiod_y", "*"), ("paaasial_toimin_3_20180101", ["11+12", "12"]), ("ikaryhma_10_20180101", ["25-29", "30-34"]),
@@ -494,7 +581,7 @@ def h2():
 def main():
     _, t = px("synt/12dt.px", [("contentscode", ["tfr"]), ("timeperiod_y", "*")])
     fi_tfr = {int(k[0]): v for k, v in t.items()}
-    out = {"built": str(date.today()), "hypotheses": {"h1": h1(turso_nordic(), fi_tfr), "h2": h2(), "h3": h3()}}
+    out = {"built": str(date.today()), "hypotheses": {"h1": h1(turso_nordic(), fi_tfr), "h1e": h1e(fi_tfr), "h2": h2(), "h3": h3()}}
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
@@ -505,7 +592,7 @@ def main():
             kept = []
             for p in h["predictions"]:
                 q = dict(prev.get(p["id"], p))
-                if q.get("actual") is None and q["year"] in fi_tfr and hk == "h1":
+                if q.get("actual") is None and q["year"] in fi_tfr and "tfr" in q["id"]:
                     q["actual"] = fi_tfr[q["year"]]
                 kept.append(q)
             kept += [q for pid, q in prev.items() if pid not in {p["id"] for p in h["predictions"]}]
