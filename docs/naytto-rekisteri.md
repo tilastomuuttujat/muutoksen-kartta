@@ -1148,3 +1148,37 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 - **Seuraava testi:** täsmällisyys.
   - Lasku pitäisi näkyä maataloustuotteissa, kuten viljassa, lihassa ja maitotaloustuotteissa.
   - Tuontiruoassa, kuten hedelmissä, kahvissa ja teessä, sitä ei pitäisi näkyä.
+
+## H23. Eläkeiän nosto piti 63–64-vuotiaat työssä
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Uusi teema.
+- **Väite:** vuoden 2017 eläkeuudistus nosti 63–65-vuotiaiden työllisyyttä juuri niissä ikä- ja
+  vuosiryhmissä, joita alimman vanhuuseläkeiän nousu koski.
+  - Uudistus nosti alinta vanhuuseläkeikää 3 kuukaudella syntymävuotta kohden: vuonna 1954 ja
+    aiemmin syntyneillä se oli 63 v, vuonna 1955 syntyneillä 63 v 3 kk ja niin edelleen, ja
+    vuosina 1962–1964 syntyneillä 65 v.
+- **Aineisto:** väestö pääasiallisen toiminnan ja yksivuotisiän mukaan 31.12. (StatFin 115c).
+  - Työlliset ja eläkeläiset osuutena ikäryhmästä.
+  - Iät 60–67, vuodet 2010–2024.
+- **Annos:** se osuus ikäryhmästä, joka ei vuoden lopussa vielä uuden säännön mukaan olisi päässyt
+  eläkkeelle mutta olisi päässyt vanhan säännön mukaan.
+  - Kaava: annos(a, t) = rajaa(E(t−a) − a, 0, 1) − rajaa(63 − a, 0, 1), missä E(c) on syntymävuoden c
+    alin eläkeikä vuosina.
+  - Oletus: syntymäpäivät jakautuvat tasaisesti vuoden ympäri.
+  - Annos on nolla vuoteen 2017 asti ja kaikilla alle 63-vuotiailla.
+- **Malli:** kaksisuuntainen kiinteä vaikutus (ikä ja vuosi), pienimmän neliösumman menetelmä,
+  heteroskedastisuuden kestävät keskivirheet (HC1).
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Annos | Työllisten osuus ~ annos + ikä + vuosi | Tukee: b > 0, p < 0,05 ja esitrenditarkistus läpäisty. Kumoaa: b ≤ 0. Muuten: ei ratkea |
+| T2 Täsmällisyys | Eläkeläisten osuus ~ annos + ikä + vuosi | Tukee: b < 0 ja p < 0,05. Kumoaa: b ≥ 0. Muuten: ei ratkea |
+
+- **Esitrenditarkistus (osa T1:tä):**
+  - Vuodet 2010–2017, joilla todellinen annos on nolla.
+  - Selittäjänä on kolmen vuoden päähän siirretty annos, annos(a, t + 3).
+  - Jos sen kerroin on positiivinen ja p < 0,05, T1 on enintään "ei ratkea".
+- **Rajaus:**
+  - Samaan uudistukseen kuuluivat osittainen varhennettu vanhuuseläke (61-vuotiaasta) ja
+    työttömyysturvan lisäpäivien ikärajan nosto. Ne vaikuttavat myös 61–64-vuotiaisiin.
+  - Annos kohdistuu kuitenkin vain eläkeiän nousun mukaisiin solmuihin.
