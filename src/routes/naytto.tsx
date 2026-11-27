@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Kolmekymmentä hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Kolmekymmentäyksi hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Kahdeksan väitettä kumoutui, viisi on tuettu, kuusi on ehdokkaita ja yksitoista näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Kahdeksan väitettä kumoutui, viisi on tuettu, seitsemän on ehdokkaita ja yksitoista näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -257,6 +257,8 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h24" && t.id === "osuus" && <LinesChart from={1948} to={2025} event={1957} eventLabel="1957" marks={[1967, 1977, 1982, 1991]} min={15}
         lines={[{ label: "vienti / BKT", s: (t.detail as unknown as { share: [number, number][] }).share, main: true }]}
         caption="Tavaroiden ja palvelujen viennin osuus BKT:sta käyvin hinnoin, % (StatFin 15ai). Katkoviivat: devalvaatiovuodet." />}
+      {h.id === "h24b" && t.id === "kesto" && <DevalBars two={(NAYTTO.hypotheses.h24.tests[0]!.detail as unknown as { events: Record<string, number> }).events}
+        five={(t.detail as unknown as { events: Record<string, number> }).events} />}
       {h.id === "h14" && t.id === "katkos" && <BreakChart detail={t.detail as Break} cfg={{ trend: [1976, 1987], win: [1988, 1991], from: 1960, label: "laki voimaan 1/1988", ticks: [1960, 1976, 1988, 2000, 2025], zeroTicks: [0, 1, 2, 3], caption: "Avioerot 1 000 asukasta kohden (StatFin 121v). Katkoviiva: vuosien 1976–1987 trendi jatkettuna. Poikkeama 1988–1991 oli suurempi kuin kaikissa tavallisissa jaksoissa." }} />}
       {h.id === "h13" && t.id === "suomi" && <DecouplingChart detail={t.detail as { co2: [number, number][]; gdp: [number, number][] }} />}
       {h.id === "h12" && t.id === "toisto" && <CountryCorr h="h12" detail={t.detail as Pooled & Rc} />}
@@ -710,6 +712,40 @@ function MigrationChart({ detail }: { detail: { toSweden: [number, number][]; fr
         {[1945, 1960, 1970, 1980, 1992].map((t) => <text key={t} x={x(t)} y={H - 12} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
       </svg>
       <p className="text-xs text-muted-foreground">Muuttaneet henkilöt vuodessa (Korkiasaari 1993) ja Suomen työttömyysaste (katkoviiva, oma asteikko).</p>
+    </div>
+  );
+}
+
+function DevalBars({ two, five }: { two: Record<string, number>; five: Record<string, number> }) {
+  const ev = Object.keys(two);
+  const W = 620, H = 190, L = 40, R = 600, TOP = 14, BOT = 150;
+  const vals = [...Object.values(two), ...Object.values(five)];
+  const lo = Math.min(-20, ...vals), hi = Math.max(...vals) + 8;
+  const y = (v: number) => BOT - ((v - lo) / (hi - lo)) * (BOT - TOP);
+  const gw = (R - L) / ev.length, bw = 26;
+  return (
+    <div className="mt-2 overflow-x-auto">
+      <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[460px] max-w-2xl" role="img" aria-label={`Viennin BKT-osuuden muutos 2 ja 5 vuodessa devalvaatiosta: ${ev.map((e) => `${e}: ${two[e]} % ja ${five[e]} %`).join("; ")}`}>
+        <line x1={L} x2={R} y1={y(0)} y2={y(0)} stroke="var(--foreground)" strokeOpacity={0.4} />
+        {[-20, 0, 20, 40, 60].filter((t) => t >= lo && t <= hi).map((t) => <text key={t} x={L - 6} y={y(t) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">{t > 0 ? `+${t}` : t < 0 ? `−${-t}` : t}</text>)}
+        {ev.map((e, i) => {
+          const cx = L + gw * i + gw / 2;
+          return (
+            <g key={e}>
+              {([[two[e]!, cx - bw - 2, 0.45], [five[e]!, cx + 2, 1]] as [number, number, number][]).map(([v, x0, op]) => (
+                <g key={x0}>
+                  <rect x={x0} width={bw} y={Math.min(y(0), y(v))} height={Math.abs(y(v) - y(0))} fill="var(--primary)" fillOpacity={op} />
+                  <text x={x0 + bw / 2} y={v >= 0 ? y(v) - 3 : y(v) + 11} textAnchor="middle" className="fill-foreground text-[10px] tabular-nums">{Math.round(v) > 0 ? "+" : Math.round(v) < 0 ? "−" : ""}{Math.abs(Math.round(v))}</text>
+                </g>
+              ))}
+              <text x={cx} y={H - 22} textAnchor="middle" className="fill-muted-foreground text-[11px]">{e}</text>
+            </g>
+          );
+        })}
+        <rect x={L} y={H - 12} width={10} height={8} fill="var(--primary)" fillOpacity={0.45} /><text x={L + 14} y={H - 4} className="fill-muted-foreground text-[10px]">2 vuotta (H24)</text>
+        <rect x={L + 110} y={H - 12} width={10} height={8} fill="var(--primary)" /><text x={L + 124} y={H - 4} className="fill-muted-foreground text-[10px]">5 vuotta</text>
+      </svg>
+      <p className="text-xs text-muted-foreground">Viennin BKT-osuuden muutos devalvaatiovuodesta, % (StatFin 15ai).</p>
     </div>
   );
 }

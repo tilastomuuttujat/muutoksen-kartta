@@ -466,6 +466,15 @@ describe("pilot results", () => {
     expect(t3!.detail).toMatchObject({ pctChange: 11.5, percentile: 1, placebo: 34, events: { "1977": 3.9, "1982": 5.8, "1991": 26.2 }, no1991: { pctChange: 4.8, percentile: 0.972 } });
     expect(statusOfHypothesis(hypothesis("h24")!)).toBe("tuettu");
   });
+  it("H24b numbers quoted in the register", () => {
+    const [t1, t2] = NAYTTO.hypotheses.h24b.tests as { result: string; detail: Record<string, unknown> }[];
+    expect(t1!.result).toBe("tukee");
+    expect(t1!.detail).toMatchObject({ pctChange: 15.4, percentile: 0.99, placebo: 40, placeboMedianPct: 1.6, events: { "1957": -0.2, "1967": 29.3, "1977": 7.1, "1982": -13.4, "1991": 71 }, no1991: { pctChange: 4.6, percentile: 0.711 } });
+    expect(t2!.result).toBe("ei-ratkea");
+    expect(t2!.detail).toMatchObject({ pctChange: -0.8, percentile: 0.405, placebo: 48, events: { "1957": -4.6, "1967": 5.5, "1977": -2.6, "1982": -15.2, "1991": 15.7 } });
+    expect(statusOfHypothesis(hypothesis("h24b")!)).toBe("ehdokas");
+    expect(statusOfHypothesis(hypothesis("h24")!)).toBe("tuettu");
+  });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
       expect(p.lo).toBeLessThan(p.point);

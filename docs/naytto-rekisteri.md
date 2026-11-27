@@ -1326,3 +1326,29 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 |---|---|---|
 | T1 Kesto | Viennin BKT-osuuden log-muutos t0 → t0 + 5, viiden tapahtuman keskiarvo, lumeikkunat k = 5 | Tukee: > 0 ja suurempi kuin 95 %:ssa lumejoukoista. Kumoaa: ≤ 0. Muuten: ei ratkea |
 | T2 Kuluminen | Log-muutos t0 + 2 → t0 + 5, viiden tapahtuman keskiarvo, lumeikkunat k = 3 | Tukee: ≥ 0, eli etu ei kulunut. Kumoaa: < 0 ja pienempi kuin 95 %:ssa lumejoukoista, eli etu kului poikkeuksellisen nopeasti. Muuten: ei ratkea, eli etu kului jonkin verran mutta tavanomaisen vaihtelun rajoissa |
+
+## H24b: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Kesto: tukee.** Viennin BKT-osuus oli viiden vuoden päästä keskimäärin 15,4 % korkeampi kuin
+  devalvaatiovuonna.
+  - Tämä on suurempi kuin 99 %:ssa lumejoukoista (40 lumeikkunaa, mediaani +1,6 %).
+- **T2 Kuluminen: ei ratkea.** Vuodesta t0 + 2 vuoteen t0 + 5 muutos oli keskimäärin −0,8 %.
+  - Tämä on tavallista vaihtelua (persentiili 40 %, 48 lumeikkunaa).
+
+  | Tapahtuma | Muutos t0 → t0 + 5 | Muutos t0 + 2 → t0 + 5 |
+  |---|---|---|
+  | 1957 | −0 % | −5 % |
+  | 1967 | +29 % | +6 % |
+  | 1977 | +7 % | −3 % |
+  | 1982 | −13 % | −15 % |
+  | 1991 | +71 % | +16 % |
+
+- **Tila:** ehdokas. Tukeva testi on yksi asetelma.
+- **Jälkikäteinen herkkyystarkistus** (ei rekisteröity, ei vaikuta tilaan): ilman vuotta 1991
+  viiden vuoden muutos on +4,6 % (persentiili 71 %).
+  - Kestotulos nojaa siis pääosin vuoteen 1991. Vain vuosien 1967 ja 1991 etu säilyi selvästi.
+  - Vuosien 1957 ja 1982 etu hävisi viidessä vuodessa. Vuoden 1982 jälkeiseen jaksoon osui myös
+    idänkaupan supistuminen öljyn hinnan laskiessa 1986, mitä ei ole testattu.
+- **Tulkinta:** kahden vuoden vaikutus (H24) oli johdonmukainen. Kesto vaihteli tapauksittain, eikä
+  aineisto riitä erottamaan devalvaatiokierrettä muista syistä.

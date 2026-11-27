@@ -1816,7 +1816,29 @@ def h24():
     t3 = {"id": "maarat", "design": "tasmallisyys", "result": res(c), "date": str(date.today()),
           "summary": f"Viennin määrä suhteessa tuonnin määrään kahdessa vuodessa: keskimäärin {c['pctChange']:+.1f} % ({ev(c)}); suurempi kuin {c['percentile'] * 100:.0f} %:ssa lumejoukoista ({c['placebo']} lumeikkunaa)",
           "detail": c}
-    return {"tests": [t1, t2, t3], "predictions": []}
+    # H24b (rekisteri 27.11.2026): kesto t0 → t0+5 ja kuluminen t0+2 → t0+5.
+    def window(series, events, start_off, k, first=1953, last=2020):
+        ch = lambda t, a, b: series[t + b] - series[t + a] if t + a in series and t + b in series else None
+        obs = [ch(t, start_off, start_off + k) for t in events]
+        plac = [c for t in range(first, last + 1) if (c := ch(t, 0, k)) is not None and not any(t <= e <= t + k for e in E5)]
+        m = float(np.mean(obs))
+        draws = np.array([np.mean(rng.choice(plac, len(events), replace=False)) for _ in range(20000)])
+        return {"mean": round(m, 4), "pctChange": round((math.exp(m) - 1) * 100, 1), "percentile": round(float(np.mean(draws < m)), 3),
+                "placebo": len(plac), "placeboMedianPct": round((math.exp(float(np.median(plac))) - 1) * 100, 1),
+                "events": {str(t): round((math.exp(o) - 1) * 100, 1) for t, o in zip(events, obs)}}
+    kd = window(lsh, E5, 0, 5)
+    kl = window(lsh, E5, 2, 3)
+    kd["no1991"] = {k_: v for k_, v in window(lsh, E5[:-1], 0, 5).items() if k_ in ("pctChange", "percentile")}  # jälkikäteinen, ei rekisteröity
+    rk = "tukee" if kd["mean"] > 0 and kd["percentile"] >= 0.95 else "kumoaa" if kd["mean"] <= 0 else "ei-ratkea"
+    rl = "tukee" if kl["mean"] >= 0 else "kumoaa" if kl["percentile"] <= 0.05 else "ei-ratkea"
+    evs = lambda x: ", ".join(f"{t} {v:+.0f} %" for t, v in x["events"].items())
+    b1 = {"id": "kesto", "design": "luonnollinen", "result": rk, "date": str(date.today()),
+          "summary": f"Viennin BKT-osuus viidessä vuodessa devalvaatiosta: keskimäärin {kd['pctChange']:+.1f} % ({evs(kd)}); suurempi kuin {kd['percentile'] * 100:.0f} %:ssa lumejoukoista ({kd['placebo']} lumeikkunaa, mediaani {kd['placeboMedianPct']:+.1f} %)",
+          "detail": kd}
+    b2 = {"id": "kuluminen", "design": "tasmallisyys", "result": rl, "date": str(date.today()),
+          "summary": f"Muutos vuodesta t0+2 vuoteen t0+5: keskimäärin {kl['pctChange']:+.1f} % ({evs(kl)}); suurempi kuin {kl['percentile'] * 100:.0f} %:ssa lumejoukoista ({kl['placebo']} lumeikkunaa, mediaani {kl['placeboMedianPct']:+.1f} %)",
+          "detail": kl}
+    return {"tests": [t1, t2, t3], "predictions": [], "kesto": {"tests": [b1, b2], "predictions": []}}
 
 
 def h11():
@@ -1997,6 +2019,7 @@ def main():
     out["hypotheses"]["h22"] = h22()
     out["hypotheses"]["h23"] = h23()
     out["hypotheses"]["h24"] = h24()
+    out["hypotheses"]["h24b"] = out["hypotheses"]["h24"].pop("kesto")
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
