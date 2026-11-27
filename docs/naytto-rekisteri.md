@@ -654,3 +654,18 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 | R2 Aluekohtaiset trendit | T1:n malliin lisätään kunkin maakunnan oma lineaarinen trendi | Jos kerroin ei ole enää negatiivinen yksisuuntaisella p < 0,05, T1 merkitään "ei ratkea" |
 | R3 Poikkeusvuodet pois | T1 ilman vuosia 2015–2017 (turvapaikanhakijat) ja 2022–2024 (Ukrainan tilapäinen suojelu) | Lisätieto, ei muuta tulosta |
 | R4 Kansalaisuuden saaminen | Ei voi testata tällä aineistolla, koska alueittaista syntyperää tai kieltä ei ole | Kirjataan rajoitteeksi |
+
+## H11: tarkistusten tulos
+
+- **Laskettu:** 27.11.2026.
+- **R1 Ennakkotesti: ei läpäise.** Osuus vuonna t + 2 → työllisyys vuonna t: −0,83 (p = 0,003), eli
+  lähes yhtä suuri kuin T1:n −0,99.
+- **R2 Aluekohtaiset trendit: ei läpäise.** Kerroin −0,16 (p = 0,32).
+- **R3 Poikkeusvuodet pois:** −1,08 (p = 0,002). Tulos ei johdu vuosista 2015–2017 tai 2022–2024.
+- **Seuraus kirjattujen sääntöjen mukaan:** T1 ja T2 merkitään "ei ratkea". H11:n tila on oletus.
+- **Tulkinta:**
+  - Ulkomaan kansalaisten osuus on kasvanut eniten maakunnissa, joiden Suomen kansalaisten
+    työllisyys on kehittynyt muita heikommin.
+  - Yhteys syntyy alueiden pitkistä kehityssuunnista. Aineisto ei osoita, että osuuden kasvu olisi
+    heikentänyt työllisyyttä vuodesta toiseen.
+  - Kansalaisuuden saamisen vaikutusta Suomen kansalaisten ryhmän koostumukseen ei voitu testata.

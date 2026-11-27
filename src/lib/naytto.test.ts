@@ -262,6 +262,20 @@ describe("pilot results", () => {
     expect(e.age19_2024.value).toBeCloseTo(17.14, 2);
     expect(statusOfHypothesis(hypothesis("h10")!)).toBe("kumottu");
   });
+  it("H11 main result and checks quoted in the register", () => {
+    const [t1, t2] = NAYTTO.hypotheses.h11.tests as { result: string; detail: { b: number; p: number; checks?: Record<string, { b: number; p: number; fails?: boolean }> } }[];
+    expect(t1!.result).toBe("ei-ratkea");
+    expect(t2!.result).toBe("ei-ratkea");
+    expect(t1!.detail.b).toBeCloseTo(-0.99, 2);
+    expect(t2!.detail.b).toBeCloseTo(0.78, 2);
+    const c = t1!.detail.checks!;
+    expect(c["lead"]!.b).toBeCloseTo(-0.83, 2);
+    expect(c["lead"]!.fails).toBe(true);
+    expect(c["trends"]!.b).toBeCloseTo(-0.16, 2);
+    expect(c["trends"]!.p).toBeCloseTo(0.32, 2);
+    expect(c["excluded"]!.b).toBeCloseTo(-1.08, 2);
+    expect(statusOfHypothesis(hypothesis("h11")!)).toBe("oletus");
+  });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
       expect(p.lo).toBeLessThan(p.point);

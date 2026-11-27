@@ -1158,6 +1158,90 @@ def h10():
     return {"tests": [t1, t2], "predictions": [], "extra": extra}
 
 
+def fe_panel(Y, X, regions, years, lag=1, trends=False):
+    """Kaksisuuntainen kiinteä vaikutus: Y[r][t] ~ X[r][t − lag]. trends=True lisää alueiden omat lineaariset trendit."""
+    rows = [(r, t, Y[r][t], X[r][t - lag]) for r in regions for t in years]
+    a = np.array([[x[2], x[3]] for x in rows], float)
+    ri = np.array([regions.index(x[0]) for x in rows]); ti = np.array([years.index(x[1]) for x in rows])
+    tt = np.array([x[1] for x in rows], float)
+    for col in (0, 1):
+        v = a[:, col].copy()
+        for _ in range(60 if trends else 20):
+            for idx, n in ((ri, len(regions)), (ti, len(years))):
+                s_ = np.bincount(idx, v, n) / np.maximum(np.bincount(idx, None, n), 1)
+                v = v - s_[idx]
+            if trends:
+                for r in range(len(regions)):
+                    m = ri == r
+                    tc = tt[m] - tt[m].mean()
+                    v[m] = v[m] - tc * (tc @ v[m]) / (tc @ tc)
+        a[:, col] = v
+    return float((a[:, 0] @ a[:, 1]) / (a[:, 1] @ a[:, 1])), len(rows)
+
+
+def perm_p(Y, X, regions, years, b, side, seed, R=2000, lag=1, trends=False):
+    rng = random.Random(seed); hits = 0
+    for _ in range(R):
+        perm = regions[:]; rng.shuffle(perm)
+        bb, _ = fe_panel(Y, {r: X[p_] for r, p_ in zip(regions, perm)}, regions, years, lag=lag, trends=trends)
+        if (bb <= b) if side < 0 else (bb >= b):
+            hits += 1
+    return (hits + 1) / (R + 1)
+
+
+def h11():
+    """H11 (docs/naytto-rekisteri.md): ulkomaan kansalaisten osuus → Suomen kansalaisten työllisyys ja työttömyys."""
+    regions = ["MK01", "MK02", "MK04", "MK05", "MK06", "MK07", "MK08", "MK09", "MK10", "MK11", "MK12", "MK13", "MK14", "MK15", "MK16", "MK17", "MK18", "MK19"]
+    ids, d = px("tyokay/115f.px", [("alue_28_20250101", regions + ["SSS"]), ("paaasial_toimin_3_20180101", ["SSS", "11", "12"]),
+                                  ("kansalaisuus_26_20170101", ["SSS", "246"]), ("sukupuoli_9_20180101", ["SSS"]), ("ikaryhma_10_20180101", ["18-64"]),
+                                  ("timeperiod_y", "*")])
+    ir, it, ik, iy = (ids.index(x) for x in ("alue_28_20250101", "paaasial_toimin_3_20180101", "kansalaisuus_26_20170101", "timeperiod_y"))
+    T = {(k[ir], k[it], k[ik], int(k[iy])): v for k, v in d.items()}
+    yrs = sorted({k[3] for k in T})
+    share = {r: {y: 100 * (1 - T[(r, "SSS", "246", y)] / T[(r, "SSS", "SSS", y)]) for y in yrs} for r in regions + ["SSS"]}
+    emp = {r: {y: 100 * T[(r, "11", "246", y)] / T[(r, "SSS", "246", y)] for y in yrs} for r in regions + ["SSS"]}
+    une = {r: {y: 100 * T[(r, "12", "246", y)] / (T[(r, "11", "246", y)] + T[(r, "12", "246", y)]) for y in yrs} for r in regions + ["SSS"]}
+    years = [y for y in yrs if y - 1 in yrs]
+    b1, n = fe_panel(emp, share, regions, years)
+    p1 = perm_p(emp, share, regions, years, b1, -1, 6)
+    b2, _ = fe_panel(une, share, regions, years)
+    p2 = perm_p(une, share, regions, years, b2, 1, 7)
+    r1 = "tukee" if b1 < 0 and p1 < 0.05 else "kumoaa" if b1 >= 0 else "ei-ratkea"
+    r2_ = "tukee" if b2 > 0 and p2 < 0.05 else "kumoaa" if b2 <= 0 else "ei-ratkea"
+    # Tarkistukset (kirjattu päätestien jälkeen, ennen tarkistusten laskentaa)
+    lead_years = [y for y in years if y + 2 in yrs]
+    bl, _ = fe_panel(emp, share, regions, lead_years, lag=-2)
+    pl = perm_p(emp, share, regions, lead_years, bl, -1 if bl < 0 else 1, 8, R=1000, lag=-2)
+    r1_fail = bl * b1 > 0 and pl < 0.05 and abs(bl) >= 0.5 * abs(b1)
+    bt, _ = fe_panel(emp, share, regions, years, trends=True)
+    pt = perm_p(emp, share, regions, years, bt, -1, 9, R=1000, trends=True)
+    r2_fail = not (bt < 0 and pt < 0.05)
+    excl = [y for y in years if y not in (2015, 2016, 2017, 2022, 2023, 2024)]
+    bx, _ = fe_panel(emp, share, regions, excl)
+    px_ = perm_p(emp, share, regions, excl, bx, -1, 10, R=1000)
+    checks = {"lead": {"b": round(bl, 4), "p": round(pl, 6), "fails": bool(r1_fail)},
+              "trends": {"b": round(bt, 4), "p": round(pt, 6), "fails": bool(r2_fail)},
+              "excluded": {"b": round(bx, 4), "p": round(px_, 6), "years": excl}}
+    downgraded = r1_fail or r2_fail
+    if downgraded:
+        if r1 == "tukee":
+            r1 = "ei-ratkea"
+        if r2_fail is False and r1_fail and r2_ == "tukee":
+            r2_ = "ei-ratkea"
+        if r1_fail and r2_ == "tukee":
+            r2_ = "ei-ratkea"
+    t1 = {"id": "annos", "design": "annos", "result": r1, "date": str(date.today()),
+          "summary": (f"1 %-yks. suurempi ulkomaan kansalaisten osuuden kasvu kuin muualla → Suomen kansalaisten työllisyysaste {b1:+.2f} %-yks. seuraavana vuonna (p = {p1:.3f}, 18 maakuntaa, {years[0]}–{years[-1]})"
+                      + (f". Tarkistukset: osuus kaksi vuotta myöhemmin ennustaa yhtä vahvasti ({bl:+.2f}), ja aluekohtaisten trendien jälkeen kerroin on {bt:+.2f} (p = {pt:.2f})" if downgraded else "")),
+          "detail": {"b": round(b1, 4), "p": round(p1, 6), "n": n, "years": [years[0], years[-1]], "checks": checks, "downgraded": downgraded}}
+    t2 = {"id": "tyottomyys", "design": "tasmallisyys", "result": r2_, "date": str(date.today()),
+          "summary": f"Sama asetelma, Suomen kansalaisten työttömyysaste: {b2:+.2f} %-yks. (p = {p2:.3f})" + (". Merkitty ei ratkea saman ennakkotestin perusteella" if downgraded and r1_fail else ""),
+          "detail": {"b": round(b2, 4), "p": round(p2, 4)}}
+    span = {r: (round(share[r][yrs[0]], 1), round(share[r][yrs[-1]], 1)) for r in regions + ["SSS"]}
+    return {"tests": [t1, t2], "predictions": [], "describe": {"shareSpan": span,
+            "national": {"share": sorted((y, round(v, 2)) for y, v in share["SSS"].items()), "emp": sorted((y, round(v, 2)) for y, v in emp["SSS"].items())}}}
+
+
 def h1_regional():
     ids_t, tf = px("synt/12du.px", [("alue_23_20260101", "*"), ("contentscode", ["tfr"]), ("timeperiod_y", "*")])
     ids_w, pop = px("tyokay/115w.px", [("alue_28_20250101", "*"), ("timeperiod_y", "*"), ("paaasial_toimin_3_20180101", ["11+12", "12"]), ("ikaryhma_10_20180101", ["25-29", "30-34"]),
@@ -1266,6 +1350,7 @@ def main():
     out = {"built": str(date.today()), "hypotheses": {"h1": h1(turso_nordic(), fi_tfr), "h1e": h1e(fi_tfr), "h1f": h1f(fi_tfr), "h1g": h1g(fi_tfr), "h2": h2(), "h3": h3(), "h4": h4(), "h5": h5(), "h6": h6(), "h7": h7()}}
     out["hypotheses"]["h8"], out["hypotheses"]["h9"] = h8_h9()
     out["hypotheses"]["h10"] = h10()
+    out["hypotheses"]["h11"] = h11()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
@@ -1313,6 +1398,8 @@ def main():
     d5 = e6["tests"][4]["detail"]; print("  hinta", d5["priceChange"]); print("  kuolleisuus t+1", d5["nextMortChange"])
     print("  extra", e6["extra"])
     for t in out["hypotheses"]["h7"]["tests"]: print("h7", t["id"], t["result"], "|", t["summary"])
+    for t in out["hypotheses"]["h11"]["tests"]: print("h11", t["id"], t["result"], "|", t["summary"])
+    print("  tarkistukset", out["hypotheses"]["h11"]["tests"][0]["detail"]["checks"])
     for t in out["hypotheses"]["h10"]["tests"]: print("h10", t["id"], t["result"], "|", t["summary"])
     x10 = out["hypotheses"]["h10"]["extra"]; print("  extra", {k: (v if k != "students18" else {kk: vv for kk, vv in v.items() if kk != "series"}) for k, v in x10.items()})
     print("  sarja18", [x for x in out["hypotheses"]["h10"]["tests"][0]["detail"]["series"] if x[0] >= 2008])

@@ -76,7 +76,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -294,6 +294,19 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Laajennuksen kaksi ensimmäistä ikäluokkaa eivät eronneet aiemmista: niiden 18-vuotiaiden osuus, jotka eivät opiskele eivätkä ole töissä, oli 2023–2024 noin 5 %, kuten aiemminkin, ja 21-vuotiailla muutos oli samaa luokkaa. Tulos koskee kuitenkin vain tilannetta vuoden lopussa, kun koko ikäluokka on jo täyttänyt 18 ja oppivelvollisuus on päättynyt. Sitä, pysyivätkö nuoret koulussa oppivelvollisuuden aikana, tästä aineistosta ei voi mitata, koska alle 18-vuotiaat on luokiteltu opiskelijoiksi.",
     next: "Oikea mittari olisi toisen asteen keskeyttäminen ja tutkinnon suorittaminen ikäluokittain (Tilastokeskus: koulutuksen keskeyttäminen ja sijoittuminen). Ensimmäiset luvut laajennuksen ikäluokista, jotka ovat suorittaneet tutkinnon tai eivät, valmistuvat vuosina 2025–2026.",
+  },
+  {
+    id: "h11",
+    title: "Ulkomaan kansalaisten osuus → Suomen kansalaisten työllisyys",
+    claim: "Kun ulkomaan kansalaisten osuus työikäisistä kasvaa, Suomen kansalaisten työllisyys heikkenee.",
+    registered: "2026-11-27",
+    preregistered: "Päätestit kirjattiin ennen laskentaa. Tarkistukset ja niiden seuraukset kirjattiin päätestien jälkeen mutta ennen tarkistusten laskentaa.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h11.tests,
+    predictions: [],
+    reading:
+      "Päätestissä maakunnissa, joissa ulkomaan kansalaisten osuus kasvoi muita enemmän, Suomen kansalaisten työllisyys oli seuraavana vuonna heikompi. Tarkistukset osoittivat, että yhteys syntyy alueiden pitkistä kehityssuunnista: osuus kaksi vuotta myöhemmin ”ennustaa” nykyistä työllisyyttä yhtä vahvasti, ja kun kunkin maakunnan oma kehityssuunta otetaan huomioon, yhteys katoaa. Ulkomaan kansalaisten osuus on siis kasvanut eniten maakunnissa, joiden työllisyys on kehittynyt muita heikommin, mutta aineisto ei osoita, että kasvu olisi heikentänyt työllisyyttä. Kansalaisuuden saamisen vaikutusta ryhmien koostumukseen ei voitu testata.",
+    next: "Tarkempi testi vaatisi syntyperän tai kielen mukaan jaotellun alueaineiston, jolloin kansalaisuuden saaminen ei sotke vertailua, sekä asetelman, jossa maahanmuuton alueellinen jakautuminen ei riipu työpaikoista (esim. pakolaisten kuntasijoitus).",
   },
   {
     id: "h2",

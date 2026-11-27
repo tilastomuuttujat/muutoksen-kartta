@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Kuusitoista hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Seitsemäntoista hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Kuusi väitettä kumoutui, yksi on tuettu, neljä on ehdokkaita ja viiden näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Kuusi väitettä kumoutui, yksi on tuettu, neljä on ehdokkaita ja kuuden näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -225,6 +225,7 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h4" && t.id === "toisto-maat" && <SimpleDots rows={toDots(t.detail as Pooled, "Palvelut")} side="neg" band="H4:n ennuste: vasemmalla" note="Työttömyyden muutos ja julkisten palvelujen (D63) reaalikasvu 1–2 vuotta myöhemmin. Yhdistetty Ruotsi ja Tanska; Suomi näytetään vertailuksi." />}
       {h.id === "h4" && t.id === "palvelut-vs-rahat" && <ServicesVsCash detail={t.detail as SvC} />}
       {h.id === "h5" && t.id === "pysyvyys" && <PersistenceDots detail={t.detail as Persist} />}
+      {h.id === "h11" && t.id === "annos" && <ChecksTable detail={t.detail as { b: number; p: number; checks: Record<string, { b: number; p: number }> }} />}
       {h.id === "h10" && t.id === "katkos" && <NeetChart a18={(t.detail as { series: [number, number][] }).series} a21={(h.tests[1]!.detail as { series: [number, number][] }).series} />}
       {(h.id === "h8" || h.id === "h9") && t.id === "toisto" && <CountryCorr h={h.id} detail={t.detail as Pooled & Rc} />}
       {h.id === "h7" && t.id === "ajoitus" && <SuicideChart detail={t.detail as Suicide} />}
@@ -548,6 +549,29 @@ function NeetChart({ a18, a21 }: { a18: [number, number][]; a21: [number, number
         {[2000, 2005, 2010, 2015, 2021, 2024].map((t) => <text key={t} x={x(t)} y={H - 12} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
       </svg>
       <p className="text-xs text-muted-foreground">Ei opiskele eikä ole töissä (työttömät ja muut työvoiman ulkopuolella olevat), osuus ikäluokasta 31.12. (StatFin 115c). Katkoviiva: 18-vuotiaiden trendi 2011–2022 jatkettuna. 21-vuotiaat eivät olleet uudistuksen piirissä.</p>
+    </div>
+  );
+}
+
+function ChecksTable({ detail }: { detail: { b: number; p: number; checks: Record<string, { b: number; p: number }> } }) {
+  const c = detail.checks;
+  const rows: [string, string, { b: number; p: number }][] = [
+    ["Päätesti", "osuus vuotta aiemmin", { b: detail.b, p: detail.p }],
+    ["R1 Ennakkotesti", "osuus kaksi vuotta myöhemmin (ei voi vaikuttaa)", c["lead"]!],
+    ["R2 Aluekohtaiset trendit", "jokaiselle maakunnalle oma kehityssuunta", c["trends"]!],
+    ["R3 Poikkeusvuodet pois", "ilman 2015–2017 ja 2022–2024", c["excluded"]!],
+  ];
+  return (
+    <div className="mt-2 overflow-x-auto">
+      <table className="w-full min-w-[440px] max-w-2xl text-sm">
+        <thead><tr className="text-left text-xs text-muted-foreground"><th className="font-medium">Malli</th><th className="font-medium">Selittäjä</th><th className="font-medium">Kerroin</th><th className="font-medium">p</th></tr></thead>
+        <tbody>
+          {rows.map(([a, b, v]) => (
+            <tr key={a} className="border-t"><td className="py-1">{a}</td><td className="text-xs">{b}</td><td className="tabular-nums">{v.b > 0 ? "+" : ""}{nf(v.b)}</td><td className="tabular-nums">{nf(v.p, 3)}</td></tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="mt-1 text-xs text-muted-foreground">Kerroin: Suomen kansalaisten työllisyysasteen muutos (%-yks.), kun ulkomaan kansalaisten osuus on 1 %-yks. suurempi kuin muualla. Ennakkotestin yhtä suuri kerroin ja trendien jälkeen katoava yhteys osoittavat, että yhteys syntyy alueiden pitkistä kehityssuunnista.</p>
     </div>
   );
 }
