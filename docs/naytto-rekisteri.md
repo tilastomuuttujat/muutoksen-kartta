@@ -477,3 +477,23 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 - **Lisätieto, ei vaikuta tulokseen:**
   - T4 ilman vuotta 2004, jolloin jäljelle jäävät korotukset ja pienet muutokset.
   - Myynnin vaste samalla asetelmalla.
+
+## H6 / T4–T5: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T4 Hinta-annos: ei ratkea.**
+  - r = −0,35 (viive 0 v, p = 0,12, n = 29).
+  - Ilman vuotta 2004: r = −0,20 (p = 0,51).
+  - Myynti samalla asetelmalla: r = −0,35 (p = 0,13).
+- **T5 Korotusvuodet: ei ratkea.**
+  - Aineistosta tunnistuneet vuodet: 2008, 2009, 2012 ja 2018.
+  - Kuolleisuus muuttui seuraavana vuonna −2,8 %, muina vuosina −1,4 % (p = 0,31).
+- **Reaalihinta:**
+  - 2003: 110 → 2004: 94 → 2007: 87.
+  - Nousu 2008–2014 takaisin tasolle 101.
+- **Tulkinta:**
+  - Järjestys sopii väitteeseen: hinta laski 2004 ja kuolleisuus nousi, ja kun hinta nousi
+    2008–2014, kuolleisuus kääntyi laskuun.
+  - Vuositason aineisto (alle 30 vuotta) ei kuitenkaan riitä erottamaan vaikutusta muusta
+    vaihtelusta.
+- **Tila:** ehdokas ennallaan.

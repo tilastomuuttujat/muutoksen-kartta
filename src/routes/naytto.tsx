@@ -226,6 +226,7 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h4" && t.id === "palvelut-vs-rahat" && <ServicesVsCash detail={t.detail as SvC} />}
       {h.id === "h5" && t.id === "pysyvyys" && <PersistenceDots detail={t.detail as Persist} />}
       {h.id === "h6" && t.id === "katkos" && <BreakChart detail={t.detail as Break} />}
+      {h.id === "h6" && t.id === "hinta" && <PriceChart price={(t.detail as { realPrice: [number, number][] }).realPrice} mort={(h.tests[0]!.detail as Break).series} />}
       {h.id === "h5" && t.id === "ikaluokat" && <CohortChart detail={t.detail as Cohorts} />}
       {t.id === "esikoisika" && <CohortChart detail={t.detail as Cohorts} outcomeLabel="Esikoisia naista kohden 30 ikävuoteen mennessä (20–29-v.)" scale={100} unit="/100" zero={false}
         note={`Jos huono tulovaihe lykkäisi perheen perustamista, alemman käyrän pitäisi painua laman ikäluokkien ja finanssikriisin ikäluokkien kohdalla trendin alle. Testissä molemmista poistettiin ikäluokkien suora trendi. Esikoiset 40 ikävuoteen mennessä: r = ${nf((t.detail as { by40: { r: number } }).by40.r)}.`} />}
@@ -428,6 +429,43 @@ function BreakChart({ detail }: { detail: Break }) {
       <p className="text-xs text-muted-foreground">
         Alkoholiperäiset taudit ja alkoholimyrkytykset, ikävakioitu kuolleisuus / 100 000 (StatFin 11ay). Katkoviiva: vuosien 1992–2003 trendi jatkettuna. Poikkeama 2004–2007 oli suurempi kuin {detail.above}:ssä {detail.placebo} tavallisesta jaksosta; kirjattu raja oli 95 %.
       </p>
+    </div>
+  );
+}
+
+function PriceChart({ price, mort }: { price: [number, number][]; mort: [number, number][] }) {
+  const W = 620, H = 200, L = 40, R = 560, TOP = 14, BOT = 168;
+  const X0 = price[0]![0], X1 = price.at(-1)![0];
+  const x = (y: number) => L + ((y - X0) / (X1 - X0)) * (R - L);
+  const m = mort.filter(([y]) => y >= X0 && y <= X1);
+  const base = (s: [number, number][]) => { const b = s.find(([y]) => y === 2003)![1]; return s.map(([y, v]) => [y, (v / b) * 100] as [number, number]); };
+  const P = base(price), M = base(m);
+  const all = [...P, ...M].map((p) => p[1]);
+  const lo = Math.min(...all) - 5, hi = Math.max(...all) + 5;
+  const y = (v: number) => BOT - ((v - lo) / (hi - lo)) * (BOT - TOP);
+  const line = (s: [number, number][]) => s.map(([a, v], i) => `${i ? "L" : "M"}${x(a).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  return (
+    <div className="mt-2 overflow-x-auto">
+      <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[460px] max-w-2xl" role="img" aria-label={`Alkoholin reaalihinta ja alkoholikuolleisuus ${X0}–${X1}, 2003 = 100`}>
+        <line x1={L} x2={R} y1={y(100)} y2={y(100)} stroke="var(--foreground)" strokeOpacity={0.3} />
+        <text x={L - 6} y={y(100) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">100</text>
+        <line x1={x(2004)} x2={x(2004)} y1={TOP} y2={BOT} stroke="var(--primary)" strokeDasharray="3 3" />
+        <path d={line(P)} fill="none" stroke="var(--foreground)" strokeOpacity={0.7} strokeWidth={1.8} />
+        <path d={line(M)} fill="none" stroke="var(--primary)" strokeWidth={2.2} />
+        {(() => {
+          const yp = y(P.at(-1)![1]), ym = y(M.at(-1)![1]);
+          const gap = Math.abs(yp - ym) < 13 ? (13 - Math.abs(yp - ym)) / 2 : 0;
+          const up = yp <= ym ? -1 : 1;
+          return (
+            <>
+              <text x={R + 4} y={yp + 4 + up * gap} className="fill-foreground text-[11px]">reaalihinta</text>
+              <text x={R + 4} y={ym + 4 - up * gap} className="fill-primary text-[11px] font-semibold">kuolleisuus</text>
+            </>
+          );
+        })()}
+        {[X0, 2004, 2008, 2012, 2018, X1].map((t) => <text key={t} x={x(t)} y={H - 12} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
+      </svg>
+      <p className="text-xs text-muted-foreground">Alkoholijuomien reaalihinta (kuluttajahintaindeksi 02.1 / kokonaisindeksi, StatFin 15b5) ja alkoholikuolleisuus, molemmat 2003 = 100. Hinta laski 2004 ja nousi veronkorotusten myötä 2008–2014.</p>
     </div>
   );
 }

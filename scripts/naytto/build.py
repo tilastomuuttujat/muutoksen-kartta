@@ -915,10 +915,48 @@ def h6():
     t3 = {"id": "myynti", "design": "ajoitus", "result": r3, "date": str(date.today()),
           "summary": f"Alkoholin myynnin muutos → alkoholikuolleisuuden muutos r = {r2(lc['r'])} (viive {lc['lag']} v, p = {lc['p']:.3f}, n = {lc['n']})",
           "detail": {**lc, "sales": sorted(sales.items())}}
+    # T4–T5: alkoholijuomien reaalihinta (StatFin 15b5)
+    idk, kd = px("khi/15b5.px", [("timeperiod_m", "*"), ("coicop_46_20231201", ["SSS", "021"]), ("contentscode", ["ip_khi"])])
+    im, ico = idk.index("timeperiod_m"), idk.index("coicop_46_20231201")
+    months = {}
+    for k, v in kd.items():
+        if v is not None:
+            months.setdefault((k[ico], int(k[im][:4])), []).append(v)
+    full = {key: sum(v) / len(v) for key, v in months.items() if len(v) == 12}
+    real = {y: full[("021", y)] / full[("SSS", y)] for (c, y) in full if c == "021" and ("SSS", y) in full}
+    pr = prewhiten(changes(real, True))
+    mort = {y: v for y, v in ser[("SSS", "41")].items() if y >= 1995}
+    pmo = prewhiten(changes(mort, True))
+    lc4 = lead_corr(pr, pmo, lags=(0, 1))
+    r4 = "tukee" if lc4["r"] < 0 and lc4["p"] < 0.05 else "kumoaa" if lc4["r"] >= 0 else "ei-ratkea"
+    pr_no04 = {y: v for y, v in pr.items() if y != 2004}
+    lc4b = lead_corr(pr_no04, pmo, lags=(0, 1))
+    psales = prewhiten(changes({y: v for y, v in sales.items() if y >= 1995}, True))
+    lc4s = lead_corr(pr, psales, lags=(0, 1))
+    t4 = {"id": "hinta", "design": "ajoitus", "result": r4, "date": str(date.today()),
+          "summary": f"Alkoholin reaalihinnan muutos → alkoholikuolleisuuden muutos r = {r2(lc4['r'])} (viive {lc4['lag']} v, p = {lc4['p']:.3f}, n = {lc4['n']}); ilman vuotta 2004 r = {r2(lc4b['r'])}",
+          "detail": {**lc4, "without2004": lc4b, "sales": lc4s,
+                     "realPrice": sorted((y, round(v * 100, 1)) for y, v in real.items())}}
+    dprice = changes(real, True); dmort = changes(mort, True)
+    cand = [y for y in range(2005, 2025) if y in dprice and y + 1 in dmort]
+    events = [y for y in cand if dprice[y] >= math.log(1.03)]
+    nxt = {y: dmort[y + 1] for y in cand}
+    diff = lambda ev: float(np.mean([nxt[y] for y in ev]) - np.mean([nxt[y] for y in cand if y not in ev]))
+    obs5 = diff(events)
+    rng = random.Random(4); R = 5000
+    le = sum(1 for _ in range(R) if diff(rng.sample(cand, len(events))) <= obs5)
+    p5 = (le + 1) / (R + 1)
+    r5 = "tukee" if obs5 < 0 and p5 < 0.05 else "kumoaa" if obs5 >= 0 else "ei-ratkea"
+    t5 = {"id": "korotukset", "design": "ajoitus", "result": r5, "date": str(date.today()),
+          "summary": (f"Korotusvuodet (reaalihinta +3 % tai enemmän): {', '.join(map(str, events))}. Kuolleisuus muuttui seuraavana vuonna "
+                      f"{(math.exp(np.mean([nxt[y] for y in events])) - 1) * 100:+.1f} %, muina vuosina {(math.exp(np.mean([nxt[y] for y in cand if y not in events])) - 1) * 100:+.1f} % (p = {p5:.3f})"),
+          "detail": {"events": events, "diff": round(obs5, 4), "p": round(p5, 4), "years": cand,
+                     "priceChange": {y: round((math.exp(dprice[y]) - 1) * 100, 1) for y in cand},
+                     "nextMortChange": {y: round((math.exp(nxt[y]) - 1) * 100, 1) for y in cand}}}
     extra = {"homicide": {k: v for k, v in katkos(ser[("SSS", "51")]).items() if k != "series"},
              "men": {k: v for k, v in katkos(ser[("1", "41")]).items() if k != "series"},
              "women": {k: v for k, v in katkos(ser[("2", "41")]).items() if k != "series"}}
-    return {"tests": [t1, t2, t3], "predictions": [], "extra": extra}
+    return {"tests": [t1, t2, t3, t4, t5], "predictions": [], "extra": extra}
 
 
 def h1_regional():
@@ -1070,6 +1108,8 @@ def main():
     print("  rows40", [(r["born"], round(r["outcome"], 3)) for r in fc["detail"]["by40"]["rows"]])
     e6 = out["hypotheses"]["h6"]
     for t in e6["tests"]: print("h6", t["id"], t["result"], "|", t["summary"])
+    d4 = e6["tests"][3]["detail"]; print("  ilman 2004", d4["without2004"], "myynti", d4["sales"]); print("  reaalihinta", d4["realPrice"])
+    d5 = e6["tests"][4]["detail"]; print("  hinta", d5["priceChange"]); print("  kuolleisuus t+1", d5["nextMortChange"])
     print("  extra", e6["extra"])
     print("malli", out["hypotheses"]["h1"]["model"])
     print("toisto maittain", json.dumps(out["hypotheses"]["h1"]["tests"][0]["detail"]["countries"]))

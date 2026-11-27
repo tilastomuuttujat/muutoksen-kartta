@@ -198,6 +198,23 @@ describe("pilot results", () => {
     expect(e["women"]!.pct).toBeCloseTo(10.5, 1);
     expect(e["homicide"]!.pct).toBeCloseTo(3, 0);
   });
+  it("H6 price tests quoted in the register", () => {
+    const t = NAYTTO.hypotheses.h6.tests;
+    const price = t.find((x) => x.id === "hinta")!, ev = t.find((x) => x.id === "korotukset")!;
+    expect(price.result).toBe("ei-ratkea");
+    const d = price.detail as { r: number; p: number; n: number; without2004: { r: number }; realPrice: [number, number][] };
+    expect(d.r).toBeCloseTo(-0.35, 2);
+    expect(d.p).toBeCloseTo(0.12, 2);
+    expect(d.n).toBe(29);
+    expect(d.without2004.r).toBeCloseTo(-0.2, 2);
+    const rp = Object.fromEntries(d.realPrice);
+    expect(rp[2004]).toBeCloseTo(93.8, 1);
+    expect(rp[2007]).toBeCloseTo(86.7, 1);
+    expect(ev.result).toBe("ei-ratkea");
+    expect((ev.detail as { events: number[] }).events).toEqual([2008, 2009, 2012, 2018]);
+    expect((ev.detail as { p: number }).p).toBeCloseTo(0.31, 2);
+    expect(statusOfHypothesis(hypothesis("h6")!)).toBe("ehdokas");
+  });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
       expect(p.lo).toBeLessThan(p.point);

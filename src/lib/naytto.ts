@@ -240,8 +240,8 @@ export const HYPOTHESES: Hypothesis[] = [
     tests: NAYTTO.hypotheses.h6.tests,
     predictions: [],
     reading:
-      "Alkoholikuolleisuus nousi vuodesta 2003 vuoteen 2007 noin kolmanneksella ja oli 2004–2007 keskimäärin 15 % korkeammalla kuin aiempi trendi ennusti, kun muiden tautien kuolleisuus oli samaan aikaan trendin alapuolella. Kuolleisuus oli kuitenkin noussut jyrkästi jo ennen alennusta, joten nousu oli vain 90 %:n tasolla tavallisiin jaksoihin verrattuna, ei kirjatun 95 %:n. Myynnin ja kuolleisuuden yhteys vuositasolla tukee mekanismia. Miehillä katkos oli selvempi kuin naisilla; henkirikoksissa sitä ei näy.",
-    next: "Vahvempi asetelma: myöhemmät veronkorotukset (2008–2009 ja 2012–) annoksina vastakkaiseen suuntaan. Jos vero vaikuttaa, kuolleisuuden pitäisi laskea korotusten jälkeen. Toinen vaihtoehto: alue-erot, sillä Viron tuonnin pitäisi näkyä eniten Etelä-Suomessa.",
+      "Alkoholikuolleisuus nousi vuodesta 2003 vuoteen 2007 noin kolmanneksella, kun alkoholin reaalihinta laski noin 15 %, ja kääntyi laskuun, kun hinta nousi veronkorotusten myötä vuosina 2008–2014. Järjestys sopii väitteeseen, ja myynnin ja kuolleisuuden yhteys vuositasolla tukee mekanismia. Kirjatut katkos- ja annostestit jäivät kuitenkin rajan alle: kuolleisuus nousi jo ennen alennusta, ja vuositason aineisto (alle 30 vuotta) on liian lyhyt erottamaan vaikutusta muusta vaihtelusta. Miehillä katkos oli selvempi kuin naisilla; henkirikoksissa sitä ei näy.",
+    next: "Vahvempi asetelma vaatii tarkemman aineiston: kuukausittainen kuolleisuus (StatFin 11bf, 1969–) veronmuutosten ympärillä tai alue-erot Viron tuonnin mukaan (Etelä-Suomi vs. muut). Kuukausiaineisto erottaisi maaliskuun 2004 katkoksen vuoden sisäisestä vaihtelusta.",
   },
   {
     id: "h2",
