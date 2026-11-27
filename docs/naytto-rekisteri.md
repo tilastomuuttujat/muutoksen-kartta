@@ -1234,3 +1234,37 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Jos uudistuksella ei olisi vaikutusta (b = 0), ennuste olisi 49,3 %, mikä on välin ulkopuolella.
 - **Osuma:** toteutunut arvo on välillä. Toteutunut arvo täytetään vasta, kun virallinen luku on
   julkaistu, eikä väliä siirretä.
+
+## H24. Devalvaatiot lisäsivät vientiä
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Uusi teema.
+- **Väite:** markan devalvaatiot paransivat vientiteollisuuden kilpailukykyä, jolloin viennin osuus
+  taloudesta kasvoi ja tuonti suhteessa vientiin väheni kahden vuoden kuluessa.
+- **Tapahtumat** (vuosi t0, kirjattu ennen laskentaa):
+  - 1957: syyskuu, noin 39 %.
+  - 1967: lokakuu, noin 31 %.
+  - 1977: huhtikuu ja syyskuu sekä helmikuu 1978.
+  - 1982: lokakuu, noin 10 %.
+  - 1991: marraskuu, noin 12 %, sekä kellutus syyskuussa 1992.
+  - Vuoden 1931 kultakannasta luopumista ei voida testata, koska vientisarjat alkavat vuodesta 1948.
+- **Aineisto:** StatFin 15ai (kansantalouden tilinpidon historialliset sarjat).
+  - Vienti (P6K), tuonti (P7R) ja BKT (B1GMH) käyvin hinnoin 1948–.
+  - Samat viitevuoden 2015 hinnoin 1976–.
+- **Ikkuna:** muutos vuodesta t0 vuoteen t0 + 2. Devalvaatiot tehtiin useimmiten loppuvuodesta.
+- **Lumeikkunat:**
+  - Kaikki kahden vuoden ikkunat, jotka eivät leikkaa yhdenkään tapahtuman ikkunaa.
+  - Ikkunan alkuvuosi on 1953 tai myöhemmin, jolloin sotakorvausvuodet jäävät pois.
+  - Testisuure on tapahtumien keskiarvo. Sitä verrataan 20 000 satunnaisen, samankokoisen
+    lumeikkunajoukon keskiarvoon (siemenluku 1).
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Luonnollinen koe | Viennin BKT-osuuden (käyvin hinnoin, log) muutos, viiden tapahtuman keskiarvo, verrattuna lumeikkunoihin | Tukee: > 0 ja suurempi kuin 95 %:ssa lumejoukoista. Kumoaa: ≤ 0. Muuten: ei ratkea |
+| T2 Toisto | Kuinka monessa viidestä tapahtumasta T1:n muutos ylitti lumeikkunoiden mediaanin | Tukee: 5/5 (yksisuuntainen p = 0,03). Kumoaa: enintään 2/5. Muuten: ei ratkea |
+| T3 Täsmällisyys | Viennin määrän kasvu miinus tuonnin määrän kasvu (kiintein hinnoin, log), tapahtumat 1977, 1982 ja 1991, lumeikkunat 1976– | Tukee: > 0 ja suurempi kuin 95 %:ssa lumejoukoista. Kumoaa: ≤ 0. Muuten: ei ratkea |
+
+- **Rajaus:**
+  - Käyvin hinnoin mitattu osuus kasvaa myös pelkästä vientihintojen noususta markoissa. Siksi T3
+    mittaa määriä.
+  - Vuoden 1991 ikkunaan osuvat myös Neuvostoliiton kaupan romahdus ja lama.
+  - Vuoden 1977 ikkunaan osuu öljykriisin jälkeinen elpyminen.
