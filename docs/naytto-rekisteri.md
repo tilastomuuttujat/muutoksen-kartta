@@ -595,3 +595,26 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 
 - **Lisätieto, ei vaikuta tulokseen:** opiskelijoiden osuus 18-vuotiaista, tytöt ja pojat
   erikseen, sekä 19-vuotiaat vuonna 2024 (ikäluokka 2005).
+
+## H10: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Luonnollinen koe: kumoaa.**
+  - 18-vuotiaat, jotka eivät opiskele eivätkä ole töissä: 2023–2024 +0,5 %-yks. vuosien 2011–2022
+    trendistä.
+  - Osuus 2022: 4,9 % → 2023: 5,9 % → 2024: 4,9 %.
+- **T2 Vertailuryhmä: ei ratkea.** 21-vuotiaat +0,6 %-yks. trendistä.
+- **Lisätieto:**
+  - Opiskelijoiden osuus 18-vuotiaista +2,0 %-yks. trendistä (suurempi kuin 18:ssa 23
+    lumejaksosta, ei poikkeuksellinen).
+  - Pojat +0,7 ja tytöt +0,3 %-yks.
+  - 19-vuotiaiden osuus laski 2024 (20,4 → 17,1 %), mutta samankokoiset vuosimuutokset ovat
+    tavallisia (esim. 2021: −5,1).
+- **Tila:** kumottu, koska vahva asetelma kumoaa.
+- **Rajoite, joka rajaa tulkintaa:**
+  - Tilasto mitataan 31.12. Silloin koko ikäluokka on jo täyttänyt 18, ja oppivelvollisuus on
+    päättynyt.
+  - Testi mittaa siksi, jatkuuko vaikutus oppivelvollisuuden päättymisen jälkeen. Sitä, pysyivätkö
+    nuoret koulussa oppivelvollisuuden aikana, se ei mittaa, koska alle 18-vuotiaat on luokiteltu
+    opiskelijoiksi.
+  - Kumottu koskee siis vain kirjattua väitettä 18-vuotiaiden tilanteesta.

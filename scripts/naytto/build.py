@@ -1114,6 +1114,50 @@ def h8_h9():
     return {"tests": [t1, t2, t3], "predictions": []}, {"tests": [t9], "predictions": []}
 
 
+def h10():
+    """H10 (docs/naytto-rekisteri.md): oppivelvollisuuden laajennus → NEET-osuus 18-vuotiailla."""
+    ids, d = px("tyokay/115c.px", [("paaasial_toimin_3_20180101", ["SSS", "12", "99", "22"]), ("sukupuoli_9_20180101", ["SSS", "1", "2"]),
+                                  ("ikaryhma_10_20180101", ["018", "019", "021"]), ("timeperiod_y", "*")])
+    ia, isx, iy, it = (ids.index(x) for x in ("ikaryhma_10_20180101", "sukupuoli_9_20180101", "timeperiod_y", "paaasial_toimin_3_20180101"))
+    tab = {(k[isx], int(k[ia]), int(k[iy]), k[it]): v for k, v in d.items()}
+    years = sorted({k[2] for k in tab})
+    neet = lambda sx, a: {y: 100 * (tab[(sx, a, y, "12")] + tab[(sx, a, y, "99")]) / tab[(sx, a, y, "SSS")] for y in years}
+    stud = lambda sx, a: {y: 100 * tab[(sx, a, y, "22")] / tab[(sx, a, y, "SSS")] for y in years}
+
+    def dev(series, start):
+        pre = [(y, series[y]) for y in range(start - 12, start) if y in series]
+        if len(pre) < 12 or not all(y in series for y in (start, start + 1)):
+            return None
+        b = np.polyfit([p_[0] for p_ in pre], [p_[1] for p_ in pre], 1)
+        return float(np.mean([series[y] - np.polyval(b, y) for y in (start, start + 1)]))
+
+    def test(series):
+        obs = dev(series, 2023)
+        plac = [v for v in (dev(series, s_) for s_ in range(1999, 2022)) if v is not None]
+        below = sum(1 for v in plac if v > obs)  # kuinka monessa lumejaksossa poikkeama oli suurempi (vähemmän lasku)
+        return {"dev": round(obs, 3), "below": below, "placebo": len(plac), "share": round(below / len(plac), 3),
+                "series": sorted((y, round(v, 2)) for y, v in series.items())}
+
+    a18, a21 = test(neet("SSS", 18)), test(neet("SSS", 21))
+    r1 = "tukee" if a18["dev"] < 0 and a18["share"] >= 0.95 else "kumoaa" if a18["dev"] >= 0 else "ei-ratkea"
+    t1 = {"id": "katkos", "design": "luonnollinen", "result": r1, "date": str(date.today()),
+          "summary": f"18-vuotiaat, jotka eivät opiskele eivätkä ole töissä: 2023–2024 {a18['dev']:+.1f} %-yks. vuosien 2011–2022 trendistä; {a18['below']}/{a18['placebo']} lumejaksossa poikkeama oli suurempi (tukeminen vaatisi laskun, joka on suurempi kuin 95 %:ssa)",
+          "detail": a18}
+    if a21["dev"] <= a18["dev"]:
+        r2_ = "kumoaa"
+    elif r1 == "tukee" and a21["share"] < 0.95:
+        r2_ = "tukee"
+    else:
+        r2_ = "ei-ratkea"
+    t2 = {"id": "vertailu", "design": "tasmallisyys", "result": r2_, "date": str(date.today()),
+          "summary": f"21-vuotiaat (eivät uudistuksen piirissä): {a21['dev']:+.1f} %-yks. trendistä; {a21['below']}/{a21['placebo']} lumejaksossa poikkeama oli suurempi",
+          "detail": a21}
+    extra = {"students18": test(stud("SSS", 18)), "boys18": {k: v for k, v in test(neet("1", 18)).items() if k != "series"},
+             "girls18": {k: v for k, v in test(neet("2", 18)).items() if k != "series"},
+             "age19_2024": {"value": round(neet("SSS", 19)[2024], 2), "prev": round(neet("SSS", 19)[2023], 2)}}
+    return {"tests": [t1, t2], "predictions": [], "extra": extra}
+
+
 def h1_regional():
     ids_t, tf = px("synt/12du.px", [("alue_23_20260101", "*"), ("contentscode", ["tfr"]), ("timeperiod_y", "*")])
     ids_w, pop = px("tyokay/115w.px", [("alue_28_20250101", "*"), ("timeperiod_y", "*"), ("paaasial_toimin_3_20180101", ["11+12", "12"]), ("ikaryhma_10_20180101", ["25-29", "30-34"]),
@@ -1221,6 +1265,7 @@ def main():
     fi_tfr = {int(k[0]): v for k, v in t.items()}
     out = {"built": str(date.today()), "hypotheses": {"h1": h1(turso_nordic(), fi_tfr), "h1e": h1e(fi_tfr), "h1f": h1f(fi_tfr), "h1g": h1g(fi_tfr), "h2": h2(), "h3": h3(), "h4": h4(), "h5": h5(), "h6": h6(), "h7": h7()}}
     out["hypotheses"]["h8"], out["hypotheses"]["h9"] = h8_h9()
+    out["hypotheses"]["h10"] = h10()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
@@ -1268,6 +1313,10 @@ def main():
     d5 = e6["tests"][4]["detail"]; print("  hinta", d5["priceChange"]); print("  kuolleisuus t+1", d5["nextMortChange"])
     print("  extra", e6["extra"])
     for t in out["hypotheses"]["h7"]["tests"]: print("h7", t["id"], t["result"], "|", t["summary"])
+    for t in out["hypotheses"]["h10"]["tests"]: print("h10", t["id"], t["result"], "|", t["summary"])
+    x10 = out["hypotheses"]["h10"]["extra"]; print("  extra", {k: (v if k != "students18" else {kk: vv for kk, vv in v.items() if kk != "series"}) for k, v in x10.items()})
+    print("  sarja18", [x for x in out["hypotheses"]["h10"]["tests"][0]["detail"]["series"] if x[0] >= 2008])
+    print("  sarja21", [x for x in out["hypotheses"]["h10"]["tests"][1]["detail"]["series"] if x[0] >= 2008])
     for hk in ("h8", "h9"):
         for t in out["hypotheses"][hk]["tests"]:
             print(hk, t["id"], t["result"], "|", t["summary"]); print("   ", t["detail"].get("countries", ""))

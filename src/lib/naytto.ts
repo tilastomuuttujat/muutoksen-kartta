@@ -76,7 +76,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -281,6 +281,19 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Neljässä Pohjoismaassa yhdessä masennuslääkkeiden käytön kasvu on kulkenut itsemurhien vähenemisen kanssa samana vuonna, selvimmin Norjassa. Suomessa yhteys on päinvastainen, ja Suomen itsemurhien suurin lasku 1990-luvulla tapahtui ennen kuin lääkeaineisto alkaa. Samanaikainen yhteys ei kerro, kumpi muuttui ensin.",
     next: "Pidempi lääkeaineisto (Kela, Suomi 1990–) ja ikäryhmittäinen vertailu: jos lääkkeet vaikuttavat, itsemurhien pitäisi laskea eniten niissä ikäryhmissä, joissa käyttö kasvoi eniten.",
+  },
+  {
+    id: "h10",
+    title: "Oppivelvollisuuden laajennus 2021 → nuorten syrjäytyminen",
+    claim: "Oppivelvollisuuden laajennus 18 ikävuoteen (ikäluokasta 2005) vähensi niiden 18-vuotiaiden osuutta, jotka eivät opiskele eivätkä ole töissä.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. Uusi teema.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h10.tests,
+    predictions: [],
+    reading:
+      "Laajennuksen kaksi ensimmäistä ikäluokkaa eivät eronneet aiemmista: niiden 18-vuotiaiden osuus, jotka eivät opiskele eivätkä ole töissä, oli 2023–2024 noin 5 %, kuten aiemminkin, ja 21-vuotiailla muutos oli samaa luokkaa. Tulos koskee kuitenkin vain tilannetta vuoden lopussa, kun koko ikäluokka on jo täyttänyt 18 ja oppivelvollisuus on päättynyt. Sitä, pysyivätkö nuoret koulussa oppivelvollisuuden aikana, tästä aineistosta ei voi mitata, koska alle 18-vuotiaat on luokiteltu opiskelijoiksi.",
+    next: "Oikea mittari olisi toisen asteen keskeyttäminen ja tutkinnon suorittaminen ikäluokittain (Tilastokeskus: koulutuksen keskeyttäminen ja sijoittuminen). Ensimmäiset luvut laajennuksen ikäluokista, jotka ovat suorittaneet tutkinnon tai eivät, valmistuvat vuosina 2025–2026.",
   },
   {
     id: "h2",
