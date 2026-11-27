@@ -51,9 +51,6 @@ function HeatPage() {
           <Link to="/" className="underline-offset-4 hover:underline">
             ← Kartta
           </Link>
-          <Link to="/teemat" className="underline-offset-4 hover:underline">
-            Teemat →
-          </Link>
         </nav>
       </header>
 

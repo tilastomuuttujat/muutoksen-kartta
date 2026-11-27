@@ -47,7 +47,7 @@ function GenerationsPage() {
         </div>
         <nav className="flex gap-4 text-sm text-muted-foreground">
           <Link to="/heijastukset" className="underline-offset-4 hover:underline">← Heijastusaalto</Link>
-          <Link to="/elamankaari" className="underline-offset-4 hover:underline">Elämänkaari →</Link>
+          <Link to="/" className="underline-offset-4 hover:underline">Kartta →</Link>
         </nav>
       </header>
 

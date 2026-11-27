@@ -10,28 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ElamankaariRouteImport } from './routes/elamankaari'
 import { Route as HeijastuksetRouteImport } from './routes/heijastukset'
 import { Route as LampokarttaRouteImport } from './routes/lampokartta'
 import { Route as MitajosRouteImport } from './routes/mitajos'
 import { Route as PalloRouteImport } from './routes/pallo'
 import { Route as PoikkeamatRouteImport } from './routes/poikkeamat'
-import { Route as PolkuRouteImport } from './routes/polku'
 import { Route as SelityksetRouteImport } from './routes/selitykset'
 import { Route as SkanneriRouteImport } from './routes/skanneri'
 import { Route as SukupolvetRouteImport } from './routes/sukupolvet'
 import { Route as TahtikarttaRouteImport } from './routes/tahtikartta'
-import { Route as TeematRouteImport } from './routes/teemat'
 import { Route as TutkaRouteImport } from './routes/tutka'
+import { Route as VertailuRouteImport } from './routes/vertailu'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ElamankaariRoute = ElamankaariRouteImport.update({
-  id: '/elamankaari',
-  path: '/elamankaari',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HeijastuksetRoute = HeijastuksetRouteImport.update({
@@ -59,11 +52,6 @@ const PoikkeamatRoute = PoikkeamatRouteImport.update({
   path: '/poikkeamat',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PolkuRoute = PolkuRouteImport.update({
-  id: '/polku',
-  path: '/polku',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SelityksetRoute = SelityksetRouteImport.update({
   id: '/selitykset',
   path: '/selitykset',
@@ -84,132 +72,118 @@ const TahtikarttaRoute = TahtikarttaRouteImport.update({
   path: '/tahtikartta',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TeematRoute = TeematRouteImport.update({
-  id: '/teemat',
-  path: '/teemat',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const TutkaRoute = TutkaRouteImport.update({
   id: '/tutka',
   path: '/tutka',
   getParentRoute: () => rootRouteImport,
 } as any)
+const VertailuRoute = VertailuRouteImport.update({
+  id: '/vertailu',
+  path: '/vertailu',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/elamankaari': typeof ElamankaariRoute
   '/heijastukset': typeof HeijastuksetRoute
   '/lampokartta': typeof LampokarttaRoute
   '/mitajos': typeof MitajosRoute
   '/pallo': typeof PalloRoute
   '/poikkeamat': typeof PoikkeamatRoute
-  '/polku': typeof PolkuRoute
   '/selitykset': typeof SelityksetRoute
   '/skanneri': typeof SkanneriRoute
   '/sukupolvet': typeof SukupolvetRoute
   '/tahtikartta': typeof TahtikarttaRoute
-  '/teemat': typeof TeematRoute
   '/tutka': typeof TutkaRoute
+  '/vertailu': typeof VertailuRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/elamankaari': typeof ElamankaariRoute
   '/heijastukset': typeof HeijastuksetRoute
   '/lampokartta': typeof LampokarttaRoute
   '/mitajos': typeof MitajosRoute
   '/pallo': typeof PalloRoute
   '/poikkeamat': typeof PoikkeamatRoute
-  '/polku': typeof PolkuRoute
   '/selitykset': typeof SelityksetRoute
   '/skanneri': typeof SkanneriRoute
   '/sukupolvet': typeof SukupolvetRoute
   '/tahtikartta': typeof TahtikarttaRoute
-  '/teemat': typeof TeematRoute
   '/tutka': typeof TutkaRoute
+  '/vertailu': typeof VertailuRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/elamankaari': typeof ElamankaariRoute
   '/heijastukset': typeof HeijastuksetRoute
   '/lampokartta': typeof LampokarttaRoute
   '/mitajos': typeof MitajosRoute
   '/pallo': typeof PalloRoute
   '/poikkeamat': typeof PoikkeamatRoute
-  '/polku': typeof PolkuRoute
   '/selitykset': typeof SelityksetRoute
   '/skanneri': typeof SkanneriRoute
   '/sukupolvet': typeof SukupolvetRoute
   '/tahtikartta': typeof TahtikarttaRoute
-  '/teemat': typeof TeematRoute
   '/tutka': typeof TutkaRoute
+  '/vertailu': typeof VertailuRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/elamankaari'
     | '/heijastukset'
     | '/lampokartta'
     | '/mitajos'
     | '/pallo'
     | '/poikkeamat'
-    | '/polku'
     | '/selitykset'
     | '/skanneri'
     | '/sukupolvet'
     | '/tahtikartta'
-    | '/teemat'
     | '/tutka'
+    | '/vertailu'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/elamankaari'
     | '/heijastukset'
     | '/lampokartta'
     | '/mitajos'
     | '/pallo'
     | '/poikkeamat'
-    | '/polku'
     | '/selitykset'
     | '/skanneri'
     | '/sukupolvet'
     | '/tahtikartta'
-    | '/teemat'
     | '/tutka'
+    | '/vertailu'
   id:
     | '__root__'
     | '/'
-    | '/elamankaari'
     | '/heijastukset'
     | '/lampokartta'
     | '/mitajos'
     | '/pallo'
     | '/poikkeamat'
-    | '/polku'
     | '/selitykset'
     | '/skanneri'
     | '/sukupolvet'
     | '/tahtikartta'
-    | '/teemat'
     | '/tutka'
+    | '/vertailu'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ElamankaariRoute: typeof ElamankaariRoute
   HeijastuksetRoute: typeof HeijastuksetRoute
   LampokarttaRoute: typeof LampokarttaRoute
   MitajosRoute: typeof MitajosRoute
   PalloRoute: typeof PalloRoute
   PoikkeamatRoute: typeof PoikkeamatRoute
-  PolkuRoute: typeof PolkuRoute
   SelityksetRoute: typeof SelityksetRoute
   SkanneriRoute: typeof SkanneriRoute
   SukupolvetRoute: typeof SukupolvetRoute
   TahtikarttaRoute: typeof TahtikarttaRoute
-  TeematRoute: typeof TeematRoute
   TutkaRoute: typeof TutkaRoute
+  VertailuRoute: typeof VertailuRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -219,13 +193,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/elamankaari': {
-      id: '/elamankaari'
-      path: '/elamankaari'
-      fullPath: '/elamankaari'
-      preLoaderRoute: typeof ElamankaariRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/heijastukset': {
@@ -263,13 +230,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PoikkeamatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/polku': {
-      id: '/polku'
-      path: '/polku'
-      fullPath: '/polku'
-      preLoaderRoute: typeof PolkuRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/selitykset': {
       id: '/selitykset'
       path: '/selitykset'
@@ -298,13 +258,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TahtikarttaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/teemat': {
-      id: '/teemat'
-      path: '/teemat'
-      fullPath: '/teemat'
-      preLoaderRoute: typeof TeematRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/tutka': {
       id: '/tutka'
       path: '/tutka'
@@ -312,24 +265,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TutkaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/vertailu': {
+      id: '/vertailu'
+      path: '/vertailu'
+      fullPath: '/vertailu'
+      preLoaderRoute: typeof VertailuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ElamankaariRoute: ElamankaariRoute,
   HeijastuksetRoute: HeijastuksetRoute,
   LampokarttaRoute: LampokarttaRoute,
   MitajosRoute: MitajosRoute,
   PalloRoute: PalloRoute,
   PoikkeamatRoute: PoikkeamatRoute,
-  PolkuRoute: PolkuRoute,
   SelityksetRoute: SelityksetRoute,
   SkanneriRoute: SkanneriRoute,
   SukupolvetRoute: SukupolvetRoute,
   TahtikarttaRoute: TahtikarttaRoute,
-  TeematRoute: TeematRoute,
   TutkaRoute: TutkaRoute,
+  VertailuRoute: VertailuRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

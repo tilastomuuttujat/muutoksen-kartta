@@ -97,9 +97,6 @@ function AnomalyPage() {
           <Link to="/" className="underline-offset-4 hover:underline">
             ← Kartta
           </Link>
-          <Link to="/polku" className="underline-offset-4 hover:underline">
-            Aikajana →
-          </Link>
         </nav>
       </header>
 

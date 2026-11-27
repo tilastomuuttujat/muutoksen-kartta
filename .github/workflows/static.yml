@@ -32,7 +32,7 @@ jobs:
       - name: Build browser application
         run: |
           bun run vite build --config vite.pages.config.ts --mode pages
-          for route in heijastukset sukupolvet poikkeamat elamankaari selitykset skanneri mitajos polku teemat lampokartta tutka pallo tahtikartta; do
+          for route in heijastukset sukupolvet vertailu poikkeamat selitykset skanneri mitajos lampokartta tutka pallo tahtikartta; do
             mkdir -p "dist-pages/$route"
             cp dist-pages/index.html "dist-pages/$route/index.html"
           done
