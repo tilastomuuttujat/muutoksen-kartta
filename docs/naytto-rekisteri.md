@@ -1038,3 +1038,20 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 | T1 Luonnollinen koe | Suomen myynnin muutos miinus Ruotsin, Norjan ja Tanskan keskimääräinen muutos 1968→1969, verrattuna saman erotuksen lumevuosiin | Tukee: ero > 0 ja suurempi kuin 95 %:ssa lumevuosista. Kumoaa: ero ≤ 0. Muuten: ei ratkea |
 | T2 Täsmällisyys | Pahoinpitelyt 100 000 asukasta kohden, muutos 1968→1969 verrattuna lumevuosiin | Tukee: muutos > 0 ja suurempi kuin 95 %:ssa lumevuosista. Kumoaa: muutos ≤ 0. Muuten: ei ratkea |
 | T3 Kontrolli | Petokset samalla tavalla. Niiden ei pitäisi reagoida alkoholiin. | Kumoaa: petosten muutos ≥ pahoinpitelyjen muutos, jolloin kyse voi olla kirjaamisesta. Tukee: T2 tukee ja petosten muutos jää alle 95 %:n. Muuten: ei ratkea |
+
+## H20: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Luonnollinen koe: tukee.**
+  - Alkoholin myynti asukasta kohden kasvoi 1968→1969 Suomessa 46 % (3,9 → 5,7 litraa).
+  - Ruotsissa kasvu oli 6 %, Norjassa 2 % ja Tanskassa 7 %.
+  - Suomen ja vertailumaiden ero oli suurempi kuin yhdessäkään 58 lumevuodesta.
+- **T2 Täsmällisyys: tukee.** Pahoinpitelyt 100 000 asukasta kohden kasvoivat 38 %. Kasvu oli
+  suurempi kuin yhdessäkään 72 lumevuodesta.
+- **T3 Kontrolli: tukee.** Petokset kasvoivat 8 %, mikä on tavallista vaihtelua (persentiili 60 %).
+  Pahoinpitelyjen hyppy ei siis johdu yleisestä kirjaamisen muutoksesta.
+- **Tila:** tuettu. Vahva asetelma (luonnollinen koe) ja täsmällisyystesti tukevat.
+- **Rajaus:**
+  - Pahoinpitelyt jatkoivat kasvuaan 1970-luvulla, joten testi osoittaa vain hypyn vuonna 1969, ei
+    koko myöhempää kasvua.
+  - Testit eivät myöskään erottele keskiolutta ja maaseudun uusia alkoholiliikkeitä toisistaan.

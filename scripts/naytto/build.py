@@ -1582,6 +1582,50 @@ def h19():
     return {"tests": [t1, t2], "predictions": []}
 
 
+def h20():
+    """H20 (docs/naytto-rekisteri.md): keskiolut ruokakauppoihin 1969 → myynti, pahoinpitelyt; kontrolli petokset."""
+    sales, cnt = {}, {}
+    for line in open(os.path.join(D, "values.ndjson")):
+        k, y, g_, v, kind = json.loads(line)
+        if v is None or kind not in ("observed", "estimate"):
+            continue
+        if k == "nordics2.alcohol_sales_1960_2024":
+            sales.setdefault(g_, {})[int(y)] = float(v)
+        elif k in ("crime.hcs.fi.police_assault", "crime.hcs.fi.police_fraud"):
+            cnt.setdefault(k.split("_")[-1], {})[int(y)] = float(v)
+    ids, d = px("ssaaty/121v.px", [("timeperiod_y", "*"), ("contentscode", ["ssaaty-vaesto"])])
+    iy = ids.index("timeperiod_y")
+    pop = {int(k[iy]): v for k, v in d.items() if v}
+    rate = {n: {y: c[y] / pop[y] * 1e5 for y in c if y in pop} for n, c in cnt.items()}
+
+    def placebo(ch, y0, y1):
+        obs = ch[1969]
+        plac = [ch[y] for y in range(y0, y1 + 1) if y != 1969 and y in ch]
+        above = sum(1 for v in plac if v < obs)
+        return {"change": round(obs, 4), "pct": round((math.exp(obs) - 1) * 100, 1), "above": above, "placebo": len(plac),
+                "percentile": round(above / len(plac), 3)}
+    lch = lambda s_: {y: math.log(s_[y]) - math.log(s_[y - 1]) for y in s_ if y - 1 in s_ and s_[y] > 0 and s_[y - 1] > 0}
+    chs = {c: lch(sales[c]) for c in ("FI", "SE", "NO", "DK")}
+    diff = {y: chs["FI"][y] - np.mean([chs[c][y] for c in ("SE", "NO", "DK")]) for y in chs["FI"] if all(y in chs[c] for c in ("SE", "NO", "DK"))}
+    a = placebo(diff, 1961, 2024)
+    a["countries"] = {c: round((math.exp(chs[c][1969]) - 1) * 100, 1) for c in chs}
+    b = placebo(lch(rate["assault"]), 1950, 2022)
+    f = placebo(lch(rate["fraud"]), 1950, 2022)
+    res = lambda x: "tukee" if x["change"] > 0 and x["percentile"] >= 0.95 else "kumoaa" if x["change"] <= 0 else "ei-ratkea"
+    r1, r2_ = res(a), res(b)
+    r3 = "kumoaa" if f["change"] >= b["change"] else "tukee" if r2_ == "tukee" and f["percentile"] < 0.95 else "ei-ratkea"
+    t1 = {"id": "myynti", "design": "luonnollinen", "result": r1, "date": str(date.today()),
+          "summary": f"Alkoholin myynti 1968→1969: Suomi {a['countries']['FI']:+.0f} %, Ruotsi {a['countries']['SE']:+.0f} %, Norja {a['countries']['NO']:+.0f} %, Tanska {a['countries']['DK']:+.0f} %; ero suurempi kuin {a['above']}:ssä {a['placebo']} lumevuodesta",
+          "detail": {**a, "series": {c: sorted(sales[c].items()) for c in ("FI", "SE", "NO", "DK")}}}
+    t2 = {"id": "pahoinpitelyt", "design": "tasmallisyys", "result": r2_, "date": str(date.today()),
+          "summary": f"Pahoinpitelyt 1968→1969 {b['pct']:+.0f} %; suurempi kuin {b['above']}:ssä {b['placebo']} lumevuodesta",
+          "detail": {**b, "assault": sorted((y, round(v, 2)) for y, v in rate["assault"].items() if y >= 1950), "fraud": sorted((y, round(v, 2)) for y, v in rate["fraud"].items() if y >= 1950)}}
+    t3 = {"id": "kontrolli", "design": "tasmallisyys", "result": r3, "date": str(date.today()),
+          "summary": f"Petokset 1968→1969 {f['pct']:+.0f} %; suurempi kuin {f['above']}:ssä {f['placebo']} lumevuodesta",
+          "detail": f}
+    return {"tests": [t1, t2, t3], "predictions": []}
+
+
 def h11():
     """H11 (docs/naytto-rekisteri.md): ulkomaan kansalaisten osuus → Suomen kansalaisten työllisyys ja työttömyys."""
     regions = ["MK01", "MK02", "MK04", "MK05", "MK06", "MK07", "MK08", "MK09", "MK10", "MK11", "MK12", "MK13", "MK14", "MK15", "MK16", "MK17", "MK18", "MK19"]
@@ -1755,6 +1799,7 @@ def main():
     out["hypotheses"]["h17"] = h17()
     out["hypotheses"]["h18"] = h18()
     out["hypotheses"]["h19"] = h19()
+    out["hypotheses"]["h20"] = h20()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.

@@ -396,6 +396,22 @@ describe("pilot results", () => {
     expect(t2!.detail.placebo - t2!.detail.above).toBe(25);
     expect(statusOfHypothesis(hypothesis("h19")!)).toBe("oletus");
   });
+  it("H20 numbers quoted in the register", () => {
+    const [t1, t2, t3] = NAYTTO.hypotheses.h20.tests as { result: string; detail: { pct: number; above: number; placebo: number; percentile: number; countries?: Record<string, number>; series?: Record<string, [number, number][]> } }[];
+    expect(t1!.result).toBe("tukee");
+    expect(t1!.detail.countries).toEqual({ FI: 46.2, SE: 6.1, NO: 2.3, DK: 7.2 });
+    expect(t1!.detail.above).toBe(58);
+    expect(t1!.detail.placebo).toBe(58);
+    const fi = Object.fromEntries(t1!.detail.series!["FI"]!);
+    expect([fi[1968], fi[1969]]).toEqual([3.9, 5.7]);
+    expect(t2!.result).toBe("tukee");
+    expect(Math.round(t2!.detail.pct)).toBe(38);
+    expect([t2!.detail.above, t2!.detail.placebo]).toEqual([72, 72]);
+    expect(t3!.result).toBe("tukee");
+    expect(Math.round(t3!.detail.pct)).toBe(8);
+    expect(Math.round(t3!.detail.percentile * 100)).toBe(60);
+    expect(statusOfHypothesis(hypothesis("h20")!)).toBe("tuettu");
+  });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
       expect(p.lo).toBeLessThan(p.point);

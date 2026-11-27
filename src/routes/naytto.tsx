@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Kaksikymmentäviisi hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Kaksikymmentäkuusi hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Kahdeksan väitettä kumoutui, kaksi on tuettu, viisi on ehdokkaita ja kymmenen näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Kahdeksan väitettä kumoutui, kolme on tuettu, viisi on ehdokkaita ja kymmenen näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -236,6 +236,12 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h19" && <BreakChart detail={{ ...(t.detail as Break), series: (t.detail as unknown as { deaths?: [number, number][]; lethality?: [number, number][] }).deaths ?? (t.detail as unknown as { lethality: [number, number][] }).lethality }} cfg={t.id === "katkos"
         ? { trend: [1961, 1972], win: [1973, 1976], from: 1950, label: "rajoitus 1973", ticks: [1950, 1961, 1973, 1990, 2025], zeroTicks: [0, 500, 1000], caption: "Tieliikenteessä kuolleet vuodessa (StatFin 11bh). Katkoviiva: vuosien 1961–1972 trendi jatkettuna." }
         : { trend: [1961, 1972], win: [1973, 1976], from: 1950, label: "rajoitus 1973", ticks: [1950, 1961, 1973, 1990, 2025], zeroTicks: [0, 4, 8], caption: "Kuolleita sataa loukkaantunutta kohden (StatFin 11bh). Katkoviiva: vuosien 1961–1972 trendi jatkettuna." }} />}
+      {h.id === "h20" && t.id === "myynti" && <LinesChart from={1960} to={1985} event={1969} eventLabel="laki 1/1969"
+        lines={Object.entries((t.detail as unknown as { series: Record<string, [number, number][]> }).series).map(([c, s]) => ({ label: { FI: "Suomi", SE: "Ruotsi", NO: "Norja", DK: "Tanska" }[c] ?? c, s, main: c === "FI" }))}
+        caption="Alkoholin myynti litroina 100 % alkoholia asukasta kohden. Suomi korostettuna." />}
+      {h.id === "h20" && t.id === "pahoinpitelyt" && <LinesChart from={1955} to={1985} event={1969} eventLabel="laki 1/1969"
+        lines={[{ label: "pahoinpitelyt", s: (t.detail as unknown as { assault: [number, number][] }).assault, main: true }, { label: "petokset", s: (t.detail as unknown as { fraud: [number, number][] }).fraud, main: false }]}
+        caption="Poliisin tietoon tulleet pahoinpitelyt ja petokset 100 000 asukasta kohden (HCS-sarjat ja StatFin 121v)." />}
       {h.id === "h14" && t.id === "katkos" && <BreakChart detail={t.detail as Break} cfg={{ trend: [1976, 1987], win: [1988, 1991], from: 1960, label: "laki voimaan 1/1988", ticks: [1960, 1976, 1988, 2000, 2025], zeroTicks: [0, 1, 2, 3], caption: "Avioerot 1 000 asukasta kohden (StatFin 121v). Katkoviiva: vuosien 1976–1987 trendi jatkettuna. Poikkeama 1988–1991 oli suurempi kuin kaikissa tavallisissa jaksoissa." }} />}
       {h.id === "h13" && t.id === "suomi" && <DecouplingChart detail={t.detail as { co2: [number, number][]; gdp: [number, number][] }} />}
       {h.id === "h12" && t.id === "toisto" && <CountryCorr h="h12" detail={t.detail as Pooled & Rc} />}
@@ -689,6 +695,34 @@ function MigrationChart({ detail }: { detail: { toSweden: [number, number][]; fr
         {[1945, 1960, 1970, 1980, 1992].map((t) => <text key={t} x={x(t)} y={H - 12} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
       </svg>
       <p className="text-xs text-muted-foreground">Muuttaneet henkilöt vuodessa (Korkiasaari 1993) ja Suomen työttömyysaste (katkoviiva, oma asteikko).</p>
+    </div>
+  );
+}
+
+function LinesChart({ lines, from, to, event, eventLabel, caption }: { lines: { label: string; s: [number, number][]; main: boolean }[]; from: number; to: number; event: number; eventLabel: string; caption: string }) {
+  const W = 620, H = 200, L = 40, R = 540, TOP = 14, BOT = 168;
+  const x = (yr: number) => L + ((yr - from) / (to - from)) * (R - L);
+  const cut = lines.map((l) => ({ ...l, s: l.s.filter(([yr]) => yr >= from && yr <= to) }));
+  const hi = Math.max(...cut.flatMap((l) => l.s.map((p) => p[1]))) * 1.05;
+  const y = (v: number) => BOT - (v / hi) * (BOT - TOP);
+  const step = hi > 200 ? 100 : hi > 20 ? 10 : 2;
+  const ticks = Array.from({ length: Math.floor(hi / step) + 1 }, (_, i) => i * step);
+  const ends = cut.map((l) => ({ ...l, ly: y(l.s.at(-1)![1]) })).sort((a, b) => a.ly - b.ly);
+  for (let i = 1; i < ends.length; i++) if (ends[i]!.ly - ends[i - 1]!.ly < 12) ends[i]!.ly = ends[i - 1]!.ly + 12;
+  return (
+    <div className="mt-2 overflow-x-auto">
+      <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[460px] max-w-2xl" role="img" aria-label={caption}>
+        <line x1={x(event)} x2={x(event)} y1={TOP} y2={BOT} stroke="var(--primary)" strokeOpacity={0.4} strokeDasharray="3 3" />
+        <text x={x(event) + 4} y={TOP + 8} className="fill-primary text-[10px]">{eventLabel}</text>
+        {ticks.map((t) => <text key={t} x={L - 6} y={y(t) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">{t}</text>)}
+        {cut.filter((l) => !l.main).concat(cut.filter((l) => l.main)).map((l) => (
+          <path key={l.label} d={l.s.map(([a, v], i) => `${i ? "L" : "M"}${x(a).toFixed(1)},${y(v).toFixed(1)}`).join(" ")} fill="none"
+            stroke={l.main ? "var(--primary)" : "var(--muted-foreground)"} strokeWidth={l.main ? 2.2 : 1.4} strokeOpacity={l.main ? 1 : 0.8} />
+        ))}
+        {ends.map((l) => <text key={l.label} x={R + 6} y={l.ly + 4} className={l.main ? "fill-primary text-[11px] font-semibold" : "fill-muted-foreground text-[11px]"}>{l.label}</text>)}
+        {[from, event, to].map((t) => <text key={t} x={x(t)} y={H - 12} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
+      </svg>
+      <p className="text-xs text-muted-foreground">{caption}</p>
     </div>
   );
 }
