@@ -135,3 +135,18 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Maittain: Suomi −0,18, Ruotsi −0,13, Norja −0,26, Tanska +0,33. Mikään ei ole merkitsevä.
 - **Tulkinta:** määräaikaisuus ei ennusta syntyvyyttä, eikä se lisää mitään työttömyyden lisäksi.
   Työn epävarmuus siinä muodossa kuin määräaikaisuus sitä mittaa ei selitä yhteyttä.
+
+## H1d. Perheen perustamisen lykkääntyminen → syntyvyys (tarkennus)
+
+- **Kirjattu:** 27.11.2026, H1:n, H1b:n ja H1c:n testien jälkeen ja ennen alla olevan testin laskentaa.
+- **Väite:** koko maan nuorten naisten työttömyys kuvaa sitä, kuinka vaikeaa on vakiinnuttaa
+  työura. Se siirtää perheen perustamista, joten vaikutus näkyy ennen kaikkea esikoisissa. Myöhempien
+  lasten syntyvyys reagoi vähemmän.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T6 Esikoiset | Esikoisten kokonaishedelmällisyys ≈ TFR × esikoisten osuus syntyneistä, joiden järjestysluku tunnetaan (Eurostat demo_fordagec). Myöhemmät = TFR − esikoiset. Suomi, Ruotsi, Norja ja Tanska 1995–2024. Selittäjä naisten 25–34 työttömyys. Menetelmä kuten aiemmissa (log-muutokset, rajaus, AR(1), viive 1–2 v, Šidák, maat yhdessä). | Tukee: esikoisten r < 0, p < 0,05 ja \|r\| > myöhempien \|r\|. Kumoaa: esikoisten r ≥ 0, tai myöhempien r on negatiivisempi kuin esikoisten ja p < 0,05. Muuten: ei ratkea |
+
+- **Aineiston tarkistus ennen tulosta:** Suomen likiarvoa verrataan tarkkaan esikoisten
+  hedelmällisyyteen (12dm ja 12c6, `statfin.synt.tfr_order_1`). Jos vuosimuutosten korrelaatio on
+  alle 0,9, testi tehdään vain Suomen tarkalla sarjalla ja tulos on enintään "ei ratkea".
