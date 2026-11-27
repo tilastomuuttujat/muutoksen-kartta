@@ -545,6 +545,25 @@ describe("pilot results", () => {
     expect(Math.abs((b3!.detail["rho"] as number) + 0.31)).toBeLessThanOrEqual(0.0051);
     expect(statusOfHypothesis(hypothesis("h25b")!)).toBe("ehdokas");
   });
+  it("H25c and H25d numbers quoted in the register", () => {
+    const [c1, c2] = NAYTTO.hypotheses.h25c.tests as { result: string; detail: Record<string, unknown> }[];
+    expect(c1!.result).toBe("tukee");
+    expect(Math.abs((c1!.detail["rho"] as number) + 0.5)).toBeLessThanOrEqual(0.005);
+    expect(c1!.detail["p"] as number).toBeCloseTo(0.047, 3);
+    const pts = c1!.detail["points"] as { iso: string; rr: number; hp: number }[];
+    expect([...pts].sort((a, b) => b.rr - a.rr)[0]!.iso).toBe("FIN");
+    expect(pts.find((p) => p.iso === "ESP")).toMatchObject({ rr: 0.08, hp: 115.3 });
+    expect(c2!.result).toBe("kumoaa");
+    expect(c2!.detail).toMatchObject({ finRate: 1.66, sweRate: 1.74 });
+    expect([Math.round(c2!.detail["finHp"] as number), Math.round(c2!.detail["sweHp"] as number)]).toEqual([44, 94]);
+    expect(statusOfHypothesis(hypothesis("h25c")!)).toBe("ristiriita");
+    const [d1] = NAYTTO.hypotheses.h25d.tests as { result: string; detail: Record<string, unknown> }[];
+    expect(d1!.result).toBe("ei-ratkea");
+    expect(d1!.detail).toMatchObject({ core: ["AUT", "DEU", "FRA", "LUX", "NLD"], coreMedian: 0.9, floatMedian: 3.6, crisisMedian: -4.5, fin: -7.9, finMaxSpread: 0.4 });
+    expect((d1!.detail["maxSpread"] as Record<string, number>)["Belgia"]).toBe(1.62);
+    expect(d1!.detail["p"] as number).toBeCloseTo(0.15, 2);
+    expect(statusOfHypothesis(hypothesis("h25d")!)).toBe("oletus");
+  });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
       expect(p.lo).toBeLessThan(p.point);

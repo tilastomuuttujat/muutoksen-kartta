@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Kolmekymmentäseitsemän hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Kolmekymmentäyhdeksän hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Yhdeksän väitettä kumoutui, kuusi on tuettu, yhdeksän on ehdokkaita ja kolmetoista näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Yhdeksän väitettä kumoutui, kuusi on tuettu, yhdeksän on ehdokkaita ja viisitoista näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -277,6 +277,9 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
         legend={["euromaat", "oma valuutta"]}
         pts={(t.detail as unknown as { points: { iso: string; name: string; group: string; reer: number; gdp: number }[] }).points.map((p) => ({ label: p.name, x: p.reer, y: p.gdp, muted: p.group === "oma", show: ["FIN", "DNK", "ISL", "GBR", "IRL", "GRC", "ITA", "JPN", "SWE", "DEU"].includes(p.iso) }))}
         xLabel="reaalikurssin muutos 2007 → 2009, % (− = heikkeni)" yLabel="BKT asukasta kohden 2007 → 2015, %" />}
+      {h.id === "h25c" && t.id === "annos" && <PointScatter
+        pts={(t.detail as unknown as { points: { iso: string; name: string; rr: number; hp: number }[] }).points.map((p) => ({ label: p.name, x: p.rr, y: p.hp }))}
+        xr={[-0.5, 2]} xLabel="reaalikorko 1999–2007, % (lyhyt korko − inflaatio)" yLabel="asuntojen reaalihinnat 1998 → 2007, %" />}
       {h.id === "h14" && t.id === "katkos" && <BreakChart detail={t.detail as Break} cfg={{ trend: [1976, 1987], win: [1988, 1991], from: 1960, label: "laki voimaan 1/1988", ticks: [1960, 1976, 1988, 2000, 2025], zeroTicks: [0, 1, 2, 3], caption: "Avioerot 1 000 asukasta kohden (StatFin 121v). Katkoviiva: vuosien 1976–1987 trendi jatkettuna. Poikkeama 1988–1991 oli suurempi kuin kaikissa tavallisissa jaksoissa." }} />}
       {h.id === "h13" && t.id === "suomi" && <DecouplingChart detail={t.detail as { co2: [number, number][]; gdp: [number, number][] }} />}
       {h.id === "h12" && t.id === "toisto" && <CountryCorr h="h12" detail={t.detail as Pooled & Rc} />}
@@ -734,17 +737,18 @@ function MigrationChart({ detail }: { detail: { toSweden: [number, number][]; fr
   );
 }
 
-function PointScatter({ pts, xLabel, yLabel, dots = false, legend }: { pts: { label: string; x: number; y: number; show?: boolean; muted?: boolean }[]; xLabel: string; yLabel: string; dots?: boolean; legend?: [string, string] }) {
+function PointScatter({ pts, xLabel, yLabel, dots = false, legend, xr }: { pts: { label: string; x: number; y: number; show?: boolean; muted?: boolean }[]; xLabel: string; yLabel: string; dots?: boolean; legend?: [string, string]; xr?: [number, number] }) {
   const W = 620, H = 210, L = 50, R = 580, TOP = 18, BOT = 170;
   const nice = (v: number) => Math.ceil(Math.abs(v) / 10) * 10 * Math.sign(v);
-  const x0 = Math.min(0, nice(Math.min(...pts.map((p) => p.x)) - 2)), x1 = Math.max(0, nice(Math.max(...pts.map((p) => p.x)) + 2));
+  const x0 = xr ? xr[0] : Math.min(0, nice(Math.min(...pts.map((p) => p.x)) - 2)), x1 = xr ? xr[1] : Math.max(0, nice(Math.max(...pts.map((p) => p.x)) + 2));
   const y0 = Math.min(0, nice(Math.min(...pts.map((p) => p.y)) - 2)), y1 = Math.max(0, nice(Math.max(...pts.map((p) => p.y)) + 2));
   const x = (v: number) => L + ((v - x0) / (x1 - x0)) * (R - L);
   const y = (v: number) => BOT - ((v - y0) / (y1 - y0)) * (BOT - TOP);
-  const sgn = (v: number) => (v > 0 ? `+${v}` : v < 0 ? `−${-v}` : `${v}`);
+  const sgn = (v: number) => { const t = Math.abs(v).toLocaleString("fi-FI"); return v > 0 ? `+${t}` : v < 0 ? `−${t}` : "0"; };
   const ticks = (a: number, b: number) => {
-    const step = [10, 20, 50, 100].find((st) => (b - a) / st <= 6) ?? 200;
-    return Array.from({ length: Math.floor((b - a) / 10) + 1 }, (_, i) => a + i * 10).filter((t) => t % step === 0);
+    const step = [0.5, 1, 2, 5, 10, 20, 50, 100].find((st) => (b - a) / st <= 6) ?? 200;
+    const first = Math.ceil(a / step) * step;
+    return Array.from({ length: Math.floor((b - first) / step + 1e-9) + 1 }, (_, i) => Math.round((first + i * step) * 10) / 10);
   };
   return (
     <div className="mt-2 overflow-x-auto">

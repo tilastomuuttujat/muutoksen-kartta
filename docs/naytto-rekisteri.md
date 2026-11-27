@@ -1719,3 +1719,55 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 | T1 Luonnollinen koe | BKT asukasta kohden, log-muutos 2007 → 2015: ydineuromaat vs. omavaluuttaiset. Ryhmämediaanien ero, yksisuuntainen permutaatiotesti (10 000, siemen 1) | Tukee: ydinmaiden mediaani < omavaluuttaisten mediaani ja p < 0,05. Kumoaa: ydinmaiden mediaani ≥ omavaluuttaisten mediaani. Muuten: ei ratkea |
 
 - **Kuvaileva:** velkakriisimaiden mediaani ja Suomen sijainti.
+
+## H25c: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Annos: tukee.** rho = −0,50 (permutaatio-p = 0,047, 12 euromaata).
+  - Matalan reaalikoron maissa asuntojen reaalihinnat nousivat enemmän.
+
+  | Maa | Reaalikorko 1999–2007 | Asuntojen reaalihinnat 1998 → 2007 |
+  |---|---|---|
+  | Irlanti | −0,25 % | +79 % |
+  | Espanja | 0,08 % | +115 % |
+  | Portugali | 0,28 % | −1 % |
+  | Luxemburg | 0,50 % | +75 % |
+  | Alankomaat | 0,80 % | +59 % |
+  | Italia | 0,87 % | +38 % |
+  | Kreikka | 0,96 % | +65 % |
+  | Belgia | 1,00 % | +63 % |
+  | Ranska | 1,29 % | +104 % |
+  | Itävalta | 1,47 % | −4 % |
+  | Saksa | 1,65 % | −16 % |
+  | Suomi | 1,66 % | +44 % |
+
+- **T2 Ruotsi: kumoaa.**
+  - Edellytys täyttyi niukasti: Suomen reaalikorko oli 1,66 % ja Ruotsin 1,74 %.
+  - Asuntojen reaalihinnat kuitenkin nousivat Suomessa vähemmän (+44 %) kuin Ruotsissa (+94 %).
+- **Tila:** ristiriita. Vahva asetelma tukee, ja yksi heikko testi kumoaa.
+- **Tulkinta:**
+  - Euroalueen tasolla yhteinen korko näyttää paisuttaneen asuntohintoja matalan reaalikoron maissa
+    (Irlanti ja Espanja).
+  - Suomi ei kuulunut niihin: sen reaalikorko oli euromaiden korkein, koska inflaatio oli hidasta.
+  - Väitteen Suomea koskeva osa kumoutui. Euro ei tehnyt Suomen rahapolitiikasta poikkeuksellisen
+    kevyttä.
+
+## H25d: tulos
+
+- **Laskettu:** 27.11.2026.
+- **Ydinmaat säännön mukaan** (pitkän koron ero Saksaan enintään 1,5 %-yks. 2010–2012): Itävalta,
+  Saksa, Ranska, Luxemburg ja Alankomaat.
+  - Belgia jäi ulos niukasti (1,62).
+  - Suomen suurin ero oli 0,40, joten Suomi olisi kuulunut ydinmaihin.
+- **T1 Luonnollinen koe: ei ratkea.** BKT asukasta kohden 2007 → 2015:
+  - Ydinmaiden mediaani +0,9 %, omavaluuttaisten +3,6 % (p = 0,15).
+  - Ennustettu suunta, mutta viidellä ydinmaalla ero ei ole merkitsevä.
+- **Kuvaileva:**
+  - Velkakriisimaiden mediaani oli −4,5 %.
+  - Suomi (−7,9 %) jäi velkakriisimaiden mediaaninkin alle, vaikka sen korot eivät nousseet.
+- **Tila:** oletus.
+- **Tulkinta:**
+  - Ydineuromaatkin kasvoivat hitaammin kuin omavaluuttaiset, mikä sopii valuuttamekanismiin. Ero
+    jäi kuitenkin tilastollisesti avoimeksi.
+  - Suomen poikkeuksellisen heikkoa kehitystä ei selitä velkakriisi. Valuuttamekanismi ja Suomen omat
+    rakenteelliset shokit (Nokia, metsäteollisuus, Venäjä) jäävät tällä aineistolla erottamatta.

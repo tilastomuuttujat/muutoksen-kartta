@@ -1870,6 +1870,61 @@ def h25():
     return {"tests": [a1, a2], "predictions": []}, {"tests": [b1, b2, b3], "predictions": []}
 
 
+def h25cd():
+    """H25c yhteinen korko → asuntohinnat ja H25d ydineuromaat vs. omavaluuttaiset (docs/naytto-rekisteri.md)."""
+    import pandas as pd
+    path = os.environ.get("GMD_DTA", os.path.join("/tmp", "GMD_2026_09.dta"))
+    if not os.path.exists(path):
+        urllib.request.urlretrieve(GMD_URL, path)
+    d = pd.read_stata(path, columns=["ISO3", "year", "strate", "infl", "rHPI", "ltrate", "rGDP_pc"])
+    S = {iso: g.set_index("year") for iso, g in d.groupby("ISO3")}
+    NM = {"FIN": "Suomi", "SWE": "Ruotsi", "AUT": "Itävalta", "BEL": "Belgia", "DEU": "Saksa", "ESP": "Espanja", "FRA": "Ranska",
+          "GRC": "Kreikka", "IRL": "Irlanti", "ITA": "Italia", "LUX": "Luxemburg", "NLD": "Alankomaat", "PRT": "Portugali"}
+    EURO12 = ["AUT", "BEL", "DEU", "ESP", "FRA", "GRC", "IRL", "ITA", "LUX", "NLD", "PRT", "FIN"]
+    rng = np.random.default_rng(1)
+    rr = lambda c: float(np.mean([S[c]["strate"][y] - S[c]["infl"][y] for y in range(1999, 2008)]))
+    hp = lambda c: math.log(S[c]["rHPI"][2007] / S[c]["rHPI"][1998])
+    pc = lambda v: round((math.exp(v) - 1) * 100, 1)
+    def rk(v):
+        o = np.argsort(v, kind="stable"); r_ = np.empty(len(v)); r_[o] = np.arange(len(v)); return r_
+    X, Y = np.array([rr(c) for c in EURO12]), np.array([hp(c) for c in EURO12])
+    rx, ry = rk(X), rk(Y)
+    rho = float(np.corrcoef(rx, ry)[0, 1])
+    p1 = float(np.mean(np.array([np.corrcoef(rx, rng.permutation(ry))[0, 1] for _ in range(10000)]) <= rho))
+    c1r = "tukee" if rho < 0 and p1 < 0.05 else "kumoaa" if rho >= 0 else "ei-ratkea"
+    fr, sr, fh, sh = rr("FIN"), rr("SWE"), hp("FIN"), hp("SWE")
+    c2r = "ei-ratkea" if fr >= sr else "tukee" if fh > sh else "kumoaa"
+    pts = [{"iso": c, "name": NM[c], "rr": round(rr(c), 2), "hp": pc(hp(c))} for c in EURO12]
+    c1 = {"id": "annos", "design": "annos", "result": c1r, "date": str(date.today()),
+          "summary": f"12 euromaata: reaalikorko 1999–2007 vs. asuntojen reaalihinnan muutos 1998 → 2007, rho = {rho:.2f} (permutaatio-p = {p1:.4f})",
+          "detail": {"rho": round(rho, 3), "p": round(p1, 4), "points": pts}}
+    c2 = {"id": "ruotsi", "design": "tasmallisyys", "result": c2r, "date": str(date.today()),
+          "summary": f"Reaalikorko 1999–2007: Suomi {fr:.2f} %, Ruotsi {sr:.2f} %; asuntojen reaalihinnat 1998 → 2007: Suomi {pc(fh):+.0f} %, Ruotsi {pc(sh):+.0f} %",
+          "detail": {"finRate": round(fr, 2), "sweRate": round(sr, 2), "finHp": pc(fh), "sweHp": pc(sh)}}
+    # H25d
+    EURO = ["AUT", "BEL", "DEU", "ESP", "FRA", "GRC", "IRL", "ITA", "LUX", "NLD", "PRT"]
+    FLOAT = ["AUS", "CAN", "CHE", "GBR", "ISL", "JPN", "NOR", "NZL", "SWE", "USA"]
+    maxspread = {c: max(S[c]["ltrate"][y] - S["DEU"]["ltrate"][y] for y in range(2010, 2013)) for c in EURO + ["FIN"]}
+    core = [c for c in EURO if c == "DEU" or maxspread[c] <= 1.5]
+    crisis = [c for c in EURO if c not in core]
+    gdp = {c: math.log(S[c]["rGDP_pc"][2015] / S[c]["rGDP_pc"][2007]) for c in EURO + FLOAT + ["FIN"]}
+    diff = float(np.median([gdp[c] for c in FLOAT]) - np.median([gdp[c] for c in core]))
+    pool = [gdp[c] for c in core + FLOAT]; k = len(core)
+    draws = []
+    for _ in range(10000):
+        q = rng.permutation(pool); draws.append(np.median(q[k:]) - np.median(q[:k]))
+    p2 = float(np.mean(np.array(draws) >= diff))
+    d1r = "tukee" if diff > 0 and p2 < 0.05 else "kumoaa" if diff <= 0 else "ei-ratkea"
+    med = lambda g: pc(float(np.median([gdp[c] for c in g])))
+    names = lambda g: ", ".join(NM.get(c, c) for c in g)
+    d1 = {"id": "ydinmaat", "design": "luonnollinen", "result": d1r, "date": str(date.today()),
+          "summary": f"BKT asukasta kohden 2007 → 2015: ydineuromaat ({names(core)}) mediaani {med(core):+.1f} %, omavaluuttaiset {med(FLOAT):+.1f} % (p = {p2:.4f}); velkakriisimaat {med(crisis):+.1f} %, Suomi {pc(gdp['FIN']):+.1f} %",
+          "detail": {"core": core, "crisis": crisis, "p": round(p2, 4), "coreMedian": med(core), "floatMedian": med(FLOAT), "crisisMedian": med(crisis),
+                     "fin": pc(gdp["FIN"]), "finMaxSpread": round(maxspread["FIN"], 2),
+                     "maxSpread": {NM[c]: round(float(v), 2) for c, v in maxspread.items()}, "gdp": {NM.get(c, c): pc(v) for c, v in gdp.items()}}}
+    return {"tests": [c1, c2], "predictions": []}, {"tests": [d1], "predictions": []}
+
+
 def pension_age(c):
     """Alin vanhuuseläkeikä vuosina syntymävuoden mukaan (vuoden 2017 uudistus)."""
     if c <= 1954:
@@ -2276,6 +2331,7 @@ def main():
     out["hypotheses"]["h24e"] = h24e()
     out["hypotheses"]["h24f"] = h24f()
     out["hypotheses"]["h25"], out["hypotheses"]["h25b"] = h25()
+    out["hypotheses"]["h25c"], out["hypotheses"]["h25d"] = h25cd()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.

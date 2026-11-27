@@ -76,7 +76,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h16: { tests: Test[]; predictions: Prediction[] }; h17: { tests: Test[]; predictions: Prediction[] }; h18: { tests: Test[]; predictions: Prediction[] }; h19: { tests: Test[]; predictions: Prediction[] }; h20: { tests: Test[]; predictions: Prediction[] }; h21: { tests: Test[]; predictions: Prediction[] }; h22: { tests: Test[]; predictions: Prediction[] }; h23: { tests: Test[]; predictions: Prediction[] }; h24: { tests: Test[]; predictions: Prediction[] }; h24b: { tests: Test[]; predictions: Prediction[] }; h24c: { tests: Test[]; predictions: Prediction[] }; h24d: { tests: Test[]; predictions: Prediction[] }; h24e: { tests: Test[]; predictions: Prediction[] }; h24f: { tests: Test[]; predictions: Prediction[] }; h25: { tests: Test[]; predictions: Prediction[] }; h25b: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h16: { tests: Test[]; predictions: Prediction[] }; h17: { tests: Test[]; predictions: Prediction[] }; h18: { tests: Test[]; predictions: Prediction[] }; h19: { tests: Test[]; predictions: Prediction[] }; h20: { tests: Test[]; predictions: Prediction[] }; h21: { tests: Test[]; predictions: Prediction[] }; h22: { tests: Test[]; predictions: Prediction[] }; h23: { tests: Test[]; predictions: Prediction[] }; h24: { tests: Test[]; predictions: Prediction[] }; h24b: { tests: Test[]; predictions: Prediction[] }; h24c: { tests: Test[]; predictions: Prediction[] }; h24d: { tests: Test[]; predictions: Prediction[] }; h24e: { tests: Test[]; predictions: Prediction[] }; h24f: { tests: Test[]; predictions: Prediction[] }; h25: { tests: Test[]; predictions: Prediction[] }; h25b: { tests: Test[]; predictions: Prediction[] }; h25c: { tests: Test[]; predictions: Prediction[] }; h25d: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -567,6 +567,32 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Mekanismin ensimmäinen osa toteutui selvästi: omavaluuttaisten maiden reaalikurssit heikkenivät 2007–2009 (mediaani −6 %), euromaiden eivät (+2 %; Suomi +3 %). Kasvuero oli ennustetun suuntainen, noin 3 prosenttiyksikköä vuoteen 2015, mutta jäi niukasti kirjatun rajan alle. Suomen BKT asukasta kohden oli 2015 lähes 8 % vuoden 2007 alapuolella, kolmanneksi heikoin 23 maasta; siihen vaikuttivat myös Nokian ja metsäteollisuuden rakennemuutos ja Venäjän kauppa (ei testattu). Euromaiden sisällä hajonta oli suurta (Irlanti +23 %, Kreikka −25 %).",
     next: "Erota valuuttakurssi ja velkakriisi: vertaa euromaita, joiden korot eivät nousseet 2010–2012 (Saksa, Alankomaat, Itävalta, Suomi), omavaluuttaisiin maihin.",
+  },
+  {
+    id: "h25c",
+    title: "Yhteinen ohjauskorko paisutti asuntohintoja siellä, missä se oli liian matala",
+    claim: "Euroalueen yhteinen nimellinen korko tarkoitti nopean inflaation maissa matalaa reaalikorkoa, mikä kiihdytti asuntojen reaalihintoja 1999–2007; Suomessa reaalikorko oli matalampi kuin omaa korkoaan päättäneessä Ruotsissa.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. Jatkoa H25:lle.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h25c.tests,
+    predictions: [],
+    reading:
+      "Euroalueen tasolla yhteys löytyi: matalan reaalikoron maissa (Irlanti, Espanja) asuntojen reaalihinnat nousivat eniten. Suomi ei kuitenkaan kuulunut niihin: hitaan inflaation vuoksi Suomen reaalikorko oli euromaiden korkein, ja asuntohinnat nousivat selvästi vähemmän kuin Ruotsissa, joka päätti korostaan itse. Euro ei tehnyt Suomen rahapolitiikasta poikkeuksellisen kevyttä.",
+    next: "Luotonanto (ei Global Macro Databasessa): kasvoiko kotitalouksien velka nopeimmin matalan reaalikoron euromaissa?",
+  },
+  {
+    id: "h25d",
+    title: "Heikompi kasvu johtui valuutasta eikä vain velkakriisistä",
+    claim: "Myös ne euromaat, joihin velkakriisi ei osunut, kasvoivat 2007–2015 hitaammin kuin omavaluuttaiset maat.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa; ydinmaiden määritelmä (korkoero Saksaan ≤ 1,5 %-yks. 2010–2012) kirjattiin ennen tuloksia.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h25d.tests,
+    predictions: [],
+    reading:
+      "Ydineuromaat (Itävalta, Saksa, Ranska, Luxemburg, Alankomaat) kasvoivat 2007–2015 hitaammin kuin omavaluuttaiset maat (mediaani +0,9 % vs. +3,6 %), mikä sopii valuuttamekanismiin, mutta viidellä maalla ero jää tilastollisesti avoimeksi. Suomi olisi koronsa puolesta kuulunut ydinmaihin, mutta sen BKT asukasta kohden jäi jopa velkakriisimaiden mediaanin alle (−7,9 % vs. −4,5 %). Velkakriisi ei siis selitä Suomen heikkoutta; valuuttaa ja Suomen omia rakenteellisia shokkeja (Nokia, metsäteollisuus, Venäjä) tämä aineisto ei erota.",
+    next: "Erottaa rakenneshokki valuutasta: vertaa Suomen alueita tai toimialoja, joihin Nokia ja metsäteollisuus eivät osuneet, Ruotsin vastaaviin.",
   },
   {
     id: "h2",
