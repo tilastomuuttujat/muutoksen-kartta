@@ -761,3 +761,29 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 | T1 Suomi pitkällä aikavälillä | OWID: alueperusteiset CO₂-päästöt ja Maddison: BKT yhteensä (Turso), jousto 1961–2004 vs. 2005–2022. Ero testataan lohkobootstrapilla (3 vuoden lohkot, 5 000 toistoa). | Tukee: jousto pienempi 2005– ja yksisuuntainen p < 0,05. Kumoaa: jousto ei pienempi. Muuten: ei ratkea |
 | T2 Toisto Pohjoismaissa | Ruotsi, Norja ja Tanska: kasvihuonekaasupäästöt ilman maankäyttösektoria (Eurostat env_air_gge, TOTX4_MEMO) ja kiinteähintainen BKT (nama_10_gdp CLV10_MNAC). Jousto 1996–2004 vs. 2005–2024, maakohtaiset vakiot, lohkobootstrap kuten T1. | Kuten T1 |
 | T3 Absoluuttinen irtikytkentä | Suomi, Ruotsi, Norja ja Tanska: BKT:n ja kasvihuonekaasupäästöjen kokonaismuutos 2005 → 2024 | Tukee: kaikissa neljässä BKT kasvoi ja päästöt laskivat. Kumoaa: vähintään kahdessa päästöt kasvoivat. Muuten: ei ratkea |
+
+## H13: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Suomi: kumoaa.** Jousto 1961–2004 0,39, 2005–2022 0,86 (p = 0,83).
+- **T2 Toisto Pohjoismaissa: kumoaa.** Jousto 1996–2004 −0,95, 2005–2024 0,99.
+- **T3 Absoluuttinen irtikytkentä: tukee.** 2005 → 2024 BKT kasvoi ja päästöt laskivat kaikissa
+  neljässä maassa:
+
+  | Maa | BKT | Päästöt |
+  |---|---|---|
+  | Suomi | +14 % | −44 % |
+  | Ruotsi | +39 % | −28 % |
+  | Norja | +36 % | −18 % |
+  | Tanska | +30 % | −46 % |
+
+- **Tila:** kumottu, koska kaksi testiä kumoaa.
+- **Operationalisoinnin virhe (kirjattu tuloksen jälkeen):**
+  - Vuosimuutosten jousto mittaa sitä, miten päästöt reagoivat suhdanteisiin. Se ei mittaa pitkää
+    kehityssuuntaa.
+  - Väitteen ydin, eli päästöt laskevat talouden kasvaessa, näkyy jouston sijaan vakiotermissä:
+    päästöjen muutos nollakasvun vuonna.
+  - Päästöt reagoivat suhdanteisiin edelleen voimakkaasti, mutta niiden pitkä kehityssuunta irtosi
+    kasvusta.
+  - Kirjattua tulosta ei muuteta. Oikealla mittarilla kirjattava tarkennus H13b ei olisi ennalta
+    kirjattu suhteessa näihin lukuihin.

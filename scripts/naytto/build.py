@@ -1279,6 +1279,93 @@ def h12():
     return {"tests": [t1, t2, t3], "predictions": []}
 
 
+def h13():
+    """H13 (docs/naytto-rekisteri.md): talouskasvun ja päästöjen irtikytkentä."""
+    co2, gdp = {}, {}
+    for line in open(os.path.join(D, "values.ndjson")):
+        k, y, g_, v, kind = json.loads(line)
+        if v is None or kind not in ("observed", "estimate"):
+            continue
+        if k == "owid.finland.annual-co2-emissions-per-country.v20261026":
+            co2[int(y)] = float(v)
+        elif k == "owid.finland.gdp-maddison-project-database.v20261026":
+            gdp[int(y)] = float(v)
+    dl = lambda d, y: math.log(d[y]) - math.log(d[y - 1])
+
+    def slope(rows):
+        a = np.array(rows, float)
+        x, y = a[:, 0] - a[:, 0].mean(), a[:, 1] - a[:, 1].mean()
+        return float(x @ y / (x @ x))
+
+    def boot(groups_before, groups_after, seed, R=5000):
+        """groups_*: lista vuosittaisia ryhmiä [(x, y) …]; lohkot 3 vuotta, slope demeanattuna ryhmän sisällä."""
+        rng = np.random.default_rng(seed)
+        def resample(groups):
+            n = len(groups); out = []
+            while len(out) < n:
+                st = int(rng.integers(0, n - 2))
+                out.extend(groups[st:st + 3])
+            return out[:n]
+        diffs = []
+        for _ in range(R):
+            b_ = [r for g in resample(groups_before) for r in g]
+            a_ = [r for g in resample(groups_after) for r in g]
+            diffs.append(slope(a_) - slope(b_))
+        return diffs
+
+    yrs = [y for y in range(1961, 2023) if y in co2 and y - 1 in co2 and y in gdp and y - 1 in gdp]
+    before = [[(dl(gdp, y), dl(co2, y))] for y in yrs if y <= 2004]
+    after = [[(dl(gdp, y), dl(co2, y))] for y in yrs if y >= 2005]
+    e_b, e_a = slope([r for g in before for r in g]), slope([r for g in after for r in g])
+    diffs = boot(before, after, 131)
+    p1 = float(np.mean([d_ >= 0 for d_ in diffs]))
+    res = lambda eb, ea, p_: "tukee" if ea < eb and p_ < 0.05 else "kumoaa" if ea >= eb else "ei-ratkea"
+    t1 = {"id": "suomi", "design": "ajoitus", "result": res(e_b, e_a, p1), "date": str(date.today()),
+          "summary": f"Suomi: päästöjen jousto BKT:n suhteen 1961–2004 {e_b:.2f}, 2005–2022 {e_a:.2f} (yksisuuntainen p = {p1:.3f})",
+          "detail": {"before": round(e_b, 3), "after": round(e_a, 3), "p": round(p1, 4),
+                     "co2": sorted((y, round(v / 1e6, 2)) for y, v in co2.items() if y >= 1950),
+                     "gdp": sorted((y, round(v / 1e9, 1)) for y, v in gdp.items() if y >= 1950)}}
+    # T2 ja T3: Eurostat
+    geos = "&".join(f"geo={c}" for c in COUNTRIES)
+    _, gg = eurostat_multi("env_air_gge", f"{geos}&airpol=GHG&src_crf=TOTX4_MEMO&unit=THS_T")
+    ghg = {k[-1]: v for k, v in gg.items()}
+    gdpe = eurostat_annual("nama_10_gdp", f"{geos}&na_item=B1GQ&unit=CLV10_MNAC")
+    def groups(cs, lo, hi):
+        out = []
+        for y in range(lo, hi + 1):
+            g = []
+            for c in cs:
+                if all(t in ghg.get(c, {}) and t in gdpe.get(c, {}) for t in (y, y - 1)):
+                    g.append((c, dl(gdpe[c], y), dl(ghg[c], y)))
+            if g:
+                out.append(g)
+        return out
+    def demean(groups_):
+        # maakohtaiset vakiot: keskiarvot pois maittain koko jakson yli
+        rows = [r for g in groups_ for r in g]
+        mx = {c: np.mean([r[1] for r in rows if r[0] == c]) for c in {r[0] for r in rows}}
+        my = {c: np.mean([r[2] for r in rows if r[0] == c]) for c in mx}
+        return [[(r[1] - mx[r[0]], r[2] - my[r[0]]) for r in g] for g in groups_]
+    cs = ["SE", "NO", "DK"]
+    gb, ga = demean(groups(cs, 1996, 2004)), demean(groups(cs, 2005, 2024))
+    e2b, e2a = slope([r for g in gb for r in g]), slope([r for g in ga for r in g])
+    p2 = float(np.mean([d_ >= 0 for d_ in boot(gb, ga, 132)]))
+    t2 = {"id": "toisto", "design": "toisto", "result": res(e2b, e2a, p2), "date": str(date.today()),
+          "summary": f"Ruotsi, Norja ja Tanska: jousto 1996–2004 {e2b:.2f}, 2005–2024 {e2a:.2f} (yksisuuntainen p = {p2:.3f})",
+          "detail": {"before": round(e2b, 3), "after": round(e2a, 3), "p": round(p2, 4)}}
+    chg = {}
+    for c in COUNTRIES:
+        last = max(y for y in ghg[c] if y in gdpe[c])
+        chg[c] = {"gdp": round((gdpe[c][last] / gdpe[c][2005] - 1) * 100, 2), "ghg": round((ghg[c][last] / ghg[c][2005] - 1) * 100, 2), "last": last}
+    up = sum(1 for c in COUNTRIES if chg[c]["ghg"] > 0)
+    ok = all(chg[c]["gdp"] > 0 and chg[c]["ghg"] < 0 for c in COUNTRIES)
+    r3 = "tukee" if ok else "kumoaa" if up >= 2 else "ei-ratkea"
+    t3 = {"id": "absoluuttinen", "design": "tasmallisyys", "result": r3, "date": str(date.today()),
+          "summary": "2005 → " + str(chg["FI"]["last"]) + ": " + "; ".join(f"{ {'FI': 'Suomi', 'SE': 'Ruotsi', 'NO': 'Norja', 'DK': 'Tanska'}[c]} BKT {chg[c]['gdp']:+.0f} %, päästöt {chg[c]['ghg']:+.0f} %" for c in COUNTRIES),
+          "detail": {"countries": chg}}
+    return {"tests": [t1, t2, t3], "predictions": []}
+
+
 def h11():
     """H11 (docs/naytto-rekisteri.md): ulkomaan kansalaisten osuus → Suomen kansalaisten työllisyys ja työttömyys."""
     regions = ["MK01", "MK02", "MK04", "MK05", "MK06", "MK07", "MK08", "MK09", "MK10", "MK11", "MK12", "MK13", "MK14", "MK15", "MK16", "MK17", "MK18", "MK19"]
@@ -1445,6 +1532,7 @@ def main():
     out["hypotheses"]["h10"] = h10()
     out["hypotheses"]["h11"] = h11()
     out["hypotheses"]["h12"] = h12()
+    out["hypotheses"]["h13"] = h13()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
@@ -1502,6 +1590,7 @@ def main():
         for t in out["hypotheses"][hk]["tests"]:
             print(hk, t["id"], t["result"], "|", t["summary"]); print("   ", t["detail"].get("countries", ""))
     d7 = out["hypotheses"]["h7"]["tests"][1]["detail"]; print("  miehet", d7["men"], "naiset", d7["women"]); print("  sarja", [x for x in d7["series"] if x[0] <= 2005])
+    for t in out["hypotheses"]["h13"]["tests"]: print("h13", t["id"], t["result"], "|", t["summary"])
     for t in out["hypotheses"]["h12"]["tests"]: print("h12", t["id"], t["result"], "|", t["summary"]); print("   ", t["detail"].get("countries", ""))
     for hk, tid in (("h1", "annos"), ("h1e", "annos"), ("h1g", "annos"), ("h7", "annos")):
         t = next(x for x in out["hypotheses"][hk]["tests"] if x["id"] == tid)

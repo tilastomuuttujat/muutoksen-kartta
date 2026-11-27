@@ -303,6 +303,20 @@ describe("pilot results", () => {
     expect(ch.trends.p).toBeCloseTo(0.41, 2);
     expect(statusOfHypothesis(hypothesis("h12")!)).toBe("ehdokas");
   });
+  it("H13 numbers quoted in the register", () => {
+    const [t1, t2, t3] = NAYTTO.hypotheses.h13.tests as { result: string; detail: Record<string, unknown> }[];
+    expect(t1!.result).toBe("kumoaa");
+    expect(t1!.detail["before"] as number).toBeCloseTo(0.39, 2);
+    expect(t1!.detail["after"] as number).toBeCloseTo(0.86, 2);
+    expect(t2!.result).toBe("kumoaa");
+    expect(t3!.result).toBe("tukee");
+    const c = t3!.detail["countries"] as Record<string, { gdp: number; ghg: number }>;
+    expect(c["FI"]!.gdp).toBeCloseTo(14, 0);
+    expect(c["FI"]!.ghg).toBeCloseTo(-44, 0);
+    expect(c["NO"]!.ghg).toBeCloseTo(-18.48, 1);
+    expect(c["DK"]!.ghg).toBeCloseTo(-46, 0);
+    expect(statusOfHypothesis(hypothesis("h13")!)).toBe("kumottu");
+  });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
       expect(p.lo).toBeLessThan(p.point);

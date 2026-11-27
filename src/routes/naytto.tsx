@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Kahdeksantoista hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Yhdeksäntoista hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Kuusi väitettä kumoutui, yksi on tuettu, viisi on ehdokkaita ja kuuden näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Seitsemän väitettä kumoutui, yksi on tuettu, viisi on ehdokkaita ja kuuden näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -227,6 +227,7 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h5" && t.id === "pysyvyys" && <PersistenceDots detail={t.detail as Persist} />}
       {h.id === "h11" && t.id === "annos" && <ChecksTable detail={t.detail as { b: number; p: number; checks: Record<string, { b: number; p: number }> }} />}
       {h.id === "h10" && t.id === "katkos" && <NeetChart a18={(t.detail as { series: [number, number][] }).series} a21={(h.tests[1]!.detail as { series: [number, number][] }).series} />}
+      {h.id === "h13" && t.id === "suomi" && <DecouplingChart detail={t.detail as { co2: [number, number][]; gdp: [number, number][] }} />}
       {h.id === "h12" && t.id === "toisto" && <CountryCorr h="h12" detail={t.detail as Pooled & Rc} />}
       {(h.id === "h8" || h.id === "h9") && t.id === "toisto" && <CountryCorr h={h.id} detail={t.detail as Pooled & Rc} />}
       {h.id === "h7" && t.id === "ajoitus" && <SuicideChart detail={t.detail as Suicide} />}
@@ -572,6 +573,33 @@ function ChecksTable({ detail }: { detail: { b: number; p: number; checks: Recor
         </tbody>
       </table>
       <p className="mt-1 text-xs text-muted-foreground">Kerroin: Suomen kansalaisten työllisyysasteen muutos (%-yks.), kun ulkomaan kansalaisten osuus on 1 %-yks. suurempi kuin muualla. Ennakkotestin yhtä suuri kerroin ja trendien jälkeen katoava yhteys osoittavat, että yhteys syntyy alueiden pitkistä kehityssuunnista.</p>
+    </div>
+  );
+}
+
+function DecouplingChart({ detail }: { detail: { co2: [number, number][]; gdp: [number, number][] } }) {
+  const X0 = 1970, X1 = 2022;
+  const idx = (s: [number, number][]) => { const b = s.find(([y]) => y === 2005)![1]; return s.filter(([y]) => y >= X0 && y <= X1).map(([y, v]) => [y, (v / b) * 100] as [number, number]); };
+  const C = idx(detail.co2), G = idx(detail.gdp);
+  const W = 620, H = 200, L = 40, R = 560, TOP = 14, BOT = 168;
+  const x = (y: number) => L + ((y - X0) / (X1 - X0)) * (R - L);
+  const all = [...C, ...G].map((p) => p[1]);
+  const lo = Math.min(...all) - 5, hi = Math.max(...all) + 5;
+  const y = (v: number) => BOT - ((v - lo) / (hi - lo)) * (BOT - TOP);
+  const line = (s: [number, number][]) => s.map(([a, v], i) => `${i ? "L" : "M"}${x(a).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  return (
+    <div className="mt-2 overflow-x-auto">
+      <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[460px] max-w-2xl" role="img" aria-label="Suomen BKT ja hiilidioksidipäästöt 1970–2022, 2005 = 100">
+        <line x1={x(2005)} x2={x(2005)} y1={TOP} y2={BOT} stroke="var(--primary)" strokeDasharray="3 3" />
+        <line x1={L} x2={R} y1={y(100)} y2={y(100)} stroke="var(--foreground)" strokeOpacity={0.3} />
+        <text x={L - 6} y={y(100) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">100</text>
+        <path d={line(G)} fill="none" stroke="var(--foreground)" strokeOpacity={0.7} strokeWidth={1.8} />
+        <path d={line(C)} fill="none" stroke="var(--primary)" strokeWidth={2.2} />
+        <text x={R + 4} y={y(G.at(-1)![1]) + 4} className="fill-foreground text-[11px]">BKT</text>
+        <text x={R + 4} y={y(C.at(-1)![1]) + 4} className="fill-primary text-[11px] font-semibold">CO₂</text>
+        {[1970, 1980, 1990, 2005, 2022].map((t) => <text key={t} x={x(t)} y={H - 12} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
+      </svg>
+      <p className="text-xs text-muted-foreground">Suomi: BKT (Maddison) ja alueperusteiset hiilidioksidipäästöt (OWID), 2005 = 100. Vuosivaihtelut kulkevat yhdessä, mutta pitkä suunta erkanee 2000-luvun puolivälistä.</p>
     </div>
   );
 }

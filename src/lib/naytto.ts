@@ -76,7 +76,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -320,6 +320,19 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Ruotsissa, Norjassa ja Tanskassa liikennekuolemat ovat vähentyneet työttömyyden noustessa, kuten taantumahypoteesi ennustaa. Suomessa yhteys on heikompi ja 2000-luvulla jopa päinvastainen. Maakuntien välinen yhteys näytti aluksi tukevan väitettä, mutta vakiotarkistus osoitti sen syntyvän alueiden pitkistä kehityssuunnista: liikennekuolemat ovat vähentyneet eniten maakunnissa, joissa työttömyys on kehittynyt muita heikommin.",
     next: "Mekanismin testi: jos taantuma vähentää ajamista, liikennesuoritteen (ajetut kilometrit) pitäisi laskea työttömyyden noustessa, ja liikennekuolemat ajettua kilometriä kohden eivät muuttuisi. Suomen poikkeavuutta voisi tutkia vertaamalla, miten ajosuorite on Suomessa reagoinut suhdanteisiin.",
+  },
+  {
+    id: "h13",
+    title: "Talouskasvun ja päästöjen irtikytkentä",
+    claim: "Talouskasvu ja päästöt kulkivat ennen tiiviisti yhdessä, mutta vuodesta 2005 alkaen yhteys heikkeni: päästöjen jousto BKT:n suhteen on pienempi, ja päästöt laskevat vaikka talous kasvaa.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. Uusi teema.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h13.tests,
+    predictions: [],
+    reading:
+      "Tulos on kaksijakoinen. Päästöt laskivat vuodesta 2005 kaikissa neljässä Pohjoismaassa 18–46 %, vaikka talous kasvoi 14–39 %: pitkä kehityssuunta irtosi kasvusta. Vuodesta toiseen päästöt seuraavat taloutta kuitenkin edelleen, jopa tiiviimmin kuin ennen: taantumissa 2009 ja 2020 ne laskivat jyrkästi. Kirjattu mittari, vuosimuutosten jousto, mittasi suhdanneherkkyyttä eikä pitkää kehitystä, joten hypoteesi kumoutui sääntöjen mukaan, vaikka väitteen ydin näkyy aineistossa.",
+    next: "Tarkennus oikealla mittarilla (H13b): päästöjen muutos nollakasvun vuonna (vakiotermi) ennen ja jälkeen 2005. Koska luvut on jo nähty, testi ei olisi ennalta kirjattu; uusi ennalta kirjattava testi olisi esimerkiksi ennuste vuoden 2025 päästöistä BKT-ennusteen perusteella.",
   },
   {
     id: "h2",
