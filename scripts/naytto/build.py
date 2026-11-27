@@ -1038,6 +1038,82 @@ def h7():
     return {"tests": [t1, t2], "predictions": []}
 
 
+def break_2004(series):
+    """Sama katkostesti kuin H6:n T1: trendi 1992–2003, poikkeama 2004–2007, lumejaksot."""
+    def dev(start):
+        pre = [(y, math.log(series[y])) for y in range(start - 12, start) if y in series]
+        if len(pre) < 10 or not all(y in series for y in range(start, start + 4)):
+            return None
+        b = np.polyfit([p_[0] for p_ in pre], [p_[1] for p_ in pre], 1)
+        return float(np.mean([math.log(series[y]) - np.polyval(b, y) for y in range(start, start + 4)]))
+    starts = [s_ for s_ in range(1983, 2023) if s_ + 3 <= 2025 and (s_ + 3 < 2004 or s_ - 12 > 2007)]
+    obs = dev(2004)
+    plac = [v for v in (dev(s_) for s_ in starts) if v is not None]
+    return {"dev": round(obs, 4), "pct": round((math.exp(obs) - 1) * 100, 1), "above": sum(1 for v in plac if v < obs),
+            "placebo": len(plac), "percentile": round(sum(1 for v in plac if v < obs) / len(plac), 3),
+            "series": sorted((y, round(v, 1)) for y, v in series.items())}
+
+
+def nordic_suicides(cs):
+    """Eurostat: ikävakioitu itsemurhakuolleisuus 1994–2010 ja 2011–2023. Palauttaa log-muutokset ilman saumaa."""
+    geos = "&".join(f"geo={c}" for c in cs)
+    old = eurostat_annual("hlth_cd_asdr", f"{geos}&icd10=X60-X84_Y870&sex=T&age=TOTAL&unit=RT")
+    new = eurostat_annual("hlth_cd_asdr2", f"{geos}&icd10=X60-X84_Y870&sex=T&age=TOTAL&unit=RT")
+    out, levels = {}, {}
+    for c in cs:
+        ch = {}
+        for part in (old.get(c, {}), new.get(c, {})):
+            ch.update({y: math.log(part[y]) - math.log(part[y - 1]) for y in part if y - 1 in part and part[y] > 0 and part[y - 1] > 0})
+        out[c] = ch
+        levels[c] = sorted({**old.get(c, {}), **new.get(c, {})}.items())
+    return out, levels
+
+
+def h8_h9():
+    """H8 alkoholi → itsemurhat; H9 masennuslääkkeet → itsemurhat (docs/naytto-rekisteri.md)."""
+    sales = {c: {} for c in COUNTRIES}; ad = {c: {} for c in COUNTRIES}
+    for line in open(os.path.join(D, "values.ndjson")):
+        k, y, g_, v, kind = json.loads(line)
+        if g_ in COUNTRIES and v is not None and kind in ("observed", "estimate"):
+            if k == "nordics2.alcohol_sales_1960_2024":
+                sales[g_][int(y)] = float(v)
+            elif k == "nordics.antidepressants_2000_2023":
+                ad[g_][int(y)] = float(v)
+    ids2, s2 = px("ksyyt/11by.px", [("ikaryhma_10_20180101", ["25-44", "45-64"]), ("timeperiod_y", "*"), ("sukupuoli_9_20180101", ["SSS"])])
+    y2 = ids2.index("timeperiod_y")
+    sui = {}
+    for k, v in s2.items():
+        sui[int(k[y2])] = sui.get(int(k[y2]), 0) + (v or 0)
+    t1lc = lead_corr(prewhiten(changes({y: v for y, v in sales["FI"].items()}, True)),
+                     prewhiten(changes({y: v for y, v in sui.items() if 1960 <= y <= 2024}, True)), lags=(0, 1))
+    res = lambda lc, sign: ("tukee" if (lc["r"] > 0 if sign > 0 else lc["r"] < 0) and lc["p"] < 0.05
+                            else "kumoaa" if (lc["r"] <= 0 if sign > 0 else lc["r"] >= 0) else "ei-ratkea")
+    t1 = {"id": "ajoitus", "design": "ajoitus", "result": res(t1lc, 1), "date": str(date.today()),
+          "summary": f"Suomi 1961–2024: alkoholin myynnin muutos → itsemurhien (25–64 v) muutos r = {r2(t1lc['r'])} (viive {t1lc['lag']} v, p = {t1lc['p']:.3f}, n = {t1lc['n']})",
+          "detail": t1lc}
+    sch, slev = nordic_suicides(COUNTRIES)
+    ps = {c: prewhiten(sch[c]) for c in COUNTRIES}
+    pa = {c: prewhiten(changes(sales[c], True)) for c in COUNTRIES}
+    rep = pooled_lead(pa, ps, ["SE", "NO", "DK"], lags=(0, 1))
+    t2 = {"id": "toisto", "design": "toisto", "result": res(rep, 1), "date": str(date.today()),
+          "summary": f"Ruotsi, Norja ja Tanska 1995–2023: alkoholin myynnin muutos → itsemurhakuolleisuuden muutos r = {r2(rep['r'])} (viive {rep['lag']} v, p = {rep['p']:.3f}, n = {rep['n']})",
+          "detail": {**rep, "countries": {c: lead_corr(pa[c], ps[c], lags=(0, 1)) for c in COUNTRIES}}}
+    ids3, d3 = px("ksyyt/11ay.px", [("sukupuoli_9_20180101", ["SSS"]), ("kuolinsyyt_1_20210101", ["50"]), ("contentscode", ["ksyyikav"]), ("timeperiod_y", "*")])
+    y3 = ids3.index("timeperiod_y")
+    br = break_2004({int(k[y3]): v for k, v in d3.items() if v})
+    t3 = {"id": "katkos", "design": "luonnollinen", "result": "tukee" if br["dev"] > 0 and br["percentile"] >= 0.95 else "kumoaa" if br["dev"] <= 0 else "ei-ratkea",
+          "date": str(date.today()),
+          "summary": f"Itsemurhat 2004–2007 {br['pct']:+.0f} % vuosien 1992–2003 trendistä; suurempi kuin {br['above']}:ssä {br['placebo']} lumejaksosta",
+          "detail": br}
+    pd_ = {c: prewhiten(changes(ad[c], True)) for c in COUNTRIES}
+    rep9 = pooled_lead(pd_, ps, COUNTRIES, lags=(0, 1))
+    t9 = {"id": "toisto", "design": "toisto", "result": res(rep9, -1), "date": str(date.today()),
+          "summary": f"Neljä Pohjoismaata 2001–2023: masennuslääkkeiden käytön muutos → itsemurhakuolleisuuden muutos r = {r2(rep9['r'])} (viive {rep9['lag']} v, p = {rep9['p']:.3f}, n = {rep9['n']})",
+          "detail": {**rep9, "countries": {c: lead_corr(pd_[c], ps[c], lags=(0, 1)) for c in COUNTRIES},
+                     "levels": {"antidepressants": {c: sorted(ad[c].items()) for c in COUNTRIES}, "suicides": slev}}}
+    return {"tests": [t1, t2, t3], "predictions": []}, {"tests": [t9], "predictions": []}
+
+
 def h1_regional():
     ids_t, tf = px("synt/12du.px", [("alue_23_20260101", "*"), ("contentscode", ["tfr"]), ("timeperiod_y", "*")])
     ids_w, pop = px("tyokay/115w.px", [("alue_28_20250101", "*"), ("timeperiod_y", "*"), ("paaasial_toimin_3_20180101", ["11+12", "12"]), ("ikaryhma_10_20180101", ["25-29", "30-34"]),
@@ -1144,6 +1220,7 @@ def main():
     _, t = px("synt/12dt.px", [("contentscode", ["tfr"]), ("timeperiod_y", "*")])
     fi_tfr = {int(k[0]): v for k, v in t.items()}
     out = {"built": str(date.today()), "hypotheses": {"h1": h1(turso_nordic(), fi_tfr), "h1e": h1e(fi_tfr), "h1f": h1f(fi_tfr), "h1g": h1g(fi_tfr), "h2": h2(), "h3": h3(), "h4": h4(), "h5": h5(), "h6": h6(), "h7": h7()}}
+    out["hypotheses"]["h8"], out["hypotheses"]["h9"] = h8_h9()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
@@ -1191,6 +1268,9 @@ def main():
     d5 = e6["tests"][4]["detail"]; print("  hinta", d5["priceChange"]); print("  kuolleisuus t+1", d5["nextMortChange"])
     print("  extra", e6["extra"])
     for t in out["hypotheses"]["h7"]["tests"]: print("h7", t["id"], t["result"], "|", t["summary"])
+    for hk in ("h8", "h9"):
+        for t in out["hypotheses"][hk]["tests"]:
+            print(hk, t["id"], t["result"], "|", t["summary"]); print("   ", t["detail"].get("countries", ""))
     d7 = out["hypotheses"]["h7"]["tests"][1]["detail"]; print("  miehet", d7["men"], "naiset", d7["women"]); print("  sarja", [x for x in d7["series"] if x[0] <= 2005])
     print("malli", out["hypotheses"]["h1"]["model"])
     print("toisto maittain", json.dumps(out["hypotheses"]["h1"]["tests"][0]["detail"]["countries"]))

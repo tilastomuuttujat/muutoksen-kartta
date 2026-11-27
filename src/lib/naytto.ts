@@ -76,7 +76,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -254,7 +254,33 @@ export const HYPOTHESES: Hypothesis[] = [
     predictions: [],
     reading:
       "Maakunnissa, joissa työttömyys oli muita korkeampi, itsemurhia ei ollut seuraavana vuonna enempää, ja koko maan tasollakin yhteys on heikko. Työikäisten itsemurhat alkoivat nousta jo 1980-luvun lopulla ennen lamaa, olivat korkeimmillaan 1990–1993 ja kääntyivät pitkään laskuun 1990-luvun puolivälissä, vaikka työttömyys oli yhä korkea. Itsemurhakuolleisuuden pitkä lasku sopii paremmin muihin selityksiin, kuten mielenterveyspalvelujen ja -lääkityksen muutoksiin ja itsemurhien ehkäisyprojektiin (1986–1996), joita tämä testi ei mittaa.",
-    next: "Testaamattomat selitykset kirjattavaksi: masennuslääkkeiden käytön kasvu (Turso: Pohjoismaiden N06A-sarja 2000–) ja alkoholi (H6:n aineisto) itsemurhien selittäjinä samalla asetelmalla.",
+    next: "Muut selitykset testattiin: alkoholi (H8, ristiriitainen) ja masennuslääkkeet (H9, ehdokas).",
+  },
+  {
+    id: "h8",
+    title: "Alkoholi → itsemurhat",
+    claim: "Alkoholinkäytön kasvu lisää itsemurhia.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. H7:n testaamaton selitys.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h8.tests,
+    predictions: [],
+    reading:
+      "Suomessa alkoholin myynti ja työikäisten itsemurhat ovat liikkuneet yhdessä 1960-luvulta asti. Ruotsissa, Norjassa ja Tanskassa yhteys on kuitenkin päinvastainen, eikä vuoden 2004 veronalennus näy itsemurhissa, vaikka se näkyi alkoholikuolleisuudessa. Yhteys näyttää suomalaiselta erityispiirteeltä, esimerkiksi humalahakuisen juomatavan takia, mutta tätä selitystä ei ole testattu.",
+    next: "Suomen erityispiirteen testi: jos humalahakuisuus selittää, yhteyden pitäisi olla vahvempi alkoholimyrkytysten ja väkevien juomien kuin oluen ja viinin myynnin kanssa.",
+  },
+  {
+    id: "h9",
+    title: "Masennuslääkkeet → itsemurhat",
+    claim: "Masennuslääkkeiden käytön kasvu vähentää itsemurhia.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. H7:n testaamaton selitys.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h9.tests,
+    predictions: [],
+    reading:
+      "Neljässä Pohjoismaassa yhdessä masennuslääkkeiden käytön kasvu on kulkenut itsemurhien vähenemisen kanssa samana vuonna, selvimmin Norjassa. Suomessa yhteys on päinvastainen, ja Suomen itsemurhien suurin lasku 1990-luvulla tapahtui ennen kuin lääkeaineisto alkaa. Samanaikainen yhteys ei kerro, kumpi muuttui ensin.",
+    next: "Pidempi lääkeaineisto (Kela, Suomi 1990–) ja ikäryhmittäinen vertailu: jos lääkkeet vaikuttavat, itsemurhien pitäisi laskea eniten niissä ikäryhmissä, joissa käyttö kasvoi eniten.",
   },
   {
     id: "h2",

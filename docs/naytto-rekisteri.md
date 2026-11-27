@@ -549,3 +549,31 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 | Testi | Asetelma | Tukee / kumoaa |
 |---|---|---|
 | T1 Toisto Pohjoismaissa | Suomi, Ruotsi, Norja ja Tanska 2000–2023: masennuslääkkeiden käyttö (Turso: N06A, DDD / 1 000 as. / vrk) → ikävakioitu itsemurhakuolleisuus (Eurostat, kuten H8:n T2). Log-muutokset, rajaus, AR(1), viive 0–1 v, Šidák, maat yhdessä. | Tukee: r < 0 ja p < 0,05. Kumoaa: r ≥ 0. Muuten: ei ratkea |
+
+## H8: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Ajoitus Suomessa: tukee.** r = +0,35 (viive 0 v, p = 0,009, n = 63).
+- **T2 Toisto Pohjoismaissa: kumoaa.**
+  - Ruotsi, Norja ja Tanska yhdessä r = −0,17 (p = 0,28).
+  - Maittain: Ruotsi −0,39, Norja −0,30, Tanska −0,33. Suomi samalla Eurostat-aineistolla 1995–2023:
+    +0,28.
+- **T3 Luonnollinen koe 2004: ei ratkea.** Itsemurhat 2004–2007 +1 % trendistä, suurempi kuin
+  11:ssä 21 lumejaksosta.
+- **Tila:** ristiriitainen. Tukeva ajoitus Suomessa, kumoava toisto muissa maissa (keskitason
+  asetelma).
+- **Tulkinta:** alkoholin ja itsemurhien yhteys näkyy Suomessa, mutta ei muissa Pohjoismaissa. Se
+  sopii ajatukseen suomalaisen humalahakuisen juomatavan erityispiirteestä, mutta sitä ei ole
+  testattu. Veronalennus 2004 ei näy itsemurhissa, vaikka se näkyi alkoholikuolleisuudessa (H6).
+
+## H9: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Toisto Pohjoismaissa: tukee.**
+  - Neljä maata yhdessä r = −0,27 (viive 0 v, p = 0,03, n = 79).
+  - Maittain: Norja −0,56 (p = 0,02), Ruotsi −0,33, Tanska −0,30, Suomi +0,23.
+- **Tila:** ehdokas.
+- **Varaukset:**
+  - Samanaikainen yhteys (viive 0) ei kerro suuntaa.
+  - Suomessa yhteys on päinvastainen.
+  - Suomen itsemurhien suurin lasku (1990–2000) on ennen lääkeaineiston alkua.

@@ -229,6 +229,24 @@ describe("pilot results", () => {
     expect(Math.max(...[1988, 1989, 1990, 1991, 1992, 1993, 1994, 1995].map((y) => s[y]!))).toBe(s[1992]);
     expect(statusOfHypothesis(hypothesis("h7")!)).toBe("kumottu");
   });
+  it("H8 and H9 numbers quoted in the register", () => {
+    const h8 = NAYTTO.hypotheses.h8.tests as { id: string; result: string; detail: Record<string, unknown> }[];
+    expect(h8[0]!.result).toBe("tukee");
+    expect(h8[0]!.detail["r"] as number).toBeCloseTo(0.35, 2);
+    expect(h8[1]!.result).toBe("kumoaa");
+    expect(h8[1]!.detail["r"] as number).toBeCloseTo(-0.17, 2);
+    expect(h8[2]!.result).toBe("ei-ratkea");
+    expect(h8[2]!.detail["above"]).toBe(11);
+    const h9 = NAYTTO.hypotheses.h9.tests[0]!;
+    expect(h9.result).toBe("tukee");
+    const d = h9.detail as { r: number; p: number; n: number; countries: Record<string, { r: number }> };
+    expect(d.r).toBeCloseTo(-0.27, 2);
+    expect(d.n).toBe(79);
+    expect(d.countries["NO"]!.r).toBeCloseTo(-0.56, 2);
+    expect(d.countries["FI"]!.r).toBeCloseTo(0.23, 2);
+    expect(statusOfHypothesis(hypothesis("h8")!)).toBe("ristiriita");
+    expect(statusOfHypothesis(hypothesis("h9")!)).toBe("ehdokas");
+  });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
       expect(p.lo).toBeLessThan(p.point);
