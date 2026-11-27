@@ -76,7 +76,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h16: { tests: Test[]; predictions: Prediction[] }; h17: { tests: Test[]; predictions: Prediction[] }; h18: { tests: Test[]; predictions: Prediction[] }; h19: { tests: Test[]; predictions: Prediction[] }; h20: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h16: { tests: Test[]; predictions: Prediction[] }; h17: { tests: Test[]; predictions: Prediction[] }; h18: { tests: Test[]; predictions: Prediction[] }; h19: { tests: Test[]; predictions: Prediction[] }; h20: { tests: Test[]; predictions: Prediction[] }; h21: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -424,6 +424,19 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Alkoholin myynti kasvoi Suomessa yhdessä vuodessa 46 %, kun muissa Pohjoismaissa kasvu oli 2–7 %. Erotus oli suurempi kuin yhtenäkään muuna vuonna 1961–2024. Poliisin tietoon tulleet pahoinpitelyt kasvoivat samana vuonna 38 %, enemmän kuin minään muuna vuonna 1950–2022, mutta petokset eivät poikenneet tavallisesta. Hyppy kohdistui siis siihen, mihin mekanismi ennustaa.",
     next: "Pahoinpitelyt kasvoivat myös 1970-luvulla; seuraava testi olisi annos: kasvoiko väkivalta enemmän alueilla, joille alkoholiliikkeet ja keskioluen myynti tulivat ensimmäistä kertaa (entiset kieltokunnat)?",
+  },
+  {
+    id: "h21",
+    title: "Vankiluvun lasku lisäsi rikollisuutta",
+    claim: "Kun vankiluku laski 1970-luvulta 1990-luvulle, rikollisuus kasvoi, koska vankilassa olevat eivät voi tehdä rikoksia (eristysvaikutus).",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. Uusi teema.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h21.tests,
+    predictions: [],
+    reading:
+      "Vuosimuutosten yhteys oli väitteen suuntainen mutta heikko ja satunnaisvaihtelun rajoissa. Pitkä kuva on kaksijakoinen: vankiluku puolittui 1965–1995 ja väkivalta ja ryöstöt kasvoivat, mutta suuri osa kasvusta tapahtui jo ennen kuin vankiluku oli laskenut paljon, ja 2000-luvulla ryöstöt vähenivät vankiluvun pysyessä ennallaan.",
+    next: "Vertailu muihin Pohjoismaihin, joissa vankiluku ei laskenut samalla tavalla (Lappi-Seppälän tunnettu asetelma), vaatii niiden rikossarjat; niitä ei ole aineistossa.",
   },
   {
     id: "h2",

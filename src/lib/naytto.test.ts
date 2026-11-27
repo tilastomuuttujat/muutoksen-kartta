@@ -412,6 +412,19 @@ describe("pilot results", () => {
     expect(Math.round(t3!.detail.percentile * 100)).toBe(60);
     expect(statusOfHypothesis(hypothesis("h20")!)).toBe("tuettu");
   });
+  it("H21 numbers quoted in the register", () => {
+    const [t1, t2] = NAYTTO.hypotheses.h21.tests as { result: string; detail: { r: number; p: number; n: number; prison: [number, number][] } }[];
+    expect(t1!.result).toBe("ei-ratkea");
+    expect(t1!.detail.r).toBeCloseTo(-0.18, 2);
+    expect(t1!.detail.p).toBeCloseTo(0.27, 2);
+    expect(t1!.detail.n).toBe(69);
+    expect(t2!.result).toBe("ei-ratkea");
+    expect(t2!.detail.r).toBeCloseTo(-0.12, 2);
+    expect(t2!.detail.p).toBeCloseTo(0.53, 2);
+    const pr = Object.fromEntries(t1!.detail.prison);
+    expect([Math.round(pr[1965]!), Math.round(pr[1995]!)]).toEqual([146, 64]);
+    expect(statusOfHypothesis(hypothesis("h21")!)).toBe("oletus");
+  });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
       expect(p.lo).toBeLessThan(p.point);

@@ -1626,6 +1626,29 @@ def h20():
     return {"tests": [t1, t2, t3], "predictions": []}
 
 
+def h21():
+    """H21 (docs/naytto-rekisteri.md): vankiluvun muutos → ryöstöt ja pahoinpitelyt (eristysvaikutus)."""
+    cnt = {}
+    for line in open(os.path.join(D, "values.ndjson")):
+        k, y, g_, v, kind = json.loads(line)
+        if v is not None and k in ("crime.hcs.fi.prison_all_daily_average", "crime.hcs.fi.police_robbery", "crime.hcs.fi.police_assault"):
+            cnt.setdefault(k.split(".")[-1], {})[int(y)] = float(v)
+    ids, d = px("ssaaty/121v.px", [("timeperiod_y", "*"), ("contentscode", ["ssaaty-vaesto"])])
+    iy = ids.index("timeperiod_y")
+    pop = {int(k[iy]): v for k, v in d.items() if v}
+    rate = {n: {y: c[y] / pop[y] * 1e5 for y in c if y in pop and 1948 <= y <= 2019} for n, c in cnt.items()}
+    pp = prewhiten(changes(rate["prison_all_daily_average"], True))
+    out = []
+    for tid, key, name in (("ryostot", "police_robbery", "ryöstöjen"), ("pahoinpitelyt", "police_assault", "pahoinpitelyjen")):
+        lc = lead_corr(pp, prewhiten(changes(rate[key], True)), lags=(1, 2))
+        res = "tukee" if lc["r"] < 0 and lc["p"] < 0.05 else "kumoaa" if lc["r"] >= 0 else "ei-ratkea"
+        out.append({"id": tid, "design": "ajoitus", "result": res, "date": str(date.today()),
+                    "summary": f"Vankiluvun muutos → {name} muutos: r = {r2(lc['r'])} (viive {lc['lag']} v, p = {lc['p']:.3f}, n = {lc['n']})",
+                    "detail": {**lc, "prison": sorted((y, round(v, 1)) for y, v in rate["prison_all_daily_average"].items()),
+                               "crime": sorted((y, round(v, 1)) for y, v in rate[key].items())}})
+    return {"tests": out, "predictions": []}
+
+
 def h11():
     """H11 (docs/naytto-rekisteri.md): ulkomaan kansalaisten osuus → Suomen kansalaisten työllisyys ja työttömyys."""
     regions = ["MK01", "MK02", "MK04", "MK05", "MK06", "MK07", "MK08", "MK09", "MK10", "MK11", "MK12", "MK13", "MK14", "MK15", "MK16", "MK17", "MK18", "MK19"]
@@ -1800,6 +1823,7 @@ def main():
     out["hypotheses"]["h18"] = h18()
     out["hypotheses"]["h19"] = h19()
     out["hypotheses"]["h20"] = h20()
+    out["hypotheses"]["h21"] = h21()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.

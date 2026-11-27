@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Kaksikymmentäkuusi hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Kaksikymmentäseitsemän hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Kahdeksan väitettä kumoutui, kolme on tuettu, viisi on ehdokkaita ja kymmenen näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Kahdeksan väitettä kumoutui, kolme on tuettu, viisi on ehdokkaita ja yksitoista näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -242,6 +242,12 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h20" && t.id === "pahoinpitelyt" && <LinesChart from={1955} to={1985} event={1969} eventLabel="laki 1/1969"
         lines={[{ label: "pahoinpitelyt", s: (t.detail as unknown as { assault: [number, number][] }).assault, main: true }, { label: "petokset", s: (t.detail as unknown as { fraud: [number, number][] }).fraud, main: false }]}
         caption="Poliisin tietoon tulleet pahoinpitelyt ja petokset 100 000 asukasta kohden (HCS-sarjat ja StatFin 121v)." />}
+      {h.id === "h21" && t.id === "ryostot" && <LinesChart from={1950} to={2019} event={1965} eventLabel="1965: 146 vankia / 100 000"
+        lines={[{ label: "vankeja", s: (t.detail as unknown as { prison: [number, number][] }).prison, main: true }]}
+        caption="Vankeja keskimäärin päivässä 100 000 asukasta kohden (HCS ja StatFin 121v)." />}
+      {h.id === "h21" && <LinesChart from={1950} to={2019} event={1965} eventLabel="1965"
+        lines={[{ label: t.id === "ryostot" ? "ryöstöt" : "pahoinpitelyt", s: (t.detail as unknown as { crime: [number, number][] }).crime, main: false }]}
+        caption={`Poliisin tietoon tulleet ${t.id === "ryostot" ? "ryöstöt" : "pahoinpitelyt"} 100 000 asukasta kohden.`} />}
       {h.id === "h14" && t.id === "katkos" && <BreakChart detail={t.detail as Break} cfg={{ trend: [1976, 1987], win: [1988, 1991], from: 1960, label: "laki voimaan 1/1988", ticks: [1960, 1976, 1988, 2000, 2025], zeroTicks: [0, 1, 2, 3], caption: "Avioerot 1 000 asukasta kohden (StatFin 121v). Katkoviiva: vuosien 1976–1987 trendi jatkettuna. Poikkeama 1988–1991 oli suurempi kuin kaikissa tavallisissa jaksoissa." }} />}
       {h.id === "h13" && t.id === "suomi" && <DecouplingChart detail={t.detail as { co2: [number, number][]; gdp: [number, number][] }} />}
       {h.id === "h12" && t.id === "toisto" && <CountryCorr h="h12" detail={t.detail as Pooled & Rc} />}
@@ -705,7 +711,8 @@ function LinesChart({ lines, from, to, event, eventLabel, caption }: { lines: { 
   const cut = lines.map((l) => ({ ...l, s: l.s.filter(([yr]) => yr >= from && yr <= to) }));
   const hi = Math.max(...cut.flatMap((l) => l.s.map((p) => p[1]))) * 1.05;
   const y = (v: number) => BOT - (v / hi) * (BOT - TOP);
-  const step = hi > 200 ? 100 : hi > 20 ? 10 : 2;
+  const raw = hi / 4, mag = 10 ** Math.floor(Math.log10(raw));
+  const step = [1, 2, 5, 10].map((m) => m * mag).find((v) => v >= raw)!;
   const ticks = Array.from({ length: Math.floor(hi / step) + 1 }, (_, i) => i * step);
   const ends = cut.map((l) => ({ ...l, ly: y(l.s.at(-1)![1]) })).sort((a, b) => a.ly - b.ly);
   for (let i = 1; i < ends.length; i++) if (ends[i]!.ly - ends[i - 1]!.ly < 12) ends[i]!.ly = ends[i - 1]!.ly + 12;

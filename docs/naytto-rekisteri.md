@@ -1079,3 +1079,19 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
     testissä käytetään viivettä 1–2 vuotta eikä samaa vuotta.
   - Testi on heikko asetelma, joten tulos voi korkeintaan nostaa hypoteesin ehdokkaaksi tai pitää
     sen oletuksena.
+
+## H21: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Ryöstöt: ei ratkea.** r = −0,18 (viive 1 v, p = 0,27, n = 69).
+- **T2 Pahoinpitelyt: ei ratkea.** r = −0,12 (viive 1 v, p = 0,53, n = 69).
+- **Tila:** oletus. Testit eivät tue eivätkä kumoa väitettä.
+- **Tulkinta:**
+  - Suunta oli väitteen mukainen, mutta vuosimuutosten yhteys oli heikko ja satunnaisvaihtelun
+    rajoissa.
+  - Pitkän aikavälin kuva on kaksijakoinen:
+    - Vankiluku puolittui vuodesta 1965 vuoteen 1995 (146 → 64 / 100 000), ja samaan aikaan ryöstöt ja
+      pahoinpitelyt kasvoivat.
+    - Suuri osa kasvusta tapahtui kuitenkin jo 1965–1975, kun vankiluku oli vasta alkanut laskea.
+    - Vuoden 2000 jälkeen ryöstöt vähenivät, vaikka vankiluku pysyi lähes ennallaan.
+  - Yhteisiä pitkiä trendejä ei testattu, koska ne eivät erota syitä toisistaan.
