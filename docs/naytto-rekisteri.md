@@ -669,3 +669,32 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Yhteys syntyy alueiden pitkistä kehityssuunnista. Aineisto ei osoita, että osuuden kasvu olisi
     heikentänyt työllisyyttä vuodesta toiseen.
   - Kansalaisuuden saamisen vaikutusta Suomen kansalaisten ryhmän koostumukseen ei voitu testata.
+
+## Sääntölisäys: maakuntatestien vakiotarkistukset
+
+- **Kirjattu:** 27.11.2026, H11:n tarkistusten jälkeen ja ennen kuin aiemmat maakuntatestit ajetaan
+  uudelleen.
+- **Koskee:** kaikkia maakuntapaneelitestejä (kiinteät alue- ja vuosivaikutukset):
+  - H1 / T2
+  - H1e / T2
+  - H1g / T3
+  - H7 / T1
+  - jatkossa kaikkia uusia.
+- H11 noudattaa jo samoja tarkistuksia.
+
+**Tarkistukset:**
+
+1. **Ennakkotesti:** selittäjä vuonna t + 2 samassa mallissa.
+   - Epäonnistuu, jos kerroin on samaa merkkiä kuin päätestissä, p < 0,05 ja vähintään puolet
+     päätestin kertoimesta.
+2. **Aluekohtaiset trendit:** päätestin malliin lisätään kunkin maakunnan oma lineaarinen trendi.
+   - Tukee, jos kerroin on ennustettua merkkiä ja yksisuuntainen p < 0,05.
+
+**Seuraukset:**
+
+- **Jos päätesti tukee:** tulos muuttuu "ei ratkea", jos ennakkotesti epäonnistuu tai trendimalli ei
+  tue.
+- **Jos päätesti kumoaa:** tulos muuttuu "ei ratkea", jos trendimalli tukee. Silloin alueiden pitkät
+  kehityssuunnat ovat voineet peittää vaikutuksen.
+- **Jos päätesti ei ratkea:** tulos ei muutu.
+- Kaikkien tarkistusten luvut näytetään aina. Permutaatiot tehdään 1 000 kertaa.
