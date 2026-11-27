@@ -158,6 +158,7 @@ function SystemMap() {
           <Link to="/selitykset" className="font-medium underline-offset-4 hover:underline">Selitysten punnitus →</Link>
           <Link to="/skanneri" className="font-medium underline-offset-4 hover:underline">Skanneri →</Link>
           <Link to="/mitajos" className="font-medium underline-offset-4 hover:underline">Mitä jos? →</Link>
+          <Link to="/naytto" className="font-medium underline-offset-4 hover:underline">Näyttöverkko →</Link>
           <Link to="/lampokartta" className="font-medium underline-offset-4 hover:underline">Aineisto vuosikymmenittäin →</Link>
           <details className="relative">
             <summary className="cursor-pointer text-muted-foreground">Kokeelliset näkymät</summary>

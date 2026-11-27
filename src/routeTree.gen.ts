@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as HeijastuksetRouteImport } from './routes/heijastukset'
 import { Route as LampokarttaRouteImport } from './routes/lampokartta'
 import { Route as MitajosRouteImport } from './routes/mitajos'
+import { Route as NayttoRouteImport } from './routes/naytto'
 import { Route as PalloRouteImport } from './routes/pallo'
 import { Route as PoikkeamatRouteImport } from './routes/poikkeamat'
 import { Route as SelityksetRouteImport } from './routes/selitykset'
@@ -40,6 +41,11 @@ const LampokarttaRoute = LampokarttaRouteImport.update({
 const MitajosRoute = MitajosRouteImport.update({
   id: '/mitajos',
   path: '/mitajos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NayttoRoute = NayttoRouteImport.update({
+  id: '/naytto',
+  path: '/naytto',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PalloRoute = PalloRouteImport.update({
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/heijastukset': typeof HeijastuksetRoute
   '/lampokartta': typeof LampokarttaRoute
   '/mitajos': typeof MitajosRoute
+  '/naytto': typeof NayttoRoute
   '/pallo': typeof PalloRoute
   '/poikkeamat': typeof PoikkeamatRoute
   '/selitykset': typeof SelityksetRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/heijastukset': typeof HeijastuksetRoute
   '/lampokartta': typeof LampokarttaRoute
   '/mitajos': typeof MitajosRoute
+  '/naytto': typeof NayttoRoute
   '/pallo': typeof PalloRoute
   '/poikkeamat': typeof PoikkeamatRoute
   '/selitykset': typeof SelityksetRoute
@@ -117,6 +125,7 @@ export interface FileRoutesById {
   '/heijastukset': typeof HeijastuksetRoute
   '/lampokartta': typeof LampokarttaRoute
   '/mitajos': typeof MitajosRoute
+  '/naytto': typeof NayttoRoute
   '/pallo': typeof PalloRoute
   '/poikkeamat': typeof PoikkeamatRoute
   '/selitykset': typeof SelityksetRoute
@@ -133,6 +142,7 @@ export interface FileRouteTypes {
     | '/heijastukset'
     | '/lampokartta'
     | '/mitajos'
+    | '/naytto'
     | '/pallo'
     | '/poikkeamat'
     | '/selitykset'
@@ -147,6 +157,7 @@ export interface FileRouteTypes {
     | '/heijastukset'
     | '/lampokartta'
     | '/mitajos'
+    | '/naytto'
     | '/pallo'
     | '/poikkeamat'
     | '/selitykset'
@@ -161,6 +172,7 @@ export interface FileRouteTypes {
     | '/heijastukset'
     | '/lampokartta'
     | '/mitajos'
+    | '/naytto'
     | '/pallo'
     | '/poikkeamat'
     | '/selitykset'
@@ -176,6 +188,7 @@ export interface RootRouteChildren {
   HeijastuksetRoute: typeof HeijastuksetRoute
   LampokarttaRoute: typeof LampokarttaRoute
   MitajosRoute: typeof MitajosRoute
+  NayttoRoute: typeof NayttoRoute
   PalloRoute: typeof PalloRoute
   PoikkeamatRoute: typeof PoikkeamatRoute
   SelityksetRoute: typeof SelityksetRoute
@@ -214,6 +227,13 @@ declare module '@tanstack/react-router' {
       path: '/mitajos'
       fullPath: '/mitajos'
       preLoaderRoute: typeof MitajosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/naytto': {
+      id: '/naytto'
+      path: '/naytto'
+      fullPath: '/naytto'
+      preLoaderRoute: typeof NayttoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pallo': {
@@ -280,6 +300,7 @@ const rootRouteChildren: RootRouteChildren = {
   HeijastuksetRoute: HeijastuksetRoute,
   LampokarttaRoute: LampokarttaRoute,
   MitajosRoute: MitajosRoute,
+  NayttoRoute: NayttoRoute,
   PalloRoute: PalloRoute,
   PoikkeamatRoute: PoikkeamatRoute,
   SelityksetRoute: SelityksetRoute,
