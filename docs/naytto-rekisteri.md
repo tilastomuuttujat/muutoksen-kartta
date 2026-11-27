@@ -255,3 +255,30 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   Merkitään finanssikriisi (2008) ja EKP:n määrällisen keventämisen alku (3/2015).
 - **Rajoite:** määrällisen keventämisen vaikutusta ei voi tällä aineistolla erottaa muista samaan
   aikaan tapahtuneista asioista. Se näytetään vain ajoituksena.
+
+## H1g: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Reaalitulot: ei ratkea.**
+  - r = +0,37 (viive 2 v, p = 0,002). Suomi +0,52, Ruotsi +0,41, Tanska +0,13.
+  - Yhteys on merkitsevä, mutta heikompi kuin työllisyyden samoina vuosina (r = +0,45), joten
+    kirjattu ehto ei täyty.
+- **T2 Luotto: ei ratkea.**
+  - Yhdistetty r = +0,30 (viive 1 v, p = 0,01), mutta heikompi kuin työllisyyden.
+  - Maittain vahvin viive (2 v) antaa päinvastaisen suunnan Suomessa (−0,40) ja Ruotsissa (−0,57).
+    Yhteys ei ole vakaa.
+- **T3 Annos–vaste: kumoaa.** 10 % muita suurempi tulojen nousu → syntyvyys −1,2 % (p = 0,64, 18
+  maakuntaa). Suunta on väärä.
+- **Tila:** kumottu, koska vahva asetelma kumoaa.
+- **Kuvaileva osa** (ei testi, eikä tämä aineisto erota määrällisen keventämisen vaikutusta muista
+  syistä):
+  - Suomen lavea rahamäärä kasvoi 2007–2008 13–16 % vuodessa ja 2009 vain 0,5 %. Pankkiluotot
+    kasvoivat 2008 11,6 % ja 2009 1,1 %.
+  - Vuonna 2015 rahamäärä kasvoi 10 %, mutta luotot vain 3,9 %.
+  - Kotitalouksien reaalitulot asukasta kohti kasvoivat 2008–2015:
+    - Suomessa +2,2 %: huippu 2011, sen jälkeen laskua ja paluu vuoden 2011 tasolle vasta 2016.
+    - Ruotsissa +10,3 %.
+    - Tanskassa +8,4 %.
+  - Vuosina 2015–2019 tulot kasvoivat Suomessa +6,8 %, Ruotsissa +3,2 % ja Tanskassa +7,5 %.
+- **Toistuva kuvio:** kolmas kerta, kun koko maan taso ennustaa syntyvyyttä mutta maakuntien väliset
+  erot eivät: työttömyys (H1), työllisyys (H1e) ja tulot (H1g).

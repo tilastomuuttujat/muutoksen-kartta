@@ -41,6 +41,7 @@ describe("pilot results", () => {
     expect(statusOfHypothesis(hypothesis("h1d")!)).toBe("ehdokas");
     expect(statusOfHypothesis(hypothesis("h1e")!)).toBe("ehdokas");
     expect(statusOfHypothesis(hypothesis("h1f")!)).toBe("oletus");
+    expect(statusOfHypothesis(hypothesis("h1g")!)).toBe("kumottu");
     expect(statusOfHypothesis(hypothesis("h2")!)).toBe("kumottu");
     expect(statusOfHypothesis(hypothesis("h3")!)).toBe("tuettu");
   });
@@ -112,6 +113,23 @@ describe("pilot results", () => {
     expect(rates!.detail.predictor.r).toBeCloseTo(-0.12, 2);
     expect(rates!.detail.employment.r).toBeCloseTo(0.45, 2);
     expect(rates!.detail.countries["FI"]!.r).toBeCloseTo(0.39, 2);
+  });
+  it("H1g numbers quoted in the register", () => {
+    const g = NAYTTO.hypotheses.h1g;
+    const [inc, cred, reg] = g.tests as { result: string; detail: Record<string, unknown> }[];
+    const P = (t: { detail: Record<string, unknown> }) => t.detail["predictor"] as { r: number; p: number };
+    expect(inc!.result).toBe("ei-ratkea");
+    expect(P(inc!).r).toBeCloseTo(0.365, 3);
+    expect(cred!.result).toBe("ei-ratkea");
+    expect(P(cred!).r).toBeCloseTo(0.3, 2);
+    expect(reg!.result).toBe("kumoaa");
+    expect(reg!.detail["per10pct"] as number).toBeCloseTo(-1.2, 1);
+    const r = g.describe.recovery;
+    expect(r["FI"]!.g2008_2015).toBeCloseTo(2.2, 1);
+    expect(r["SE"]!.g2008_2015).toBeCloseTo(10.3, 1);
+    expect(r["FI"]!.regained).toBe(2016);
+    expect(Object.fromEntries(g.describe.moneyGrowth)[2009]).toBeCloseTo(0.5, 1);
+    expect(Object.fromEntries(g.describe.moneyGrowth)[2015]).toBeCloseTo(10, 1);
   });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {

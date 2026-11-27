@@ -66,9 +66,16 @@ type H1Data = {
   fiTfrLast: [number, number];
   nordic: { tfr: Record<string, [number, number][]>; uw: Record<string, [number, number][]> };
 };
+export type Describe = {
+  income2008: Record<string, [number, number][]>;
+  dti: Record<string, [number, number][]>;
+  moneyGrowth: [number, number][];
+  creditGrowth: [number, number][];
+  recovery: Record<string, { g2008_2015: number; g2015_2019: number; peak2008_2014: [number, number]; dipFrom: number | null; regained: number | null }>;
+};
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -169,6 +176,19 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Asuntojen hinnat ja korot liikkuivat odotettuun suuntaan, mutta yhteys syntyvyyteen oli heikko ja selvästi heikompi kuin työllisyyden samoilla vuosilla ja samoissa maissa. Asuntomarkkinat eivät näillä mittareilla selitä, miksi syntyvyys seuraa koko maan työmarkkinoita. Hintatesti kattaa vain vuodet 2005–, joten pieni vaikutus voi jäädä näkymättä.",
     next: "Seuraava kansallinen reitti: perhepolitiikka. Jos etuuksien ja päivähoidon muutokset reagoivat työttömyyteen ja syntyvyys niihin, päätösten ajoitus kertoo sen.",
+  },
+  {
+    id: "h1g",
+    title: "Rahan riittävyys → syntyvyys",
+    claim: "Kun kotitalouksien käytettävissä olevat reaalitulot tai luotonsaanti kasvavat, syntyvyys nousee noin 1–2 vuoden päästä. Yhteys on vähintään yhtä vahva kuin työllisyyden.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa käyttäjän kysymyksestä: vähensikö finanssikriisi kotitalouksien rahaa, ja näkyykö se syntyvyydessä?",
+    map: { edge: "Globaali finanssikriisi → Historiallisen matalan syntyvyyden aika", confidence: "heikko" },
+    tests: NAYTTO.hypotheses.h1g.tests,
+    predictions: [],
+    reading:
+      "Kotitalouksien reaalitulot ennustavat syntyvyyttä selvästi koko maan tasolla, erityisesti Suomessa, mutta heikommin kuin työllisyys. Maakuntien välillä yhteys on väärän suuntainen: alueilla, joiden tulot nousivat muita enemmän, syntyvyys ei noussut muita enemmän. Kolmas kerta sama kuvio: työttömyys, työllisyys ja tulot ennustavat syntyvyyttä maiden tasolla mutta eivät maakuntien välillä.",
+    next: "Toistuva kuvio on nyt oma kysymyksensä: miksi syntyvyys seuraa koko maan tilannetta mutta ei oman alueen? Testattavia selityksiä ovat muuttoliike (perheet muuttavat), kansalliset päätökset ja yhteinen ilmapiiri. Muuttoliikkeen voi testata vertaamalla maakuntia, joihin ja joista muutetaan vähän.",
   },
   {
     id: "h3",

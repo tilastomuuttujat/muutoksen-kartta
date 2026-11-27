@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Pilotti: kahdeksan hypoteesia, joista yksi tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Pilotti: yhdeksän hypoteesia, joista yksi tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Kaksi väitettä kumoutui, yksi on tuettu, kaksi on ehdokkaita ja kolmen näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Kolme väitettä kumoutui, yksi on tuettu, kaksi on ehdokkaita ja kolmen näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -132,10 +132,74 @@ function HypothesisCard({ h }: { h: Hypothesis }) {
       </ol>
 
       {h.predictions.length > 0 && <Predictions list={h.predictions} />}
+      {h.id === "h1g" && <MoneyStory />}
 
       <p className="mt-4 text-sm">{h.reading}</p>
       <p className="mt-2 text-sm text-muted-foreground"><strong>Seuraavaksi:</strong> {h.next}</p>
     </section>
+  );
+}
+
+function MoneyStory() {
+  const d = NAYTTO.hypotheses.h1g.describe;
+  const W = 640, H = 210, L = 40, R = 600, TOP = 12, BOT = 176;
+  const X0 = 2000, X1 = 2025;
+  const x = (y: number) => L + ((y - X0) / (X1 - X0)) * (R - L);
+  const vals = Object.values(d.income2008).flat().map((p) => p[1]);
+  const lo = Math.min(...vals) - 2, hi = Math.max(...vals) + 2;
+  const y = (v: number) => BOT - ((v - lo) / (hi - lo)) * (BOT - TOP);
+  const NAMES: Record<string, string> = { FI: "Suomi", SE: "Ruotsi", DK: "Tanska" };
+  const BW = 640, BH = 150, BL = 40, BR = 600, BTOP = 14, BBOT = 120;
+  const bx = (yr: number) => BL + ((yr - X0) / (2021 - X0)) * (BR - BL);
+  const bmax = Math.max(...d.moneyGrowth.map((p) => p[1]), ...d.creditGrowth.map((p) => p[1]));
+  const bmin = Math.min(0, ...d.creditGrowth.map((p) => p[1]));
+  const by = (v: number) => BBOT - ((v - bmin) / (bmax - bmin)) * (BBOT - BTOP);
+  const r = d.recovery;
+  return (
+    <div className="mt-4 rounded-lg border p-3">
+      <h3 className="text-sm font-semibold">Mitä finanssikriisin ja määrällisen keventämisen aikana tapahtui rahalle?</h3>
+      <p className="mt-1 text-xs text-muted-foreground">Kuvaileva osa, ei testi. Tämä aineisto ei erota EKP:n määrällisen keventämisen vaikutusta muista samaan aikaan tapahtuneista asioista.</p>
+      <div className="mt-3 overflow-x-auto">
+        <svg viewBox={`0 0 ${BW} ${BH}`} className="h-auto w-full min-w-[460px]" role="img" aria-label="Suomen lavean rahamäärän ja pankkiluottojen vuosikasvu 2000–2020">
+          <line x1={BL} x2={BR} y1={by(0)} y2={by(0)} stroke="var(--foreground)" strokeOpacity={0.5} />
+          {[2008, 2015].map((t) => <line key={t} x1={bx(t) + 6} x2={bx(t) + 6} y1={BTOP} y2={BBOT} stroke="var(--primary)" strokeDasharray="3 3" />)}
+          <text x={bx(2008) + 9} y={BTOP + 8} className="fill-primary text-[10px]">finanssikriisi</text>
+          <text x={bx(2015) + 9} y={BTOP + 8} className="fill-primary text-[10px]">EKP:n QE 3/2015</text>
+          {d.moneyGrowth.map(([yr, v]) => <rect key={`m${yr}`} x={bx(yr) + 1} y={Math.min(by(v), by(0))} width={5} height={Math.abs(by(v) - by(0))} fill="var(--primary)" />)}
+          {d.creditGrowth.map(([yr, v]) => <rect key={`c${yr}`} x={bx(yr) + 7} y={Math.min(by(v), by(0))} width={5} height={Math.abs(by(v) - by(0))} fill="var(--muted-foreground)" />)}
+          {[0, 10].map((t) => <text key={t} x={BL - 6} y={by(t) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">{t} %</text>)}
+          {[2000, 2005, 2010, 2015, 2020].map((t) => <text key={t} x={bx(t) + 6} y={BH - 14} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
+          <rect x={BL} y={BH - 8} width={8} height={6} fill="var(--primary)" /><text x={BL + 12} y={BH - 2} className="fill-foreground text-[10px]">lavea rahamäärä</text>
+          <rect x={BL + 110} y={BH - 8} width={8} height={6} fill="var(--muted-foreground)" /><text x={BL + 122} y={BH - 2} className="fill-foreground text-[10px]">pankkiluotot yksityisille</text>
+        </svg>
+      </div>
+      <p className="text-xs text-muted-foreground">Suomi, vuosikasvu %. Lähde: Jordà–Schularick–Taylor Macrohistory (R6), aineisto päättyy 2020. Luottojen −5,9 % vuonna 2014 voi olla tilastollinen katko.</p>
+      <div className="mt-3 overflow-x-auto">
+        <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[460px]" role="img" aria-label="Kotitalouksien reaalitulot asukasta kohti, 2008 = 100, Suomi, Ruotsi ja Tanska">
+          <line x1={L} x2={R} y1={y(100)} y2={y(100)} stroke="var(--foreground)" strokeOpacity={0.4} />
+          <text x={L - 6} y={y(100) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">100</text>
+          {[2008, 2015].map((t) => <line key={t} x1={x(t)} x2={x(t)} y1={TOP} y2={BOT} stroke="var(--primary)" strokeDasharray="3 3" />)}
+          {Object.entries(d.income2008).map(([c, pts]) => {
+            const fi = c === "FI";
+            const last = pts.at(-1)!;
+            return (
+              <g key={c}>
+                <path d={pts.map(([a, b], i) => `${i ? "L" : "M"}${x(a).toFixed(1)},${y(b).toFixed(1)}`).join(" ")} fill="none"
+                  stroke={fi ? "var(--primary)" : "var(--muted-foreground)"} strokeWidth={fi ? 2.4 : 1.4} />
+                <text x={R + 4} y={y(last[1]) + 4} className={`text-[11px] ${fi ? "fill-primary font-semibold" : "fill-muted-foreground"}`}>{NAMES[c]}</text>
+              </g>
+            );
+          })}
+          {[2000, 2008, 2015, 2025].map((t) => <text key={t} x={x(t)} y={H - 16} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
+        </svg>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Kotitalouksien oikaistu reaalinen käytettävissä oleva tulo asukasta kohti, 2008 = 100 (Eurostat nasa_10_ki).
+        2008–2015: Suomi {r["FI"]!.g2008_2015 > 0 ? "+" : ""}{nf(r["FI"]!.g2008_2015, 1)} %, Ruotsi +{nf(r["SE"]!.g2008_2015, 1)} %, Tanska +{nf(r["DK"]!.g2008_2015, 1)} %.
+        Suomessa tulot kääntyivät laskuun {r["FI"]!.dipFrom} ja palasivat vuoden {r["FI"]!.peak2008_2014[1]} tasolle vasta {r["FI"]!.regained}.
+        2015–2019: Suomi +{nf(r["FI"]!.g2015_2019, 1)} %, Ruotsi +{nf(r["SE"]!.g2015_2019, 1)} %, Tanska +{nf(r["DK"]!.g2015_2019, 1)} %.
+      </p>
+    </div>
   );
 }
 
@@ -158,7 +222,7 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {t.id === "odotukset" && <ExpectationDots detail={t.detail as Expect} />}
       {t.id === "maaraaikaisuus" && <TemporaryDots detail={t.detail as Temporary} />}
       {t.id === "esikoiset" && <FirstbornDots detail={t.detail as Firstborn} />}
-      {(t.id === "hinnat" || t.id === "korot") && <HousingDots id={t.id} detail={t.detail as Housing} />}
+      {(t.id === "hinnat" || t.id === "korot" || t.id === "tulot" || t.id === "luotto") && <HousingDots h={h.id} id={t.id} detail={t.detail as Housing} />}
     </li>
   );
 }
@@ -226,8 +290,16 @@ function FirstbornDots({ detail }: { detail: Firstborn }) {
 type Housing = { predictor: Rc; employment: Rc; countries: Record<string, Rc> };
 const CNAME: Record<string, string> = { FI: "Suomi", SE: "Ruotsi", NO: "Norja", DK: "Tanska" };
 
-function HousingDots({ id, detail }: { id: string; detail: Housing }) {
-  const label = id === "hinnat" ? "Reaalihinnat" : "Korko";
+const DOT_LABEL: Record<string, { label: string; side: "pos" | "neg"; band: string }> = {
+  hinnat: { label: "Reaalihinnat", side: "neg", band: "H1f:n ennuste: hinnat vasemmalla" },
+  korot: { label: "Korko", side: "neg", band: "H1f:n ennuste: korot vasemmalla" },
+  tulot: { label: "Reaalitulot", side: "pos", band: "H1g:n ennuste: tulot oikealla" },
+  luotto: { label: "Velka / tulot", side: "pos", band: "H1g:n ennuste: luotto oikealla" },
+};
+
+function HousingDots({ h, id, detail }: { h: string; id: string; detail: Housing }) {
+  const cfg = DOT_LABEL[id]!;
+  const label = cfg.label;
   return (
     <CompareDots
       rows={[
@@ -235,9 +307,11 @@ function HousingDots({ id, detail }: { id: string; detail: Housing }) {
         [`${label} yhdessä`, detail.predictor, "test", true],
         ["Työllisyys 30–34 yhdessä", detail.employment, "unemp", true],
       ]}
-      side="neg"
-      band={`H1f:n ennuste: ${id === "hinnat" ? "hinnat" : "korot"} vasemmalla`}
-      note="Jos H1f pitäisi, asuntomarkkinoiden pallojen pitäisi olla nollan vasemmalla puolella vähintään yhtä kaukana kuin työllisyyden pallo on oikealla."
+      side={cfg.side}
+      band={cfg.band}
+      note={h === "h1f"
+        ? "Jos H1f pitäisi, asuntomarkkinoiden pallojen pitäisi olla nollan vasemmalla puolella vähintään yhtä kaukana kuin työllisyyden pallo on oikealla."
+        : "Jos H1g pitäisi, pallojen pitäisi olla nollan oikealla puolella vähintään yhtä kaukana kuin työllisyyden pallo. Maittainen tulos on kunkin maan vahvimmalla viiveellä, yhdistetty yhteisellä viiveellä."}
     />
   );
 }

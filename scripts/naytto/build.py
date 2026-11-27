@@ -537,6 +537,132 @@ def h1f(fi_tfr):
     return {"tests": [t1, t2], "predictions": []}
 
 
+def eurostat_multi(dataset, params):
+    """Eurostat-taulu purettuna: {(muut ulottuvuudet…, geo): {vuosi: arvo}}."""
+    url = f"https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/{dataset}?{params}&format=JSON&lang=en"
+    with urllib.request.urlopen(url, timeout=120) as r:
+        d = json.load(r)
+    ids, size = d["id"], d["size"]
+    cats = [{v: k for k, v in d["dimension"][i]["category"]["index"].items()} for i in ids]
+    out = {}
+    for pos, v in d["value"].items():
+        p, idx = int(pos), []
+        for s_ in reversed(size):
+            idx.append(p % s_); p //= s_
+        idx.reverse()
+        k = {ids[j]: cats[j][idx[j]] for j in range(len(ids))}
+        key = tuple(k[i] for i in ids if i not in ("time", "freq"))
+        out.setdefault(key, {})[int(k["time"][:4])] = float(v)
+    return ids, out
+
+
+def r2(v):
+    """Kaksi desimaalia tavallisella pyöristyksellä (0,365 → 0,37), kuten sivun luvuissa."""
+    return f"{math.floor(abs(v) * 100 + 0.5) / 100 * (1 if v >= 0 else -1):.2f}"
+
+
+def h1g(fi_tfr):
+    """H1g (docs/naytto-rekisteri.md): rahan riittävyys. Reaalitulot, luotto, annos–vaste maakunnittain + kuvaileva osa."""
+    E = {c: {} for c in COUNTRIES}; T = {c: {} for c in COUNTRIES}; jst = {}
+    for line in open(os.path.join(D, "values.ndjson")):
+        k, y, g_, v, kind = json.loads(line)
+        if v is None or kind not in ("observed", "estimate"):
+            continue
+        if g_ in COUNTRIES and k == "safe_corridor.employment_rate_30_34":
+            E[g_][int(y)] = float(v)
+        elif g_ in COUNTRIES and k == "nordics.tfr_1950_2024" and int(y) >= 1990:
+            T[g_][int(y)] = float(v)
+        elif k in ("fi.historical20261026.jst.money", "fi.historical20261026.jst.tloans") and int(y) >= 1995:
+            jst.setdefault(k.split(".")[-1], {})[int(y)] = float(v)
+    T["FI"].update({y: v for y, v in fi_tfr.items() if y >= 1990})
+    cs = ["FI", "SE", "DK"]
+    pw = {c: prewhiten(changes(T[c], True)) for c in cs}
+    pe = {c: prewhiten(changes(E[c], False)) for c in cs}
+    geos = "&".join(f"geo={c}" for c in cs)
+    ids, ki = eurostat_multi("nasa_10_ki", f"{geos}&sector=S14_S15&na_item=B7G_R_HAB_GR&na_item=DIR_S14_S15&na_item=B7G_R_HAB_2010")
+    gi, ni = ids.index("geo"), ids.index("na_item")
+    keys = [i for i in ids if i not in ("time", "freq")]
+    pick = lambda item: {k[keys.index("geo")]: v for k, v in ki.items() if k[keys.index("na_item")] == item}
+    growth, dti, index = pick("B7G_R_HAB_GR"), pick("DIR_S14_S15"), pick("B7G_R_HAB_2010")
+
+    def run(pp, cs_, tid, label, design="ajoitus"):
+        def pooled(src):
+            best = None
+            for k in (1, 2):
+                ps = [(src[c][t - k], pw[c][t]) for c in cs_ for t in pw[c] if t - k in pp[c] and t - k in pe[c]]
+                r, n = corr(ps)
+                if r is not None and (best is None or abs(r) > abs(best[0])):
+                    best = (r, n, k)
+            r, n, k = best
+            return {"r": round(r, 3), "n": n, "lag": k, "p": round(1 - (1 - p_two_sided(r, n)) ** 2, 4)}
+        a, b = pooled(pp), pooled(pe)
+        per = {c: lead_corr(pp[c], pw[c]) for c in cs_}
+        res = "kumoaa" if a["r"] <= 0 else "tukee" if a["p"] < 0.05 and abs(a["r"]) >= abs(b["r"]) else "ei-ratkea"
+        return {"id": tid, "design": design, "result": res, "date": str(date.today()),
+                "summary": f"{label} r = {r2(a['r'])} (viive {a['lag']} v, p = {a['p']:.3f}), työllisyys 30–34 samoina vuosina r = {r2(b['r'])} (p = {b['p']:.3f}); Suomi, Ruotsi, Tanska",
+                "detail": {"predictor": a, "employment": b, "countries": per}}
+
+    # vuosimuutos on jo muutos: suodatetaan sellaisenaan
+    t1 = run({c: prewhiten({y: v for y, v in growth[c].items() if y >= 1996}) for c in cs}, cs, "tulot", "Reaalitulot")
+    t2 = run({c: prewhiten(changes({y: v for y, v in dti[c].items() if y >= 1995}, False)) for c in cs}, cs, "luotto", "Velka / tulot")
+
+    # T3 annos–vaste maakunnittain
+    ids_t, tf = px("synt/12du.px", [("alue_23_20260101", "*"), ("contentscode", ["tfr"]), ("timeperiod_y", "*")])
+    ids_i, inc = px("tjt/14ww.px", [("alue_23_20250101", [f"MK{n:02d}" for n in range(1, 20) if n != 3]), ("contentscode", ["tjt-ekvikturaha_med"]), ("timeperiod_y", "*")])
+    regions = sorted({k[0] for k in inc if k[0] != "MK21"} & {k[0] for k in tf})
+    yt, yi_ = ids_t.index("timeperiod_y"), ids_i.index("timeperiod_y")
+    tfr = {r: {int(k[yt]): v for k, v in tf.items() if k[0] == r} for r in regions}
+    lin = {r: {int(k[yi_]): math.log(v) for k, v in inc.items() if k[0] == r and v} for r in regions}
+    years = [t for t in range(1997, 2026) if all(t in tfr[r] and t - 2 in lin[r] for r in regions)]
+
+    def fe(X):
+        rows = [(r, t, math.log(tfr[r][t]), X[r][t - 2]) for r in regions for t in years]
+        a = np.array([[x[2], x[3]] for x in rows])
+        ri = [regions.index(x[0]) for x in rows]; ti = [years.index(x[1]) for x in rows]
+        for col in (0, 1):
+            v = a[:, col].copy()
+            for _ in range(20):
+                for idx, n in ((ri, len(regions)), (ti, len(years))):
+                    s_ = np.bincount(idx, v, n) / np.maximum(np.bincount(idx, None, n), 1)
+                    v = v - s_[idx]
+            a[:, col] = v
+        return float((a[:, 0] @ a[:, 1]) / (a[:, 1] @ a[:, 1])), len(rows)
+
+    b, n = fe(lin)
+    rng = random.Random(3); R = 2000; ge = 0
+    for _ in range(R):
+        perm = regions[:]; rng.shuffle(perm)
+        if fe({r: lin[p] for r, p in zip(regions, perm)})[0] >= b:
+            ge += 1
+    p = (ge + 1) / (R + 1)
+    res3 = "tukee" if b > 0 and p < 0.05 else "kumoaa" if b <= 0 else "ei-ratkea"
+    per10 = (math.exp(b * math.log(1.1)) - 1) * 100  # 10 % suurempi tulo → syntyvyyden muutos %
+    t3 = {"id": "annos", "design": "annos", "result": res3, "date": str(date.today()),
+          "summary": f"10 % muita suurempi tulojen nousu → syntyvyys {per10:+.1f} % kahden vuoden päästä (p = {p:.3f}, {len(regions)} maakuntaa, {years[0]}–{years[-1]})",
+          "detail": {"b": round(b, 4), "per10pct": round(per10, 2), "p": round(p, 4), "n": n, "regions": len(regions), "years": [years[0], years[-1]]}}
+
+    # Kuvaileva osa
+    base = lambda d, y0: {y: round(v / d[y0] * 100, 1) for y, v in d.items() if y >= 2000} if y0 in d else {}
+    describe = {
+        "income2008": {c: sorted(base(index[c], 2008).items()) for c in cs},
+        "dti": {c: sorted((y, round(v, 1)) for y, v in dti[c].items() if y >= 2000) for c in cs},
+        "moneyGrowth": sorted((y, round((jst["money"][y] / jst["money"][y - 1] - 1) * 100, 1)) for y in jst.get("money", {}) if y - 1 in jst["money"] and y >= 2000),
+        "creditGrowth": sorted((y, round((jst["tloans"][y] / jst["tloans"][y - 1] - 1) * 100, 1)) for y in jst.get("tloans", {}) if y - 1 in jst["tloans"] and y >= 2000),
+    }
+    rec = {}
+    for c in cs:
+        ix = dict(describe["income2008"][c])
+        rec[c] = {"g2008_2015": round(ix[2015] - 100, 1), "g2015_2019": round((ix[2019] / ix[2015] - 1) * 100, 1),
+                  "peak2008_2014": max((v, y) for y, v in ix.items() if 2008 <= y <= 2014)}
+        pk = rec[c]["peak2008_2014"]
+        later = [y for y in sorted(ix) if y > pk[1] and ix[y] < pk[0]]
+        back = [y for y in sorted(ix) if later and y > later[0] and ix[y] >= pk[0]]
+        rec[c]["dipFrom"] = later[0] if later else None
+        rec[c]["regained"] = back[0] if back else None
+    describe["recovery"] = rec
+    return {"tests": [t1, t2, t3], "predictions": [], "describe": describe}
+
+
 def h1_regional():
     ids_t, tf = px("synt/12du.px", [("alue_23_20260101", "*"), ("contentscode", ["tfr"]), ("timeperiod_y", "*")])
     ids_w, pop = px("tyokay/115w.px", [("alue_28_20250101", "*"), ("timeperiod_y", "*"), ("paaasial_toimin_3_20180101", ["11+12", "12"]), ("ikaryhma_10_20180101", ["25-29", "30-34"]),
@@ -642,7 +768,7 @@ def h2():
 def main():
     _, t = px("synt/12dt.px", [("contentscode", ["tfr"]), ("timeperiod_y", "*")])
     fi_tfr = {int(k[0]): v for k, v in t.items()}
-    out = {"built": str(date.today()), "hypotheses": {"h1": h1(turso_nordic(), fi_tfr), "h1e": h1e(fi_tfr), "h1f": h1f(fi_tfr), "h2": h2(), "h3": h3()}}
+    out = {"built": str(date.today()), "hypotheses": {"h1": h1(turso_nordic(), fi_tfr), "h1e": h1e(fi_tfr), "h1f": h1f(fi_tfr), "h1g": h1g(fi_tfr), "h2": h2(), "h3": h3()}}
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
