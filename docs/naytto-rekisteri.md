@@ -959,3 +959,16 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 | T1 Työntö | Suomen työttömyyden muutos → muutto Ruotsiin | Tukee: r > 0 ja p < 0,05. Kumoaa: r ≤ 0. Muuten: ei ratkea |
 | T2 Veto | Ruotsin BKT:n kasvu asukasta kohden → muutto Ruotsiin | Tukee: r > 0 ja p < 0,05. Kumoaa: r ≤ 0. Muuten: ei ratkea |
 | T3 Täsmällisyys | Suomen työttömyyden muutos → paluumuutto Ruotsista | Tukee: r < 0 ja p < 0,05. Kumoaa: r ≥ 0. Muuten: ei ratkea |
+
+## H18: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Työntö: kumoaa.** r = −0,30 (viive 0 v, p = 0,18, n = 32), eli suunta oli päinvastainen.
+- **T2 Veto: ei ratkea.** r = +0,25 (p = 0,31).
+- **T3 Paluumuutto: ei ratkea.** r = −0,39 (viive 1 v, p = 0,06).
+- **Tila:** oletus. Tukevia testejä ei ole, ja kumoava testi on heikko asetelma.
+- **Tulkinta:**
+  - Suomen työttömyyden nousu ei lisännyt muuttoa Ruotsiin samana tai seuraavana vuonna.
+  - Todennäköinen syy, jota ei ole testattu: Suomen ja Ruotsin suhdanteet kulkevat yhdessä, joten
+    kun Suomen työttömyys nousee, Ruotsin veto heikkenee samaan aikaan.
+  - Oikea mittari olisi maiden välinen ero, eli Ruotsin ja Suomen työmarkkinatilanteen erotus.

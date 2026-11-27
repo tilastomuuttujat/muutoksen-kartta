@@ -1527,6 +1527,40 @@ def h17():
     return {"tests": [t1, t2, t3], "predictions": []}
 
 
+def h18():
+    """H18 (docs/naytto-rekisteri.md): Ruotsiin muutto, työntö (FI työttömyys) ja veto (SE BKT)."""
+    to_se, from_se, U = {}, {}, {}
+    for line in open(os.path.join(D, "values.ndjson")):
+        k, y, g_, v, kind = json.loads(line)
+        if v is None:
+            continue
+        if k == "fi.korkiasaari1993.table3.to_sweden":
+            to_se[int(y)] = float(v)
+        elif k == "fi.korkiasaari1993.table3.from_sweden":
+            from_se[int(y)] = float(v)
+        elif k == "fi.histlabour.lfs2019.unemployment_rate" and kind in ("observed", "estimate"):
+            U[int(y)] = float(v)
+    url = "https://raw.githubusercontent.com/open-numbers/ddf--gapminder--fasttrack/master/countries_etc_datapoints/ddf--datapoints--gdp_pcap--by--country--time.csv"
+    with urllib.request.urlopen(url, timeout=120) as r:
+        rows = r.read().decode().splitlines()[1:]
+    se = {int(t): float(x) for c, t, x in (row.split(",") for row in rows) if c == "swe"}
+    win = lambda d: {y: v for y, v in d.items() if 1958 <= y <= 1992}
+    pu = prewhiten(changes(win(U), False))
+    pg = prewhiten(changes(win(se), True))
+    pt = prewhiten(changes(win(to_se), True))
+    pf = prewhiten(changes(win(from_se), True))
+    l1, l2, l3 = lead_corr(pu, pt, lags=(0, 1)), lead_corr(pg, pt, lags=(0, 1)), lead_corr(pu, pf, lags=(0, 1))
+    pos = lambda lc: "tukee" if lc["r"] > 0 and lc["p"] < 0.05 else "kumoaa" if lc["r"] <= 0 else "ei-ratkea"
+    neg = lambda lc: "tukee" if lc["r"] < 0 and lc["p"] < 0.05 else "kumoaa" if lc["r"] >= 0 else "ei-ratkea"
+    fmt = lambda name, lc: f"{name} r = {r2(lc['r'])} (viive {lc['lag']} v, p = {lc['p']:.3f}, n = {lc['n']})"
+    t1 = {"id": "tyonto", "design": "ajoitus", "result": pos(l1), "date": str(date.today()),
+          "summary": fmt("Suomen työttömyyden muutos → muutto Ruotsiin:", l1),
+          "detail": {**l1, "toSweden": sorted(to_se.items()), "fromSweden": sorted(from_se.items()), "unemployment": sorted((y, v) for y, v in U.items() if y <= 1995)}}
+    t2 = {"id": "veto", "design": "ajoitus", "result": pos(l2), "date": str(date.today()), "summary": fmt("Ruotsin BKT:n kasvu → muutto Ruotsiin:", l2), "detail": l2}
+    t3 = {"id": "paluu", "design": "tasmallisyys", "result": neg(l3), "date": str(date.today()), "summary": fmt("Suomen työttömyyden muutos → paluumuutto Ruotsista:", l3), "detail": l3}
+    return {"tests": [t1, t2, t3], "predictions": []}
+
+
 def h11():
     """H11 (docs/naytto-rekisteri.md): ulkomaan kansalaisten osuus → Suomen kansalaisten työllisyys ja työttömyys."""
     regions = ["MK01", "MK02", "MK04", "MK05", "MK06", "MK07", "MK08", "MK09", "MK10", "MK11", "MK12", "MK13", "MK14", "MK15", "MK16", "MK17", "MK18", "MK19"]
@@ -1698,6 +1732,7 @@ def main():
     out["hypotheses"]["h15"] = h15()
     out["hypotheses"]["h16"] = h16()
     out["hypotheses"]["h17"] = h17()
+    out["hypotheses"]["h18"] = h18()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
@@ -1755,6 +1790,7 @@ def main():
         for t in out["hypotheses"][hk]["tests"]:
             print(hk, t["id"], t["result"], "|", t["summary"]); print("   ", t["detail"].get("countries", ""))
     d7 = out["hypotheses"]["h7"]["tests"][1]["detail"]; print("  miehet", d7["men"], "naiset", d7["women"]); print("  sarja", [x for x in d7["series"] if x[0] <= 2005])
+    for t in out["hypotheses"]["h18"]["tests"]: print("h18", t["id"], t["result"], "|", t["summary"])
     for t in out["hypotheses"]["h17"]["tests"]: print("h17", t["id"], t["result"], "|", t["summary"])
     for t in out["hypotheses"]["h16"]["tests"]: print("h16", t["id"], t["result"], "|", t["summary"]); print("   ", [x for x in t["detail"]["series"] if x[0] <= 1940])
     for t in out["hypotheses"]["h15"]["tests"]: print("h15", t["id"], t["result"], "|", t["summary"]); print("   ", {k: v for k, v in t["detail"].items() if k != "diff"})

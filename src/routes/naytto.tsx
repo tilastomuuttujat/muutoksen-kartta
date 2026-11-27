@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Kaksikymmentäkolme hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Kaksikymmentäneljä hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Kahdeksan väitettä kumoutui, kaksi on tuettu, viisi on ehdokkaita ja kahdeksan näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Kahdeksan väitettä kumoutui, kaksi on tuettu, viisi on ehdokkaita ja yhdeksän näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -227,6 +227,7 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h5" && t.id === "pysyvyys" && <PersistenceDots detail={t.detail as Persist} />}
       {h.id === "h11" && t.id === "annos" && <ChecksTable detail={t.detail as { b: number; p: number; checks: Record<string, { b: number; p: number }> }} />}
       {h.id === "h10" && t.id === "katkos" && <NeetChart a18={(t.detail as { series: [number, number][] }).series} a21={(h.tests[1]!.detail as { series: [number, number][] }).series} />}
+      {h.id === "h18" && t.id === "tyonto" && <MigrationChart detail={t.detail as { toSweden: [number, number][]; fromSweden: [number, number][]; unemployment: [number, number][] }} />}
       {h.id === "h17" && t.id !== "kontrolli" && <BreakChart detail={t.detail as Break} cfg={t.id === "imevaiset"
         ? { trend: [1927, 1938], win: [1946, 1951], from: 1915, label: "neuvolalaki", ticks: [1915, 1927, 1946, 1975], zeroTicks: [0, 50, 100], caption: "Imeväiskuolleisuus, kuolleita alle 1-vuotiaita 1 000 elävänä syntynyttä kohden (StatFin 12aq). Katkoviiva: vuosien 1927–1938 trendi jatkettuna vuosiin 1946–1951." }
         : { trend: [1927, 1938], win: [1946, 1951], from: 1915, label: "neuvolalaki", ticks: [1915, 1927, 1946, 1975], zeroTicks: [0, 200, 400], caption: "Äitiyskuolleisuus, kuolleita äitejä 100 000 synnytystä kohden (OWID). Katkoviiva: vuosien 1927–1938 trendi jatkettuna vuosiin 1946–1951." }} />}
@@ -658,6 +659,33 @@ function ProhibitionChart({ detail, what }: { detail: { series: [number, number]
         {[1927, 1932, 1940, 1950, 1960].map((t) => <text key={t} x={x(t)} y={H - 12} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
       </svg>
       <p className="text-xs text-muted-foreground">{what} 100 000 asukasta kohden, poliisin tietoon tulleet (Vuorela, historiallinen rikostilasto; väkiluku StatFin 121v). Vaakaviivat: viiden vuoden keskiarvot ennen ja jälkeen kumoamisen.</p>
+    </div>
+  );
+}
+
+function MigrationChart({ detail }: { detail: { toSweden: [number, number][]; fromSweden: [number, number][]; unemployment: [number, number][] } }) {
+  const X0 = 1945, X1 = 1992;
+  const W = 620, H = 200, L = 50, R = 560, TOP = 14, BOT = 168;
+  const x = (y: number) => L + ((y - X0) / (X1 - X0)) * (R - L);
+  const hi = Math.max(...detail.toSweden.map((p) => p[1])) * 1.05;
+  const y = (v: number) => BOT - (v / hi) * (BOT - TOP);
+  const U = detail.unemployment.filter(([yy]) => yy >= X0 && yy <= X1);
+  const uh = Math.max(...U.map((p) => p[1])) * 1.1;
+  const yu = (v: number) => BOT - (v / uh) * (BOT - TOP);
+  const line = (s: [number, number][], f: (v: number) => number) => s.filter(([yy]) => yy >= X0 && yy <= X1).map(([a, v], i) => `${i ? "L" : "M"}${x(a).toFixed(1)},${f(v).toFixed(1)}`).join(" ");
+  return (
+    <div className="mt-2 overflow-x-auto">
+      <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[460px] max-w-2xl" role="img" aria-label="Muutto Suomesta Ruotsiin ja Ruotsista Suomeen 1945–1992 sekä Suomen työttömyysaste">
+        <path d={line(U, yu)} fill="none" stroke="var(--foreground)" strokeOpacity={0.5} strokeDasharray="5 3" strokeWidth={1.5} />
+        <path d={line(detail.fromSweden, y)} fill="none" stroke="var(--muted-foreground)" strokeWidth={1.6} />
+        <path d={line(detail.toSweden, y)} fill="none" stroke="var(--primary)" strokeWidth={2.2} />
+        {[0, 20000, 40000].filter((t) => t < hi).map((t) => <text key={t} x={L - 6} y={y(t) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">{t.toLocaleString("fi-FI")}</text>)}
+        <text x={x(1970) + 4} y={y(detail.toSweden.find(([yy]) => yy === 1970)![1]) - 4} className="fill-primary text-[11px] font-semibold">Suomesta Ruotsiin</text>
+        <text x={R + 4} y={y(detail.fromSweden.at(-1)![1]) + 4} className="fill-muted-foreground text-[11px]">paluu</text>
+        <text x={R + 4} y={yu(U.at(-1)![1]) + 4} className="fill-foreground text-[11px]">työttömyys</text>
+        {[1945, 1960, 1970, 1980, 1992].map((t) => <text key={t} x={x(t)} y={H - 12} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
+      </svg>
+      <p className="text-xs text-muted-foreground">Muuttaneet henkilöt vuodessa (Korkiasaari 1993) ja Suomen työttömyysaste (katkoviiva, oma asteikko).</p>
     </div>
   );
 }

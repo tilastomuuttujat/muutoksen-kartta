@@ -374,6 +374,17 @@ describe("pilot results", () => {
     expect(t3!.detail.steeper).toBe(41);
     expect(statusOfHypothesis(hypothesis("h17")!)).toBe("kumottu");
   });
+  it("H18 numbers quoted in the register", () => {
+    const [t1, t2, t3] = NAYTTO.hypotheses.h18.tests as { result: string; detail: { r: number; p: number } }[];
+    expect(t1!.result).toBe("kumoaa");
+    expect(t1!.detail.r).toBeCloseTo(-0.3, 1);
+    expect(t2!.result).toBe("ei-ratkea");
+    expect(t2!.detail.r).toBeCloseTo(0.25, 1);
+    expect(t3!.result).toBe("ei-ratkea");
+    expect(t3!.detail.r).toBeCloseTo(-0.39, 1);
+    expect(t3!.detail.p).toBeCloseTo(0.06, 1);
+    expect(statusOfHypothesis(hypothesis("h18")!)).toBe("oletus");
+  });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
       expect(p.lo).toBeLessThan(p.point);
