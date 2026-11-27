@@ -76,7 +76,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h16: { tests: Test[]; predictions: Prediction[] }; h17: { tests: Test[]; predictions: Prediction[] }; h18: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h16: { tests: Test[]; predictions: Prediction[] }; h17: { tests: Test[]; predictions: Prediction[] }; h18: { tests: Test[]; predictions: Prediction[] }; h19: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -398,6 +398,19 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Suomen työttömyyden nousu ei lisännyt muuttoa Ruotsiin, vaan muutto väheni samana vuonna. Ruotsin talouskasvun ja paluumuuton yhteydet olivat ennustetun suuntaisia mutta eivät merkitseviä. Todennäköinen syy on, että Suomen ja Ruotsin suhdanteet kulkevat yhdessä: kun Suomen työttömyys nousee, myös Ruotsin veto heikkenee samaan aikaan. Tätä selitystä ei ole testattu.",
     next: "Oikeampi mittari: maiden välinen ero (Ruotsin ja Suomen työttömyyden tai kasvun erotus). Jos muutto seurasi eroa, sen pitäisi ennustaa muuttoa vahvemmin kuin kumpikaan maa yksin.",
+  },
+  {
+    id: "h19",
+    title: "Nopeusrajoitukset käänsivät liikennekuolemat",
+    claim: "Liikennekuolemat kääntyivät laskuun 1973, kun yleinen nopeusrajoitus vakinaistettiin (ja 1975 tuli turvavyöpakko). Öljykriisin vähentämä liikenne ei yksin selitä käännettä.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. Uusi teema.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h19.tests,
+    predictions: [],
+    reading:
+      "Kuolemat kääntyivät laskuun vuoden 1972 huipun jälkeen, ja 1973–1976 kuolleita oli neljännes trendiä vähemmän. Käänne ei kuitenkaan ollut poikkeuksellinen verrattuna myöhempiin tavallisiin jaksoihin. Vakavuuden ennustettua laskua ei näkynyt: loukkaantumiset vähenivät lähes samassa suhteessa kuin kuolemat. Se sopii yhtä hyvin öljykriisin vähentämään liikenteeseen kuin nopeuden laskuun.",
+    next: "Erottelu vaatii mittarin, jota tämä sarja ei anna: kuolleet ajosuoritetta kohden (liikenteen määrä 1970-luvulla) tai tieluokittain, sillä rajoitus koski maanteitä mutta ei taajamia.",
   },
   {
     id: "h2",

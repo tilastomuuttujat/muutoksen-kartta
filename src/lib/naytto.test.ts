@@ -385,6 +385,17 @@ describe("pilot results", () => {
     expect(t3!.detail.p).toBeCloseTo(0.06, 1);
     expect(statusOfHypothesis(hypothesis("h18")!)).toBe("oletus");
   });
+  it("H19 numbers quoted in the register", () => {
+    const [t1, t2] = NAYTTO.hypotheses.h19.tests as { result: string; detail: { pct: number; above: number; placebo: number } }[];
+    expect(t1!.result).toBe("ei-ratkea");
+    expect(Math.round(t1!.detail.pct)).toBe(-26);
+    expect(t1!.detail.placebo - t1!.detail.above).toBe(30);
+    expect(t1!.detail.placebo).toBe(33);
+    expect(t2!.result).toBe("ei-ratkea");
+    expect(Math.round(t2!.detail.pct)).toBe(-4);
+    expect(t2!.detail.placebo - t2!.detail.above).toBe(25);
+    expect(statusOfHypothesis(hypothesis("h19")!)).toBe("oletus");
+  });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
       expect(p.lo).toBeLessThan(p.point);

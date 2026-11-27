@@ -1000,3 +1000,20 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Molemmat vähentävät vammojen vakavuutta.
   - Tuettu tulos tarkoittaa, että vakavuutta vähentävät toimet selittävät käänteen paremmin kuin
     liikenteen määrä.
+
+## H19: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Katkos: ei ratkea.** Kuolleita oli 1973–1976 keskimäärin 26 % vähemmän kuin vuosien 1961–1972
+  trendi ennusti.
+  - Poikkeama oli pienempi kuin 30:ssä 33 lumejaksosta (persentiili 9 %).
+  - Kirjattu raja oli 95 %, joten sitä ei aivan saavutettu.
+- **T2 Täsmällisyys: ei ratkea.** Kuolleita sataa loukkaantunutta kohden oli vain 4 % trendiä vähemmän.
+  Tämä on tavallista vaihtelua: poikkeama oli pienempi kuin 25:ssä 33 lumejaksosta.
+- **Tila:** oletus. Testit eivät tue eivätkä kumoa väitettä.
+- **Tulkinta:**
+  - Kuolemat kääntyivät laskuun vuoden 1972 huipun (1 156) jälkeen. Käänne oli suuri mutta ei
+    poikkeuksellinen verrattuna 1990-luvun laman ja 2000-luvun jaksoihin.
+  - Ennustettua vakavuuden laskua ei näkynyt: loukkaantumiset vähenivät lähes samassa suhteessa kuin
+    kuolemat. Se sopii yhtä hyvin liikenteen vähenemiseen öljykriisissä kuin nopeuden laskuun.
+  - Kansallinen aikasarja ei siksi erota näitä selityksiä toisistaan.

@@ -1561,6 +1561,27 @@ def h18():
     return {"tests": [t1, t2, t3], "predictions": []}
 
 
+def h19():
+    """H19 (docs/naytto-rekisteri.md): yleinen nopeusrajoitus 1973 → liikennekuolemat ja vakavuus."""
+    ids, d = px("ton/11bh.px", [("contentscode", ["ton-kuol", "ton-louk"]), ("timeperiod_y", "*")])
+    ic, iy = ids.index("contentscode"), ids.index("timeperiod_y")
+    T = {}
+    for k, v in d.items():
+        if v:
+            T.setdefault(k[ic], {})[int(k[iy])] = float(v)
+    kuol, louk = T["ton-kuol"], T["ton-louk"]
+    leth = {y: kuol[y] / louk[y] * 100 for y in kuol if y in louk}
+    a, b = break_test(kuol, 1973, 4, (1961, 1976)), break_test(leth, 1973, 4, (1961, 1976))
+    res = lambda x: "tukee" if x["dev"] < 0 and x["percentile"] <= 0.05 else "kumoaa" if x["dev"] >= 0 else "ei-ratkea"
+    t1 = {"id": "katkos", "design": "luonnollinen", "result": res(a), "date": str(date.today()),
+          "summary": f"Kuolleet 1973–1976 {a['pct']:+.0f} % vuosien 1961–1972 trendistä; pienempi kuin {a['placebo'] - a['above']}:ssä {a['placebo']} lumejaksosta",
+          "detail": {**a, "deaths": sorted(kuol.items()), "injured": sorted(louk.items())}}
+    t2 = {"id": "vakavuus", "design": "tasmallisyys", "result": res(b), "date": str(date.today()),
+          "summary": f"Kuolleita sataa loukkaantunutta kohden 1973–1976 {b['pct']:+.0f} % trendistä; pienempi kuin {b['placebo'] - b['above']}:ssä {b['placebo']} lumejaksosta",
+          "detail": {**b, "lethality": sorted((y, round(v, 3)) for y, v in leth.items())}}
+    return {"tests": [t1, t2], "predictions": []}
+
+
 def h11():
     """H11 (docs/naytto-rekisteri.md): ulkomaan kansalaisten osuus → Suomen kansalaisten työllisyys ja työttömyys."""
     regions = ["MK01", "MK02", "MK04", "MK05", "MK06", "MK07", "MK08", "MK09", "MK10", "MK11", "MK12", "MK13", "MK14", "MK15", "MK16", "MK17", "MK18", "MK19"]
@@ -1733,6 +1754,7 @@ def main():
     out["hypotheses"]["h16"] = h16()
     out["hypotheses"]["h17"] = h17()
     out["hypotheses"]["h18"] = h18()
+    out["hypotheses"]["h19"] = h19()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
