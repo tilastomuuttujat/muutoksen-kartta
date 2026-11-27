@@ -890,3 +890,30 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
     alkoholimarkkinoihin eikä alkoholinkäyttöön yleensä, mutta tätä ei ole testattu.
   - Henkirikokset olivat huipussaan jo 1929, joten lama ja muut 1930-luvun muutokset voivat selittää
     osan laskusta.
+
+## H17. Neuvolalaki 1944 → imeväis- ja äitiyskuolleisuus
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Uusi teema.
+- **Kartassa:** solmu neuvolalaki-1944 ("Kunnallinen äitiys- ja lastenneuvola", ongelma: äitiys- ja
+  lapsikuolleisuus).
+- **Väite:** kunnallisten äitiys- ja lastenneuvoloiden perustaminen vähensi imeväis- ja
+  äitiyskuolleisuutta enemmän kuin aiempi kehitys ja sodan jälkeinen yleinen terveyden paraneminen
+  selittävät.
+- **Aineisto:**
+  - Imeväiskuolleisuus ‰: StatFin 12aq, Turso.
+  - Äitiyskuolleisuus / 100 000 synnytystä: OWID, Turso.
+  - Kuolleet, elävänä syntyneet ja väkiluku: StatFin 121v.
+- **Asetelma:**
+  - Log-trendi 1927–1938, joten sotavuodet eivät ole mukana.
+  - Poikkeama keskimäärin 1946–1951, välissä seitsemän vuoden aukko.
+  - Lumejaksot: sama rakenne (12 vuoden trendi, 7 vuoden aukko, 6 vuoden jakso) kaikille
+    alkuvuosille 1880–2010. Jakso ei saa osua vuosiin 1914–1922 tai 1939–1951.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Luonnollinen koe | Imeväiskuolleisuus | Tukee: poikkeama < 0 ja jyrkempi kuin 95 %:ssa lumejaksoista. Kumoaa: poikkeama ≥ 0. Muuten: ei ratkea |
+| T2 Täsmällisyys | Äitiyskuolleisuus | Kuten T1 |
+| T3 Negatiivinen kontrolli | Muun väestön kuolleisuus: (kuolleet − imeväiskuolleet) / väkiluku. Imeväiskuolleet = imeväiskuolleisuus × elävänä syntyneet. | Tukee: T1 tukee ja kontrollin poikkeama on loivempi kuin imeväiskuolleisuuden ja alle 95 %:n. Kumoaa: kontrollin poikkeama on yhtä jyrkkä tai jyrkempi kuin imeväiskuolleisuuden. Muuten: ei ratkea |
+
+- **Rajoite:** antibiootit (penisilliini 1940-luvulla) ja sodan päättyminen osuvat samaan aikaan. T3
+  erottaa vain sen, mikä koski kaikkia ikäryhmiä.
