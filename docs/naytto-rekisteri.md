@@ -1430,3 +1430,38 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 
 - **Kuvaileva tarkistus** (ei testi): REER:n muutos t0 − 1 → t0 + 1 kertoo, heikkenikö reaalinen
   kurssi ylipäätään kussakin devalvaatiossa.
+
+## H24d: tulos
+
+- **Laskettu:** 27.11.2026.
+
+  | Tapahtuma | REER t0−1 → t0+1 | REER t0+2 → t0+5 | REER t0−1 → t0+5 | Vienti t0 → t0+5 | Kuluminen t0+2 → t0+5 |
+  |---|---|---|---|---|---|
+  | 1957 | +2 % | +3 % | +6 % | −0 % | −5 % |
+  | 1967 | −16 % | −6 % | −22 % | +29 % | +6 % |
+  | 1977 | −18 % | +10 % | −19 % | +7 % | −3 % |
+  | 1982 | −0 % | +3 % | +6 % | −13 % | −15 % |
+  | 1991 | −17 % | +11 % | −22 % | +71 % | +16 % |
+
+- **T1 Kuluminen: kumoaa.** rho = +0,40 (p = 0,78).
+  - Reaalisen kurssin vahvistuminen vuosina 2–5 ei liittynyt viennin edun kulumiseen.
+  - Vuosina 1991 ja 1977 kurssi vahvistui eniten, mutta etu kului vähän tai jopa kasvoi.
+- **T2 Kokonais: tukee.** rho = −1,00 (tarkka p = 0,008).
+  - Mitä enemmän reaalista heikkenemistä jäi jäljelle viiden vuoden päähän, sitä enemmän viennin
+    osuus kasvoi. Järjestys oli täydellinen.
+- **T3 Vuosittain: ei ratkea.** r = −0,24 (viive 2 v, p = 0,10, n = 67). Suunta oli ennustettu.
+- **Kuvaileva tarkistus:**
+  - Vuosien 1957 ja 1982 devalvaatiot eivät heikentäneet reaalista efektiivistä kurssia juuri
+    lainkaan (+2 % ja −0 %).
+  - Muut kolme heikensivät sitä 16–18 %.
+- **Tila:** kumottu. Sääntö: vahva asetelma (annos, T1) kumoaa.
+  - Väitteen mekanismi eli kuluminen reaalisen vahvistumisen kautta ei saanut tukea.
+- **Tulkinta** (ei testattu, uusi hypoteesi vaatii oman kirjauksen):
+  - Ratkaisevaa näyttää olleen se, heikensikö devalvaatio reaalista kurssia alun perin, eikä se,
+    kuinka paljon kurssi myöhemmin vahvistui.
+  - Vuosien 1957 ja 1982 nimellinen devalvaatio ei muuttunut reaaliseksi. Syy voi olla
+    kauppakumppanien samanaikaiset devalvaatiot (Ruotsi 1982) tai GMD:n REER-sarjan muodostus ennen
+    vuotta 1960.
+  - Tämä selittäisi myös, miksi juuri näiden kahden tapauksen etu hävisi.
+  - Selitys on muotoiltu tämän aineiston perusteella, joten se pitää testata muulla aineistolla,
+    esimerkiksi muiden maiden devalvaatioilla.

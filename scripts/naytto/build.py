@@ -1685,6 +1685,20 @@ def h22():
     return {"tests": [t1, t2], "predictions": []}
 
 
+GMD_URL = "https://gmd-releases.s3.ap-southeast-2.amazonaws.com/data/distribute/GMD_2026_09.dta"
+
+
+def gmd_series(iso, var):
+    """Global Macro Database 2026_09 (ladataan välimuistiin GMD_DTA tai /tmp)."""
+    path = os.environ.get("GMD_DTA", os.path.join("/tmp", "GMD_2026_09.dta"))
+    if not os.path.exists(path):
+        urllib.request.urlretrieve(GMD_URL, path)
+    import pandas as pd
+    d = pd.read_stata(path, columns=["ISO3", "year", var])
+    d = d[(d["ISO3"] == iso) & d[var].notna()]
+    return {int(y): float(v) for y, v in zip(d["year"], d[var])}
+
+
 def pension_age(c):
     """Alin vanhuuseläkeikä vuosina syntymävuoden mukaan (vuoden 2017 uudistus)."""
     if c <= 1954:
@@ -1874,8 +1888,37 @@ def h24():
     c2 = {"id": "palkat", "design": "annos", "result": rc2, "date": str(date.today()),
           "summary": f"Palkkojen nousu kolmessa vuodessa devalvaatiosta ({rowtxt(dc2)}) vs. viennin osuuden kuluminen: rho = {dc2['rho']:.2f} (tarkka p = {dc2['p']:.3f}, n = 5)",
           "detail": dc2}
+    # H24d (rekisteri 27.11.2026): reaalinen efektiivinen valuuttakurssi (Global Macro Database 2026_09).
+    reer = gmd_series("FIN", "REER")
+    ru = lambda xv, yv: rank_test_xy(xv, yv)
+    def rank_test_xy(xv, yv):
+        rho = spearman(xv, yv)
+        perms = [spearman(xv, [yv[i] for i in pp]) for pp in itertools.permutations(range(len(yv)))]
+        p_ = sum(1 for r_ in perms if r_ <= rho + 1e-12) / len(perms)
+        return ("tukee" if rho <= -0.9 + 1e-9 else "kumoaa" if rho >= 0 else "ei-ratkea"), round(rho, 2), round(p_, 3)
+    rw = [math.log(reer[t + 5] / reer[t + 2]) for t in E5]
+    rc = [math.log(reer[t + 5] / reer[t - 1]) for t in E5]
+    ri = [math.log(reer[t + 1] / reer[t - 1]) for t in E5]
+    five = [lsh[t + 5] - lsh[t] for t in E5]
+    rd1, rho1, p1 = ru(rw, wear)
+    rd2, rho2, p2 = ru(rc, five)
+    lc = lead_corr(prewhiten(changes({y: v for y, v in reer.items() if 1950 <= y <= 2020}, True)),
+                   prewhiten(changes({y: v for y, v in share.items() if 1950 <= y <= 2020}, True)), lags=(1, 2))
+    rd3 = "tukee" if lc["r"] < 0 and lc["p"] < 0.05 else "kumoaa" if lc["r"] >= 0 else "ei-ratkea"
+    pc = lambda v: round((math.exp(v) - 1) * 100, 1)
+    rows_d = [{"event": t, "impact": pc(a_), "after": pc(b_), "total": pc(c_), "wear": pc(w_), "five": pc(f_)} for t, a_, b_, c_, w_, f_ in zip(E5, ri, rw, rc, wear, five)]
+    txt = lambda key: ", ".join(f"{r_['event']} {r_[key]:+.0f} %" for r_ in rows_d)
+    d1 = {"id": "kuluminen", "design": "annos", "result": rd1, "date": str(date.today()),
+          "summary": f"Reaalisen kurssin vahvistuminen t0+2 → t0+5 ({txt('after')}) vs. viennin osuuden kuluminen: rho = {rho1:.2f} (tarkka p = {p1:.3f}, n = 5)",
+          "detail": {"rho": rho1, "p": p1, "rows": rows_d, "reer": sorted((y, round(v, 1)) for y, v in reer.items() if 1950 <= y <= 2020)}}
+    d2 = {"id": "kokonais", "design": "annos", "result": rd2, "date": str(date.today()),
+          "summary": f"Jäljelle jäänyt reaalinen heikkeneminen t0−1 → t0+5 ({txt('total')}) vs. viennin osuuden muutos t0 → t0+5: rho = {rho2:.2f} (tarkka p = {p2:.3f}, n = 5)",
+          "detail": {"rho": rho2, "p": p2}}
+    d3 = {"id": "vuosittain", "design": "ajoitus", "result": rd3, "date": str(date.today()),
+          "summary": f"Kaikki vuodet 1951–2020: reaalisen kurssin muutos → viennin osuuden muutos r = {r2(lc['r'])} (viive {lc['lag']} v, p = {lc['p']:.3f}, n = {lc['n']})",
+          "detail": lc}
     return {"tests": [t1, t2, t3], "predictions": [], "kesto": {"tests": [b1, b2], "predictions": []},
-            "kierre": {"tests": [c1, c2], "predictions": []}}
+            "kierre": {"tests": [c1, c2], "predictions": []}, "reaali": {"tests": [d1, d2, d3], "predictions": [], "impact": {str(t): pc(v) for t, v in zip(E5, ri)}}}
 
 
 def h11():
@@ -2058,6 +2101,7 @@ def main():
     out["hypotheses"]["h24"] = h24()
     out["hypotheses"]["h24b"] = out["hypotheses"]["h24"].pop("kesto")
     out["hypotheses"]["h24c"] = out["hypotheses"]["h24"].pop("kierre")
+    out["hypotheses"]["h24d"] = out["hypotheses"]["h24"].pop("reaali")
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.

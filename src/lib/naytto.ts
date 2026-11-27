@@ -76,7 +76,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h16: { tests: Test[]; predictions: Prediction[] }; h17: { tests: Test[]; predictions: Prediction[] }; h18: { tests: Test[]; predictions: Prediction[] }; h19: { tests: Test[]; predictions: Prediction[] }; h20: { tests: Test[]; predictions: Prediction[] }; h21: { tests: Test[]; predictions: Prediction[] }; h22: { tests: Test[]; predictions: Prediction[] }; h23: { tests: Test[]; predictions: Prediction[] }; h24: { tests: Test[]; predictions: Prediction[] }; h24b: { tests: Test[]; predictions: Prediction[] }; h24c: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h16: { tests: Test[]; predictions: Prediction[] }; h17: { tests: Test[]; predictions: Prediction[] }; h18: { tests: Test[]; predictions: Prediction[] }; h19: { tests: Test[]; predictions: Prediction[] }; h20: { tests: Test[]; predictions: Prediction[] }; h21: { tests: Test[]; predictions: Prediction[] }; h22: { tests: Test[]; predictions: Prediction[] }; h23: { tests: Test[]; predictions: Prediction[] }; h24: { tests: Test[]; predictions: Prediction[] }; h24b: { tests: Test[]; predictions: Prediction[] }; h24c: { tests: Test[]; predictions: Prediction[] }; h24d: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -502,6 +502,19 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Suunta oli ennustettu: mitä enemmän hinnat nousivat kolmessa vuodessa devalvaatiosta, sitä enemmän vientietu kului. Viidellä tapauksella yhteys ei kuitenkaan riitä. Ääripäät sopivat kierreselitykseen (1991 hinnat ja palkat nousivat vähiten ja etu kasvoi eniten; 1982 päinvastoin), mutta vuonna 1967 palkat nousivat 29 % ja etu silti säilyi.",
     next: "Suhteellinen mittari: Suomen hinnat ja palkat suhteessa kauppakumppaneihin (reaalinen valuuttakurssi). Vaatii kumppanimaiden sarjat 1957–1996.",
+  },
+  {
+    id: "h24d",
+    title: "Reaalisen kurssin vahvistuminen söi devalvaation edun",
+    claim: "Devalvaation vientietu säilyi niin kauan kuin reaalinen valuuttakurssi pysyi heikentyneenä; kun Suomen hinnat kurottivat kauppakumppanien edelle (reaalinen vahvistuminen), etu kului.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. Jatkoa H24c:lle; reaalinen efektiivinen valuuttakurssi Global Macro Databasesta.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h24d.tests,
+    predictions: [],
+    reading:
+      "Väitteen mekanismi kumoutui: reaalisen kurssin vahvistuminen vuosina 2–5 ei liittynyt edun kulumiseen. Sen sijaan jäljelle jäänyt reaalinen heikkeneminen järjesti tapaukset täydellisesti: vienti kasvoi pysyvästi vuosien 1967, 1977 ja 1991 devalvaatioissa, jotka heikensivät reaalista kurssia 16–18 %, mutta ei vuosina 1957 ja 1982, jolloin reaalinen kurssi ei juuri heikentynyt lainkaan. Ratkaisevaa näyttää olleen se, muuttuiko nimellinen devalvaatio reaaliseksi. Tämä on aineistosta johdettu selitys, ei testattu.",
+    next: "Uusi hypoteesi omalla kirjauksella: nimellinen devalvaatio lisää vientiä vain, jos se heikentää reaalista kurssia. Testattava muiden maiden devalvaatioilla (Global Macro Database sisältää REER:n ja viennin kymmenille maille), jotta sitä ei arvioida samalla aineistolla, josta se keksittiin.",
   },
   {
     id: "h2",

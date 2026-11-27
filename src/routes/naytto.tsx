@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Kolmekymmentäkaksi hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Kolmekymmentäkolme hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Kahdeksan väitettä kumoutui, viisi on tuettu, seitsemän on ehdokkaita ja kaksitoista näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Yhdeksän väitettä kumoutui, viisi on tuettu, seitsemän on ehdokkaita ja kaksitoista näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -260,6 +260,10 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h24b" && t.id === "kesto" && <DevalBars two={(NAYTTO.hypotheses.h24.tests[0]!.detail as unknown as { events: Record<string, number> }).events}
         five={(t.detail as unknown as { events: Record<string, number> }).events} />}
       {h.id === "h24c" && <WearScatter rows={(t.detail as unknown as { rows: { event: number; exposurePct: number; wearPct: number }[] }).rows} xLabel={t.id === "inflaatio" ? "hintojen nousu t0 → t0+3, %" : "palkkojen nousu t0 → t0+3, %"} />}
+      {h.id === "h24d" && t.id !== "vuosittain" && <PointScatter
+        pts={(NAYTTO.hypotheses.h24d.tests[0]!.detail as unknown as { rows: { event: number; after: number; total: number; wear: number; five: number }[] }).rows.map((r) => ({ label: String(r.event), x: t.id === "kuluminen" ? r.after : r.total, y: t.id === "kuluminen" ? r.wear : r.five }))}
+        xLabel={t.id === "kuluminen" ? "reaalisen kurssin muutos t0+2 → t0+5, % (+ = vahvistui)" : "reaalisen kurssin muutos t0−1 → t0+5, % (− = heikkeni)"}
+        yLabel={t.id === "kuluminen" ? "viennin osuuden muutos t0+2 → t0+5, %" : "viennin osuuden muutos t0 → t0+5, %"} />}
       {h.id === "h14" && t.id === "katkos" && <BreakChart detail={t.detail as Break} cfg={{ trend: [1976, 1987], win: [1988, 1991], from: 1960, label: "laki voimaan 1/1988", ticks: [1960, 1976, 1988, 2000, 2025], zeroTicks: [0, 1, 2, 3], caption: "Avioerot 1 000 asukasta kohden (StatFin 121v). Katkoviiva: vuosien 1976–1987 trendi jatkettuna. Poikkeama 1988–1991 oli suurempi kuin kaikissa tavallisissa jaksoissa." }} />}
       {h.id === "h13" && t.id === "suomi" && <DecouplingChart detail={t.detail as { co2: [number, number][]; gdp: [number, number][] }} />}
       {h.id === "h12" && t.id === "toisto" && <CountryCorr h="h12" detail={t.detail as Pooled & Rc} />}
@@ -713,6 +717,35 @@ function MigrationChart({ detail }: { detail: { toSweden: [number, number][]; fr
         {[1945, 1960, 1970, 1980, 1992].map((t) => <text key={t} x={x(t)} y={H - 12} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
       </svg>
       <p className="text-xs text-muted-foreground">Muuttaneet henkilöt vuodessa (Korkiasaari 1993) ja Suomen työttömyysaste (katkoviiva, oma asteikko).</p>
+    </div>
+  );
+}
+
+function PointScatter({ pts, xLabel, yLabel }: { pts: { label: string; x: number; y: number }[]; xLabel: string; yLabel: string }) {
+  const W = 620, H = 210, L = 50, R = 580, TOP = 18, BOT = 170;
+  const nice = (v: number) => Math.ceil(Math.abs(v) / 10) * 10 * Math.sign(v);
+  const x0 = Math.min(0, nice(Math.min(...pts.map((p) => p.x)) - 2)), x1 = Math.max(0, nice(Math.max(...pts.map((p) => p.x)) + 2));
+  const y0 = Math.min(0, nice(Math.min(...pts.map((p) => p.y)) - 2)), y1 = Math.max(0, nice(Math.max(...pts.map((p) => p.y)) + 2));
+  const x = (v: number) => L + ((v - x0) / (x1 - x0)) * (R - L);
+  const y = (v: number) => BOT - ((v - y0) / (y1 - y0)) * (BOT - TOP);
+  const sgn = (v: number) => (v > 0 ? `+${v}` : v < 0 ? `−${-v}` : `${v}`);
+  const ticks = (a: number, b: number) => Array.from({ length: Math.round((b - a) / 10) + 1 }, (_, i) => a + i * 10).filter((t, _, arr) => arr.length <= 6 || t % 20 === 0);
+  return (
+    <div className="mt-2 overflow-x-auto">
+      <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[460px] max-w-2xl" role="img" aria-label={`${xLabel} ja ${yLabel}: ${pts.map((p) => `${p.label}: ${p.x} %, ${p.y} %`).join("; ")}`}>
+        <line x1={L} x2={R} y1={y(0)} y2={y(0)} stroke="var(--foreground)" strokeOpacity={0.4} />
+        <line x1={x(0)} x2={x(0)} y1={TOP} y2={BOT} stroke="var(--foreground)" strokeOpacity={0.25} />
+        {ticks(y0, y1).map((t) => <text key={t} x={L - 6} y={y(t) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">{sgn(t)}</text>)}
+        {ticks(x0, x1).map((t) => <text key={t} x={x(t)} y={BOT + 16} textAnchor="middle" className="fill-muted-foreground text-[10px]">{sgn(t)}</text>)}
+        <text x={(L + R) / 2} y={H - 6} textAnchor="middle" className="fill-muted-foreground text-[10px]">{xLabel}</text>
+        <text x={L + 4} y={TOP - 6} className="fill-muted-foreground text-[10px]">{yLabel}</text>
+        {pts.map((p) => (
+          <g key={p.label}>
+            <circle cx={x(p.x)} cy={y(p.y)} r={5} fill="var(--primary)" />
+            <text x={x(p.x) + 8} y={y(p.y) + 4} className="fill-foreground text-[11px]">{p.label}</text>
+          </g>
+        ))}
+      </svg>
     </div>
   );
 }

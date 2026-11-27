@@ -486,6 +486,22 @@ describe("pilot results", () => {
     expect(t2!.detail.rows.map((r) => Math.round(r.exposurePct))).toEqual([16, 29, 33, 31, 4]);
     expect(statusOfHypothesis(hypothesis("h24c")!)).toBe("oletus");
   });
+  it("H24d numbers quoted in the register", () => {
+    const [t1, t2, t3] = NAYTTO.hypotheses.h24d.tests as { result: string; detail: Record<string, unknown> }[];
+    expect(t1!.result).toBe("kumoaa");
+    expect(t1!.detail).toMatchObject({ rho: 0.4, p: 0.775 });
+    const rows = t1!.detail["rows"] as { event: number; impact: number; after: number; total: number; five: number; wear: number }[];
+    expect(rows.map((r) => Math.round(r.impact))).toEqual([2, -16, -18, -0, -17]);
+    expect(rows.map((r) => Math.round(r.after))).toEqual([3, -6, 10, 3, 11]);
+    expect(rows.map((r) => Math.round(r.total))).toEqual([6, -22, -19, 6, -22]);
+    expect(t2!.result).toBe("tukee");
+    expect(t2!.detail).toEqual({ rho: -1, p: 0.008 });
+    expect(t3!.result).toBe("ei-ratkea");
+    expect(t3!.detail).toMatchObject({ lag: 2, n: 67 });
+    expect(t3!.detail["r"] as number).toBeCloseTo(-0.24, 2);
+    expect(t3!.detail["p"] as number).toBeCloseTo(0.1, 2);
+    expect(statusOfHypothesis(hypothesis("h24d")!)).toBe("kumottu");
+  });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
       expect(p.lo).toBeLessThan(p.point);
