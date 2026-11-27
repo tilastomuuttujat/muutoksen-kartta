@@ -422,3 +422,21 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Ikäluokkien pitkä lasku (syntyneet 1996: 30 %) peittää mahdollisen tulovaiheen vaikutuksen.
 - **Lisätieto, esikoiset 40 ikävuoteen mennessä:** r = −0,60 (p = 0,06, 17 ikäluokkaa).
 - **Tila:** H1d pysyy ehdokkaana. Täsmällisyys tukee, annos–vaste ei ratkea.
+
+## H6. Alkoholiveron alennus 2004 → alkoholikuolleisuus
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa.
+- **Tausta:** alkoholivero alennettiin 1.3.2004 keskimäärin noin kolmanneksella. Samaan aikaan Viro
+  liittyi EU:hun ja tuontikiintiöt poistuivat.
+- **Väite:** alennus nosti alkoholiperäistä kuolleisuutta. Muihin kuolinsyihin se ei vaikuttanut.
+- **Aineisto:** StatFin 11ay, ikävakioitu kuolleisuusluku koko väestössä 1971–2025. Alkoholi = koodi
+  41 (alkoholiperäiset taudit ja tapaturmainen alkoholimyrkytys). Muut taudit = 00-41 miinus 41.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Luonnollinen koe | Log-kuolleisuuden lineaarinen trendi 1992–2003, poikkeama siitä keskimäärin 2004–2007. Vertailuna lumejaksot: kaikki nelivuotisjaksot, joiden alkuvuosi on 1983–2022 ja joille on 12 vuoden esijakso, ja jotka eivät osu vuosiin 2004–2007 (esijakso mukaan lukien). | Tukee: poikkeama > 0 ja suurempi kuin 95 %:ssa lumejaksoista. Kumoaa: poikkeama ≤ 0. Muuten: ei ratkea |
+| T2 Negatiivinen kontrolli | Sama laskenta muille taudeille | Tukee: alkoholi on yli 95. persentiilin ja muut taudit eivät ole. Kumoaa: muiden tautien poikkeama ≥ alkoholin poikkeama. Muuten: ei ratkea |
+| T3 Ajoitus | Alkoholin myynti 15 vuotta täyttäneille (Turso, l / hlö) ja alkoholikuolleisuus 1972–2024. Log-muutokset, rajaus, AR(1), viive 0–1 v, Šidák. | Tukee: r > 0 ja p < 0,05. Kumoaa: r ≤ 0. Muuten: ei ratkea |
+
+- **Lisätieto, ei vaikuta tulokseen:** sama T1-laskenta henkirikoksille (koodi 51) sekä miehille ja
+  naisille erikseen.
