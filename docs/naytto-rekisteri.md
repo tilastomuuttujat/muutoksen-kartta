@@ -282,3 +282,36 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Vuosina 2015–2019 tulot kasvoivat Suomessa +6,8 %, Ruotsissa +3,2 % ja Tanskassa +7,5 %.
 - **Toistuva kuvio:** kolmas kerta, kun koko maan taso ennustaa syntyvyyttä mutta maakuntien väliset
   erot eivät: työttömyys (H1), työllisyys (H1e) ja tulot (H1g).
+
+## H4. Työttömyys → julkisten palvelujen kasvu hidastuu (seulan jyvä)
+
+- **Kirjattu:** 27.11.2026, ennen T2:n ja T3:n laskentaa.
+- **Lähde:** seulan aikajako. Työttömyysaste → kotitalouksien luontoismuotoiset sosiaaliset
+  tulonsiirrot (D63), viive 1 v.
+  - Löytö ≤ 2000: r = −0,72.
+  - Vahvistus 2001–2025: r = −0,49, p = 0,009.
+- **Väite:** kun työttömyys nousee, julkisten palvelujen (D63: julkisyhteisöjen maksamat palvelut,
+  kuten terveys, koulutus ja hoiva) reaalikasvu hidastuu 1–2 vuoden päästä. Rahaetuudet (D62)
+  sen sijaan kasvavat, koska ne joustavat automaattisesti.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Toisto ajassa (seula) | ks. yllä | Tehty: tukee |
+| T2 Toisto maissa | Ruotsi ja Tanska 1996–2025 (Norjan D63 puuttuu): Eurostat lfsa_urgan (työttömyys 15–74, %, muutos %-yks.) → nasa_10_nf_tr D63 (S13, PAID, käyvin hinnoin) deflatoituna BKT:n hintaindeksillä (nama_10_gdp PD15_NAC), log-muutos. Rajaus, AR(1), viive 1–2, Šidák, maat yhdessä. | Tukee: r < 0 ja p < 0,05. Kumoaa: r ≥ 0 |
+| T3 Täsmällisyys | Suomi, Ruotsi ja Tanska yhdessä, sama menetelmä. D62 (rahaetuudet) verrattuna D63:een. | Tukee: D63:n r < 0 ja D62:n r > D63:n r. Kumoaa: D62:n r ≤ D63:n r. Muuten: ei ratkea |
+
+## H5. Nuorten aikuisten työttömyys pitkittyy (seulan jyvä)
+
+- **Kirjattu:** 27.11.2026, ennen T2:n laskentaa.
+- **Lähde:** seulan maajako. Naisten 25–34 työttömyys → pitkäaikaistyöttömien osuus työttömistä
+  30–34, viive 1 v.
+  - Löytö Suomessa: r = 0,63.
+  - Vahvistus Ruotsissa, Norjassa ja Tanskassa: r = 0,51, p = 0,0003.
+- **Väite:** työttömyysaalto jättää jäljen. Pitkäaikaistyöttömien osuus nousee ja on vielä kolmen
+  vuoden päästä koholla. Pelkkä yhden vuoden nousu syntyy mekaanisesti, koska työttömyysjaksot
+  pitenevät, joten se ei vielä riitä.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Toisto maissa (seula) | ks. yllä | Tehty: tukee |
+| T2 Pysyvyys | Suomi, Ruotsi, Norja ja Tanska (Turso, 1995–). Naisten 25–34 työttömyyden muutos vuonna t ja pitkäaikaistyöttömien osuuden (30–34) muutos vuodesta t vuoteen t + 3. Korrelaatio maat yhdessä. p lasketaan efektiivisellä otoskoolla n / 3, koska kolmen vuoden jaksot menevät päällekkäin. | Tukee: r > 0 ja p < 0,05. Kumoaa: r ≤ 0 |
