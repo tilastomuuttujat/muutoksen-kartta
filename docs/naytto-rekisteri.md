@@ -1575,3 +1575,56 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Väitteen oma osa, eli viennin tavallista suurempi kasvu, oli ennustetun suuntainen mutta jäi
     merkkitestissä niukasti merkitsevyyden alle (44/74).
   - Kirjattu ehto ei täyttynyt, joten väite jää oletukseksi.
+
+## H25. Euro poisti Suomen korkopreemion
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Uusi teema: mitä euro merkitsi Suomelle.
+- **Väite:** euroon sitoutuminen poisti Suomen pitkien korkojen preemion Saksaan nähden enemmän kuin
+  omavaluuttaisissa maissa tapahtunut yleinen korkojen lähentyminen.
+  - Suomi liittyi ERM:ään lokakuussa 1996 ja EMU:hun 1.1.1999.
+- **Aineisto:** Global Macro Database 2026_09, pitkä korko (ltrate).
+- **Mittari:** korkoero Saksaan, eli maan pitkä korko miinus Saksan pitkä korko (%-yks.).
+  - Muutos = keskiarvo 1999–2007 miinus keskiarvo 1990–1995.
+- **Vertailumaat:** omavaluuttaiset maat, joilla korkosarja on saatavilla 1990–2007.
+  - Australia, Kanada, Sveitsi, Iso-Britannia, Japani, Norja, Uusi-Seelanti, Ruotsi ja
+    Yhdysvallat; Islannin sarja puuttuu.
+  - Tanska jätetään pois, koska se on sidottu euroon.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Luonnollinen koe | Suomen korkoeron muutos verrattuna vertailumaihin | Tukee: Suomen korkoero pieneni enemmän kuin yhdenkään vertailumaan. Kumoaa: Suomen pieneneminen on enintään vertailumaiden mediaani. Muuten: ei ratkea |
+| T2 Täsmällisyys | Ruotsi, jolla oli samanlainen 1990-luvun kriisi mutta joka jäi euron ulkopuolelle. Suomen korkoero 1999–2007 miinus Ruotsin korkoero 1999–2007 | Tukee: < 0, eli Suomen korko oli lähempänä Saksaa. Kumoaa: ≥ 0. Muuten: ei ratkea |
+
+- **Rajaus:**
+  - Suomen 1990–1995 korkoero sisälsi laman ja pankkikriisin riskilisän, joka olisi voinut
+    pienentyä ilman euroakin. T2 vertaa siksi Ruotsiin, jossa oli samanlainen kriisi.
+  - Testi ei kerro, oliko korkojen lasku Suomelle hyvä vai huono asia.
+
+## H25b. Ilman omaa valuuttaa sopeutuminen finanssikriisiin oli raskaampaa
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa.
+- **Väite:**
+  - Finanssikriisissä omavaluuttaisten maiden reaaliset valuuttakurssit heikkenivät ja helpottivat
+    sopeutumista.
+  - Euromaissa näin ei käynyt, ja niiden kasvu jäi heikommaksi.
+- **Aineisto:** Global Macro Database 2026_09 (REER ja rGDP_pc).
+- **Ryhmät:**
+  - Euromaat vuoden 2001 kokoonpanossa ilman Suomea: Itävalta, Belgia, Saksa, Espanja, Ranska,
+    Kreikka, Irlanti, Italia, Luxemburg, Alankomaat ja Portugali (11).
+  - Omavaluuttaiset maat: Australia, Kanada, Sveitsi, Iso-Britannia, Islanti, Japani, Norja,
+    Uusi-Seelanti, Ruotsi ja Yhdysvallat (10).
+  - Tanska (sidottu euroon) ja Suomi esitetään erikseen, eikä niitä lasketa kumpaankaan ryhmään.
+- **Menetelmä:** ryhmämediaanien ero. Yksisuuntainen permutaatiotesti ryhmämerkinnöillä, 10 000
+  permutaatiota, siemenluku 1.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Täsmällisyys | REER:n log-muutos 2007 → 2009: heikkenivätkö omavaluuttaisten maiden kurssit enemmän? | Tukee: omavaluuttaisten mediaani < euromaiden mediaani ja p < 0,05. Kumoaa: omavaluuttaisten mediaani ≥ euromaiden mediaani. Muuten: ei ratkea |
+| T2 Luonnollinen koe | Reaalisen BKT:n per asukas log-muutos 2007 → 2015 | Tukee: euromaiden mediaani < omavaluuttaisten mediaani ja p < 0,05. Kumoaa: euromaiden mediaani ≥ omavaluuttaisten mediaani. Muuten: ei ratkea |
+| T3 Annos | Kaikki 21 maata: REER:n muutos 2007 → 2009 vs. BKT per asukas 2007 → 2015. Spearman, yksisuuntainen permutaatio-p | Tukee: rho < 0 ja p < 0,05. Kumoaa: rho ≥ 0. Muuten: ei ratkea |
+
+- **Kuvaileva:** Suomen ja Tanskan sijainti kummassakin mittarissa.
+- **Rajaus:**
+  - Euromaiden kasvua heikensi myös vuosien 2010–2012 velkakriisi, joka liittyy euroon mutta ei
+    pelkästään valuuttakurssiin.
+  - Kumpikaan testi ei erottele näitä kahta mekanismia.
