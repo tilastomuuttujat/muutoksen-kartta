@@ -76,7 +76,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -307,6 +307,19 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Päätestissä maakunnissa, joissa ulkomaan kansalaisten osuus kasvoi muita enemmän, Suomen kansalaisten työllisyys oli seuraavana vuonna heikompi. Tarkistukset osoittivat, että yhteys syntyy alueiden pitkistä kehityssuunnista: osuus kaksi vuotta myöhemmin ”ennustaa” nykyistä työllisyyttä yhtä vahvasti, ja kun kunkin maakunnan oma kehityssuunta otetaan huomioon, yhteys katoaa. Ulkomaan kansalaisten osuus on siis kasvanut eniten maakunnissa, joiden työllisyys on kehittynyt muita heikommin, mutta aineisto ei osoita, että kasvu olisi heikentänyt työllisyyttä. Kansalaisuuden saamisen vaikutusta ryhmien koostumukseen ei voitu testata.",
     next: "Tarkempi testi vaatisi syntyperän tai kielen mukaan jaotellun alueaineiston, jolloin kansalaisuuden saaminen ei sotke vertailua, sekä asetelman, jossa maahanmuuton alueellinen jakautuminen ei riipu työpaikoista (esim. pakolaisten kuntasijoitus).",
+  },
+  {
+    id: "h12",
+    title: "Taantuma → vähemmän liikennekuolemia",
+    claim: "Kun työttömyys nousee, liikennekuolemat vähenevät, koska työmatkoja ja muuta ajoa on vähemmän.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. Uusi teema. Maakuntatestissä vakiotarkistukset.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h12.tests,
+    predictions: [],
+    reading:
+      "Ruotsissa, Norjassa ja Tanskassa liikennekuolemat ovat vähentyneet työttömyyden noustessa, kuten taantumahypoteesi ennustaa. Suomessa yhteys on heikompi ja 2000-luvulla jopa päinvastainen. Maakuntien välinen yhteys näytti aluksi tukevan väitettä, mutta vakiotarkistus osoitti sen syntyvän alueiden pitkistä kehityssuunnista: liikennekuolemat ovat vähentyneet eniten maakunnissa, joissa työttömyys on kehittynyt muita heikommin.",
+    next: "Mekanismin testi: jos taantuma vähentää ajamista, liikennesuoritteen (ajetut kilometrit) pitäisi laskea työttömyyden noustessa, ja liikennekuolemat ajettua kilometriä kohden eivät muuttuisi. Suomen poikkeavuutta voisi tutkia vertaamalla, miten ajosuorite on Suomessa reagoinut suhdanteisiin.",
   },
   {
     id: "h2",

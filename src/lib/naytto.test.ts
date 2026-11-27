@@ -286,6 +286,23 @@ describe("pilot results", () => {
     }
     expect(H["h7"]!.tests.find((x) => x.id === "annos")!.detail!.checks!.trends.p).toBeCloseTo(0.18, 2);
   });
+  it("H12 numbers quoted in the register", () => {
+    const [t1, t2, t3] = NAYTTO.hypotheses.h12.tests as { result: string; detail: Record<string, unknown> }[];
+    expect(t1!.result).toBe("ei-ratkea");
+    expect(t1!.detail["r"] as number).toBeCloseTo(-0.28, 2);
+    expect(t2!.result).toBe("tukee");
+    expect(t2!.detail["r"] as number).toBeCloseTo(-0.425, 3);
+    const c = t2!.detail["countries"] as Record<string, { r: number }>;
+    expect(c["SE"]!.r).toBeCloseTo(-0.54, 2);
+    expect(c["FI"]!.r).toBeCloseTo(0.34, 2);
+    expect(t3!.result).toBe("ei-ratkea");
+    expect(t3!.detail["pctPerPoint"] as number).toBeCloseTo(-2.6, 1);
+    const ch = t3!.detail["checks"] as { changed: boolean; original: string; trends: { p: number } };
+    expect(ch.changed).toBe(true);
+    expect(ch.original).toBe("tukee");
+    expect(ch.trends.p).toBeCloseTo(0.41, 2);
+    expect(statusOfHypothesis(hypothesis("h12")!)).toBe("ehdokas");
+  });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
       expect(p.lo).toBeLessThan(p.point);

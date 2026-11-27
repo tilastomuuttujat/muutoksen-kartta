@@ -726,3 +726,23 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 | T1 Ajoitus Suomessa | Työttömyysaste (Turso: työvoimatutkimuksen historiallinen sarja) → maaliikennetapaturmien ikävakioitu kuolleisuus (StatFin 11ay, koodi 42), 1972–2018. Muutos %-yks. ja log-muutos, rajaus, AR(1), viive 0–1 v, Šidák. | Tukee: r < 0 ja p < 0,05. Kumoaa: r ≥ 0. Muuten: ei ratkea |
 | T2 Toisto Pohjoismaissa | Ruotsi, Norja ja Tanska 2000–2024: työttömyys 15–74 (Eurostat lfsa_urgan) → tieliikennekuolemat miljoonaa asukasta kohden (Eurostat tran_sf_roadus). Menetelmä kuten T1, maat yhdessä. | Kuten T1 |
 | T3 Annos–vaste | 18 maakuntaa 1988–2024. Liikennekuolemat (StatFin 13u5, koodi 42, hyvinvointialueet yhdistettyinä maakunniksi kuten H7:ssä), log((kuolleet + 1) / väestö · 100 000). Työttömyysaste (115w) samana vuonna. Kiinteät alue- ja vuosivaikutukset, permutaatio 2 000 kertaa, vakiotarkistukset. | Tukee: kerroin < 0 ja p < 0,05. Kumoaa: kerroin ≥ 0. Muuten: ei ratkea |
+
+## H12: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Ajoitus Suomessa: ei ratkea.** r = −0,28 (viive 0 v, p = 0,12, n = 46).
+- **T2 Toisto Pohjoismaissa: tukee.**
+  - Ruotsi, Norja ja Tanska yhdessä r = −0,43 (viive 1 v, p < 0,001, n = 72).
+  - Maittain: Ruotsi −0,54, Tanska −0,50, Norja −0,37. Suomi samalla Eurostat-aineistolla
+    2000–2024: +0,34.
+- **T3 Annos–vaste: ei ratkea (vakiotarkistus muutti).**
+  - Päätesti −2,6 % työttömyyden prosenttiyksikköä kohden (p = 0,02), eli tukee.
+  - Ennakkotesti −1,4 % (p = 0,17), ei epäonnistu.
+  - Aluekohtaiset trendit −0,3 % (p = 0,41), eivät tue, joten tulos muuttui "ei ratkea".
+- **Tila:** ehdokas, koska toisto tukee eikä mikään kumoa.
+- **Tulkinta:**
+  - Muissa Pohjoismaissa liikennekuolemat ovat vähentyneet työttömyyden noustessa, kuten
+    taantumahypoteesi ennustaa.
+  - Suomessa yhteys on heikompi, ja 2000-luvulla jopa päinvastainen.
+  - Maakuntien välinen yhteys selittyy alueiden pitkillä kehityssuunnilla: liikennekuolemat ovat
+    vähentyneet eniten maakunnissa, joissa työttömyys on kehittynyt muita heikommin.

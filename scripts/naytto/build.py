@@ -1223,6 +1223,62 @@ def checks_text(c, scale=lambda v: f"{v:+.4f}"):
             f"(p = {c['trends']['p']:.3f})" + (f"; tulos muuttui ({c['original']} → ei ratkea)." if c["changed"] else "; tulos ei muuttunut."))
 
 
+def h12():
+    """H12 (docs/naytto-rekisteri.md): työttömyys → liikennekuolemat."""
+    res = lambda lc: "tukee" if lc["r"] < 0 and lc["p"] < 0.05 else "kumoaa" if lc["r"] >= 0 else "ei-ratkea"
+    # T1 Suomi
+    ids, d = px("ksyyt/11ay.px", [("sukupuoli_9_20180101", ["SSS"]), ("kuolinsyyt_1_20210101", ["42"]), ("contentscode", ["ksyyikav"]), ("timeperiod_y", "*")])
+    iy = ids.index("timeperiod_y")
+    road = {int(k[iy]): v for k, v in d.items() if v}
+    U = {}
+    for line in open(os.path.join(D, "values.ndjson")):
+        k, y, g_, v, kind = json.loads(line)
+        if k == "fi.histlabour.lfs2019.unemployment_rate" and v is not None and kind in ("observed", "estimate"):
+            U[int(y)] = float(v)
+    lc1 = lead_corr(prewhiten(changes({y: v for y, v in U.items() if 1970 <= y <= 2018}, False)),
+                    prewhiten(changes({y: v for y, v in road.items() if y <= 2018}, True)), lags=(0, 1))
+    t1 = {"id": "ajoitus", "design": "ajoitus", "result": res(lc1), "date": str(date.today()),
+          "summary": f"Suomi 1972–2018: työttömyyden muutos → liikennekuolleisuuden muutos r = {r2(lc1['r'])} (viive {lc1['lag']} v, p = {lc1['p']:.3f}, n = {lc1['n']})",
+          "detail": {**lc1, "series": sorted((y, round(v, 2)) for y, v in road.items()), "unemployment": sorted(U.items())}}
+    # T2 Pohjoismaat
+    geos = "&".join(f"geo={c}" for c in COUNTRIES)
+    une = eurostat_annual("lfsa_urgan", f"{geos}&age=Y15-74&sex=T&citizen=TOTAL&unit=PC")
+    rd = eurostat_annual("tran_sf_roadus", f"{geos}&sex=T&age=TOTAL&unit=P_MHAB&pers_cat=TOTAL")
+    pu = {c: prewhiten(changes(une[c], False)) for c in COUNTRIES}
+    pr = {c: prewhiten(changes(rd[c], True)) for c in COUNTRIES}
+    rep = pooled_lead(pu, pr, ["SE", "NO", "DK"], lags=(0, 1))
+    t2 = {"id": "toisto", "design": "toisto", "result": res(rep), "date": str(date.today()),
+          "summary": f"Ruotsi, Norja ja Tanska 2000–2024: työttömyyden muutos → tieliikennekuolemien muutos r = {r2(rep['r'])} (viive {rep['lag']} v, p = {rep['p']:.3f}, n = {rep['n']})",
+          "detail": {**rep, "countries": {c: lead_corr(pu[c], pr[c], lags=(0, 1)) for c in COUNTRIES}}}
+    # T3 maakunnat
+    idr, dr = px("ksyyt/13u5.px", [("alue_23_20260101", list(HVA_TO_MK)), ("kuolinsyyt_1_20210101", ["42"]), ("contentscode", ["ksyylkm"]), ("timeperiod_y", "*")])
+    ia, iyr = idr.index("alue_23_20260101"), idr.index("timeperiod_y")
+    deaths = {}
+    for k, v in dr.items():
+        mk = HVA_TO_MK[k[ia]]
+        deaths.setdefault(mk, {}).setdefault(int(k[iyr]), 0)
+        deaths[mk][int(k[iyr])] += v or 0
+    ids_w, pop = px("tyokay/115w.px", [("alue_28_20250101", sorted(set(HVA_TO_MK.values()))), ("timeperiod_y", "*"),
+                                      ("paaasial_toimin_3_20180101", ["SSS", "11+12", "12"]), ("ikaryhma_10_20180101", ["SSS"]), ("sukupuoli_9_20180101", ["SSS"])])
+    ra, ry, rt = ids_w.index("alue_28_20250101"), ids_w.index("timeperiod_y"), ids_w.index("paaasial_toimin_3_20180101")
+    P = {}
+    for k, v in pop.items():
+        P.setdefault(k[ra], {}).setdefault(int(k[ry]), {})[k[rt]] = v
+    regions = sorted(r for r in P if r in deaths)
+    un = {r: {y: 100 * x["12"] / x["11+12"] for y, x in P[r].items()} for r in regions}
+    rate = {r: {y: math.log((deaths[r].get(y, 0) + 1) / P[r][y]["SSS"] * 1e5) for y in P[r] if y in deaths[r]} for r in regions}
+    years = [t for t in range(1988, 2025) if all(t in rate[r] and t in un[r] for r in regions)]
+    b, n = fe_panel(rate, un, regions, years, lag=0)
+    p = perm_p(rate, un, regions, years, b, -1, 121, R=2000, lag=0)
+    r3 = "tukee" if b < 0 and p < 0.05 else "kumoaa" if b >= 0 else "ei-ratkea"
+    chk, r3 = panel_checks(rate, un, regions, years, b, 0, -1, r3, 122)
+    pctf = lambda v: f"{(math.exp(v) - 1) * 100:+.1f} %"
+    t3 = {"id": "annos", "design": "annos", "result": r3, "date": str(date.today()),
+          "summary": f"1 %-yks. suurempi työttömyys kuin muualla → liikennekuolemat {pctf(b)} samana vuonna (p = {p:.3f}, {len(regions)} maakuntaa, {years[0]}–{years[-1]})." + checks_text(chk, pctf),
+          "detail": {"b": round(b, 5), "pctPerPoint": round((math.exp(b) - 1) * 100, 2), "p": round(p, 6), "n": n, "regions": len(regions), "years": [years[0], years[-1]], "checks": chk}}
+    return {"tests": [t1, t2, t3], "predictions": []}
+
+
 def h11():
     """H11 (docs/naytto-rekisteri.md): ulkomaan kansalaisten osuus → Suomen kansalaisten työllisyys ja työttömyys."""
     regions = ["MK01", "MK02", "MK04", "MK05", "MK06", "MK07", "MK08", "MK09", "MK10", "MK11", "MK12", "MK13", "MK14", "MK15", "MK16", "MK17", "MK18", "MK19"]
@@ -1388,6 +1444,7 @@ def main():
     out["hypotheses"]["h8"], out["hypotheses"]["h9"] = h8_h9()
     out["hypotheses"]["h10"] = h10()
     out["hypotheses"]["h11"] = h11()
+    out["hypotheses"]["h12"] = h12()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
@@ -1445,6 +1502,7 @@ def main():
         for t in out["hypotheses"][hk]["tests"]:
             print(hk, t["id"], t["result"], "|", t["summary"]); print("   ", t["detail"].get("countries", ""))
     d7 = out["hypotheses"]["h7"]["tests"][1]["detail"]; print("  miehet", d7["men"], "naiset", d7["women"]); print("  sarja", [x for x in d7["series"] if x[0] <= 2005])
+    for t in out["hypotheses"]["h12"]["tests"]: print("h12", t["id"], t["result"], "|", t["summary"]); print("   ", t["detail"].get("countries", ""))
     for hk, tid in (("h1", "annos"), ("h1e", "annos"), ("h1g", "annos"), ("h7", "annos")):
         t = next(x for x in out["hypotheses"][hk]["tests"] if x["id"] == tid)
         print("TARKISTUS", hk, t["result"], "|", t["detail"].get("checks"))

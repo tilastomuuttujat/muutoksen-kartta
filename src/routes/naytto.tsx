@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Seitsemäntoista hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Kahdeksantoista hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Kuusi väitettä kumoutui, yksi on tuettu, neljä on ehdokkaita ja kuuden näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Kuusi väitettä kumoutui, yksi on tuettu, viisi on ehdokkaita ja kuuden näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -227,6 +227,7 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h5" && t.id === "pysyvyys" && <PersistenceDots detail={t.detail as Persist} />}
       {h.id === "h11" && t.id === "annos" && <ChecksTable detail={t.detail as { b: number; p: number; checks: Record<string, { b: number; p: number }> }} />}
       {h.id === "h10" && t.id === "katkos" && <NeetChart a18={(t.detail as { series: [number, number][] }).series} a21={(h.tests[1]!.detail as { series: [number, number][] }).series} />}
+      {h.id === "h12" && t.id === "toisto" && <CountryCorr h="h12" detail={t.detail as Pooled & Rc} />}
       {(h.id === "h8" || h.id === "h9") && t.id === "toisto" && <CountryCorr h={h.id} detail={t.detail as Pooled & Rc} />}
       {h.id === "h7" && t.id === "ajoitus" && <SuicideChart detail={t.detail as Suicide} />}
       {h.id === "h6" && t.id === "katkos" && <BreakChart detail={t.detail as Break} />}
@@ -510,18 +511,17 @@ function SuicideChart({ detail }: { detail: Suicide }) {
 }
 
 function CountryCorr({ h, detail }: { h: string; detail: Pooled & Rc }) {
-  const pooledLabel = h === "h8" ? "Ruotsi + Norja + Tanska" : "Neljä maata yhdessä";
+  const pooledLabel = h === "h9" ? "Neljä maata yhdessä" : "Ruotsi + Norja + Tanska";
   const rows: DotRow[] = [
-    ...Object.entries(detail.countries).map(([c, r]) => [CNAME[c]!, r, h === "h8" && c === "FI" ? "unemp" : "test", false] as DotRow),
+    ...Object.entries(detail.countries).map(([c, r]) => [CNAME[c]!, r, h !== "h9" && c === "FI" ? "unemp" : "test", false] as DotRow),
     [pooledLabel, detail, "test", true],
   ];
-  return (
-    <CompareDots rows={rows} side={h === "h8" ? "pos" : "neg"} lead="Korrelaatio:"
-      band={h === "h8" ? "H8:n ennuste: oikealla" : "H9:n ennuste: vasemmalla"}
-      note={h === "h8"
-        ? "Alkoholin myynnin muutos ja itsemurhakuolleisuuden muutos samana tai seuraavana vuonna (Eurostat 1995–2023). Suomi näytetään vertailuksi; yhdistetty luku on ilman Suomea."
-        : "Masennuslääkkeiden käytön muutos ja itsemurhakuolleisuuden muutos samana tai seuraavana vuonna (2001–2023)."} />
-  );
+  const cfg = {
+    h8: { side: "pos" as const, band: "H8:n ennuste: oikealla", note: "Alkoholin myynnin muutos ja itsemurhakuolleisuuden muutos samana tai seuraavana vuonna (Eurostat 1995–2023). Suomi näytetään vertailuksi; yhdistetty luku on ilman Suomea." },
+    h9: { side: "neg" as const, band: "H9:n ennuste: vasemmalla", note: "Masennuslääkkeiden käytön muutos ja itsemurhakuolleisuuden muutos samana tai seuraavana vuonna (2001–2023)." },
+    h12: { side: "neg" as const, band: "H12:n ennuste: vasemmalla", note: "Työttömyyden muutos ja tieliikennekuolemien muutos samana tai seuraavana vuonna (Eurostat 2000–2024). Suomi näytetään vertailuksi; yhdistetty luku on ilman Suomea." },
+  }[h as "h8" | "h9" | "h12"];
+  return <CompareDots rows={rows} side={cfg.side} lead="Korrelaatio:" band={cfg.band} note={cfg.note} />;
 }
 
 function NeetChart({ a18, a21 }: { a18: [number, number][]; a21: [number, number][] }) {
