@@ -76,7 +76,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h16: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -359,6 +359,19 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Euron käyttöönotto ei näy Suomen vuosi-inflaatiossa, kun sitä verrataan Ruotsiin, Tanskaan ja Norjaan, joissa euroa ei otettu käyttöön: ero vuonna 2002 oli +0,3 prosenttiyksikköä, mikä on tavallista vuosivaihtelua. Ravintoloiden ja kahviloiden hinnat, joissa pyöristyksen pitäisi näkyä selvimmin, nousivat Suomessa vähemmän kuin vertailumaissa. Testi mittaa tilastoitua hintatasoa, ei koettua inflaatiota; kokemus kalliimmasta arjesta voi johtua näkyvistä pienistä hinnoista, joita indeksi painottaa vähän.",
     next: "Tarkempi testi: kuukausi-indeksi (tammikuu 2002) ja yksittäiset pienet ostokset, kuten kahvikuppi ja parturi, joiden hinnoissa pyöristys näkyisi suoraan.",
+  },
+  {
+    id: "h16",
+    title: "Kieltolain kumoaminen 1932 → henkirikokset",
+    claim: "Kieltolain kumoaminen 5.4.1932 vähensi henkirikoksia, koska laittomien alkoholimarkkinoiden väkivalta väheni.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. Uusi teema.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h16.tests,
+    predictions: [],
+    reading:
+      "Tappoja ja murhia oli kumoamisen jälkeisinä vuosina 1933–1937 kolmannes vähemmän kuin kieltolain viimeisinä vuosina, ja lasku oli jyrkempi kuin yhdessäkään tavallisessa viisivuotisjaksossa sotien jälkeen. Pahoinpitelyt eivät kuitenkaan vähentyneet. Tämä sopii ajatukseen, että kuolemaan johtanut väkivalta liittyi salakauppaan ja trokaukseen eikä alkoholinkäyttöön yleensä, mutta sitä ei ole testattu. Henkirikokset olivat huipussaan jo 1929, joten lama ja muut 1930-luvun muutokset voivat selittää osan laskusta.",
+    next: "Mekanismin testi: jos laskun takana on laittomien markkinoiden väheneminen, henkirikosten pitäisi vähentyä eniten alueilla, joilla salakuljetus oli yleisintä (rannikko ja satamakaupungit), ja salakuljetusrikosten määrän pitäisi pudota kumoamisen jälkeen.",
   },
   {
     id: "h2",

@@ -1438,6 +1438,43 @@ def h15():
     return {"tests": [t1, t2], "predictions": []}
 
 
+def h16():
+    """H16 (docs/naytto-rekisteri.md): kieltolain kumoaminen 1932 → henkirikokset ja pahoinpitelyt."""
+    cnt = {}
+    for line in open(os.path.join(D, "values.ndjson")):
+        k, y, g_, v, kind = json.loads(line)
+        if k in ("crime.hcs.fi.police_murder", "crime.hcs.fi.police_manslaughter", "crime.hcs.fi.police_assault") and v is not None and kind in ("observed", "estimate"):
+            cnt.setdefault(k.split("_")[-1], {})[int(y)] = float(v)
+    ids, d = px("ssaaty/121v.px", [("timeperiod_y", "*"), ("contentscode", ["ssaaty-vaesto"])])
+    iy = ids.index("timeperiod_y")
+    pop = {int(k[iy]): v for k, v in d.items() if v}
+    hom = {y: (cnt["murder"][y] + cnt["manslaughter"][y]) / pop[y] * 1e5 for y in cnt["murder"] if y in cnt["manslaughter"] and y in pop}
+    ass = {y: cnt["assault"][y] / pop[y] * 1e5 for y in cnt["assault"] if y in pop}
+
+    def change(series, t):
+        a = [series.get(y) for y in range(t - 5, t)]; b = [series.get(y) for y in range(t + 1, t + 6)] if t == 1932 else [series.get(y) for y in range(t, t + 5)]
+        if None in a or None in b:
+            return None
+        return math.log(np.mean(b)) - math.log(np.mean(a))
+
+    def test(series):
+        obs = change(series, 1932)
+        plac = [v for v in (change(series, t) for t in range(1954, 2019)) if v is not None]
+        below = sum(1 for v in plac if v > obs)
+        res = "tukee" if obs < 0 and below / len(plac) >= 0.95 else "kumoaa" if obs >= 0 else "ei-ratkea"
+        return res, {"pct": round((math.exp(obs) - 1) * 100, 1), "below": below, "placebo": len(plac),
+                     "placeboMin": round((math.exp(min(plac)) - 1) * 100, 1),
+                     "series": sorted((y, round(v, 2)) for y, v in series.items())}
+    r1, d1 = test(hom); r2_, d2 = test(ass)
+    t1 = {"id": "kumoaminen", "design": "luonnollinen", "result": r1, "date": str(date.today()),
+          "summary": f"Tapot ja murhat 100 000 asukasta kohden: 1927–1931 → 1933–1937 {d1['pct']:+.0f} %; jyrkempi lasku kuin {d1['below']}:ssä {d1['placebo']} tavallisesta jaksosta (jyrkin {d1['placeboMin']:+.0f} %)",
+          "detail": d1}
+    t2 = {"id": "pahoinpitelyt", "design": "tasmallisyys", "result": r2_, "date": str(date.today()),
+          "summary": f"Pahoinpitelyt: 1927–1931 → 1933–1937 {d2['pct']:+.0f} %; {d2['below']}/{d2['placebo']} tavallisessa jaksossa muutos oli suurempi",
+          "detail": d2}
+    return {"tests": [t1, t2], "predictions": []}
+
+
 def h11():
     """H11 (docs/naytto-rekisteri.md): ulkomaan kansalaisten osuus → Suomen kansalaisten työllisyys ja työttömyys."""
     regions = ["MK01", "MK02", "MK04", "MK05", "MK06", "MK07", "MK08", "MK09", "MK10", "MK11", "MK12", "MK13", "MK14", "MK15", "MK16", "MK17", "MK18", "MK19"]
@@ -1607,6 +1644,7 @@ def main():
     out["hypotheses"]["h13"] = h13()
     out["hypotheses"]["h14"] = h14()
     out["hypotheses"]["h15"] = h15()
+    out["hypotheses"]["h16"] = h16()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
@@ -1664,6 +1702,7 @@ def main():
         for t in out["hypotheses"][hk]["tests"]:
             print(hk, t["id"], t["result"], "|", t["summary"]); print("   ", t["detail"].get("countries", ""))
     d7 = out["hypotheses"]["h7"]["tests"][1]["detail"]; print("  miehet", d7["men"], "naiset", d7["women"]); print("  sarja", [x for x in d7["series"] if x[0] <= 2005])
+    for t in out["hypotheses"]["h16"]["tests"]: print("h16", t["id"], t["result"], "|", t["summary"]); print("   ", [x for x in t["detail"]["series"] if x[0] <= 1940])
     for t in out["hypotheses"]["h15"]["tests"]: print("h15", t["id"], t["result"], "|", t["summary"]); print("   ", {k: v for k, v in t["detail"].items() if k != "diff"})
     for t in out["hypotheses"]["h14"]["tests"]: print("h14", t["id"], t["result"], "|", t["summary"])
     print("  h14 extra", out["hypotheses"]["h14"]["extra"], [x for x in out["hypotheses"]["h14"]["tests"][0]["detail"]["series"] if 1980 <= x[0] <= 1996])

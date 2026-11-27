@@ -874,3 +874,19 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 - **Rajoitteet:**
   - 1930-luvun lama (1929–1933) osuu samaan aikaan.
   - Ennen kumoamista on vain viisi vuotta aineistoa, joten trendiä ei voi sovittaa.
+
+## H16: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Luonnollinen koe: tukee.**
+  - Tapot ja murhat 100 000 asukasta kohden laskivat 1927–1931 → 1933–1937 −35 %.
+  - Lasku on jyrkempi kuin kaikissa 65 lumejaksossa (jyrkin −25 %).
+  - Tasot: 1929: 10,4 → 1932: 9,5 → 1937: 5,3.
+- **T2 Täsmällisyys: kumoaa.** Pahoinpitelyt +7 % (1929: 132 → 1937: 131 / 100 000).
+- **Tila:** ristiriitainen, koska vahva asetelma tukee ja heikko kumoaa.
+- **Tulkinta:**
+  - Kieltolain kumoamisen jälkeen vähenivät tapot ja murhat, mutta eivät pahoinpitelyt.
+  - Tämä sopii ajatukseen, että kuolemaan johtanut väkivalta liittyi laittomiin
+    alkoholimarkkinoihin eikä alkoholinkäyttöön yleensä, mutta tätä ei ole testattu.
+  - Henkirikokset olivat huipussaan jo 1929, joten lama ja muut 1930-luvun muutokset voivat selittää
+    osan laskusta.

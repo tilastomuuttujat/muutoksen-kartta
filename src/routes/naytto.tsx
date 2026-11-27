@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Kaksikymmentäyksi hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Kaksikymmentäkaksi hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Seitsemän väitettä kumoutui, kaksi on tuettu, viisi on ehdokkaita ja seitsemän näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Seitsemän väitettä kumoutui, kaksi on tuettu, viisi on ehdokkaita ja kahdeksan näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -227,6 +227,7 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h5" && t.id === "pysyvyys" && <PersistenceDots detail={t.detail as Persist} />}
       {h.id === "h11" && t.id === "annos" && <ChecksTable detail={t.detail as { b: number; p: number; checks: Record<string, { b: number; p: number }> }} />}
       {h.id === "h10" && t.id === "katkos" && <NeetChart a18={(t.detail as { series: [number, number][] }).series} a21={(h.tests[1]!.detail as { series: [number, number][] }).series} />}
+      {h.id === "h16" && <ProhibitionChart detail={t.detail as { series: [number, number][] }} what={t.id === "kumoaminen" ? "Tapot ja murhat" : "Pahoinpitelyt"} />}
       {h.id === "h15" && <EuroBars detail={t.detail as { diff: [number, number][] }} what={t.id === "ravintolat" ? "Ravintoloiden ja kahviloiden hintojen" : "Kuluttajahintojen"} />}
       {h.id === "h14" && t.id === "katkos" && <BreakChart detail={t.detail as Break} cfg={{ trend: [1976, 1987], win: [1988, 1991], from: 1960, label: "laki voimaan 1/1988", ticks: [1960, 1976, 1988, 2000, 2025], zeroTicks: [0, 1, 2, 3], caption: "Avioerot 1 000 asukasta kohden (StatFin 121v). Katkoviiva: vuosien 1976–1987 trendi jatkettuna. Poikkeama 1988–1991 oli suurempi kuin kaikissa tavallisissa jaksoissa." }} />}
       {h.id === "h13" && t.id === "suomi" && <DecouplingChart detail={t.detail as { co2: [number, number][]; gdp: [number, number][] }} />}
@@ -629,6 +630,31 @@ function EuroBars({ detail, what }: { detail: { diff: [number, number][] }; what
         {[1997, 2002, 2010, 2019].map((t) => <text key={t} x={x(t) + bw / 2} y={H - 12} textAnchor="middle" className={`text-[10px] ${t === 2002 ? "fill-primary font-semibold" : "fill-muted-foreground"}`}>{t}</text>)}
       </svg>
       <p className="text-xs text-muted-foreground">{what} vuosimuutos Suomessa miinus Ruotsin, Tanskan ja Norjan keskiarvo, %-yks. (Eurostat, yhdenmukaistettu kuluttajahintaindeksi). Punainen: 2002, euron käyttöönotto.</p>
+    </div>
+  );
+}
+
+function ProhibitionChart({ detail, what }: { detail: { series: [number, number][] }; what: string }) {
+  const S = detail.series.filter(([y]) => y <= 1960);
+  const W = 620, H = 180, L = 44, R = 600, TOP = 14, BOT = 148;
+  const x0 = S[0]![0], x1 = S.at(-1)![0];
+  const x = (y: number) => L + ((y - x0) / (x1 - x0)) * (R - L);
+  const hi = Math.max(...S.map((p) => p[1])) * 1.1;
+  const y = (v: number) => BOT - (v / hi) * (BOT - TOP);
+  const mean = (a: number, b: number) => { const v = S.filter(([yy]) => yy >= a && yy <= b).map((p) => p[1]); return v.reduce((s, z) => s + z, 0) / v.length; };
+  return (
+    <div className="mt-2 overflow-x-auto">
+      <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[460px] max-w-2xl" role="img" aria-label={`${what} 100 000 asukasta kohden ${x0}–${x1}`}>
+        <rect x={x(1939)} y={TOP} width={x(1945) - x(1939)} height={BOT - TOP} fill="var(--muted)" />
+        <text x={x(1942)} y={TOP + 10} textAnchor="middle" className="fill-muted-foreground text-[10px]">sodat</text>
+        <line x1={x(1932.3)} x2={x(1932.3)} y1={TOP} y2={BOT} stroke="var(--primary)" strokeDasharray="3 3" />
+        <text x={x(1932.3) + 4} y={TOP + 10} className="fill-primary text-[10px]">kieltolaki kumottiin 4/1932</text>
+        {[[1927, 1931], [1933, 1937]].map(([a, b]) => <line key={a} x1={x(a!)} x2={x(b!)} y1={y(mean(a!, b!))} y2={y(mean(a!, b!))} stroke="var(--foreground)" strokeOpacity={0.6} strokeWidth={2} />)}
+        <path d={S.map(([a, v], i) => `${i ? "L" : "M"}${x(a).toFixed(1)},${y(v).toFixed(1)}`).join(" ")} fill="none" stroke="var(--primary)" strokeWidth={2.2} />
+        {[0, Math.round(hi / 2), Math.round(hi * 0.9)].map((t) => <text key={t} x={L - 6} y={y(t) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">{t}</text>)}
+        {[1927, 1932, 1940, 1950, 1960].map((t) => <text key={t} x={x(t)} y={H - 12} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
+      </svg>
+      <p className="text-xs text-muted-foreground">{what} 100 000 asukasta kohden, poliisin tietoon tulleet (Vuorela, historiallinen rikostilasto; väkiluku StatFin 121v). Vaakaviivat: viiden vuoden keskiarvot ennen ja jälkeen kumoamisen.</p>
     </div>
   );
 }
