@@ -1465,3 +1465,36 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Tämä selittäisi myös, miksi juuri näiden kahden tapauksen etu hävisi.
   - Selitys on muotoiltu tämän aineiston perusteella, joten se pitää testata muulla aineistolla,
     esimerkiksi muiden maiden devalvaatioilla.
+
+## H24e. Devalvaatio lisää vientiä vain, jos se heikentää reaalista kurssia
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa.
+  - Väite muotoiltiin H24d:n tuloksesta Suomen aineistolla. Siksi se testataan muiden maiden
+    tapauksilla, ja Suomi jätetään pois.
+- **Väite:** nimellinen devalvaatio kasvattaa viennin osuutta taloudesta vain siinä määrin kuin se
+  heikentää reaalista efektiivistä valuuttakurssia. Devalvaatio, joka ei muutu reaaliseksi, ei lisää
+  vientiä.
+- **Aineisto:** Global Macro Database 2026_09.
+  - CurrencyCrisis-merkintä, REER, exports_GDP ja infl.
+- **Tapahtumat:**
+  - Valuuttakriisin ensimmäinen vuosi t0 1960–2015: merkintä on 1, edellisenä vuonna 0, eikä
+    merkintää ole viiteen edeltävään vuoteen.
+  - Kaikki maat paitsi Suomi.
+  - REER ja exports_GDP on saatavilla vuosilta t0 − 1 … t0 + 5.
+  - Inflaatio on alle 25 % jokaisena vuonna t0 − 1 … t0 + 5. Tämä rajaa pois korkean inflaation
+    tapaukset, joissa vertailu Suomeen ei ole mielekäs.
+  - Tämän rajauksen jälkeen tapahtumia on 78–80; lopullinen määrä kirjataan tuloksen yhteydessä.
+- **Mittarit:**
+  - x = REER:n log-muutos t0 − 1 → t0 + 5 (jäljelle jäänyt reaalinen muutos).
+  - y = viennin BKT-osuuden log-muutos t0 → t0 + 5.
+  - i = REER:n log-muutos t0 − 1 → t0 + 1 (välitön reaalinen muutos).
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Annos | Spearmanin rho(x, y) tapahtumien yli. Yksisuuntainen permutaatio-p, 10 000 permutaatiota, siemenluku 1 | Tukee: rho < 0 ja p < 0,05. Kumoaa: rho ≥ 0. Muuten: ei ratkea |
+| T2 Täsmällisyys ("vain jos") | Reaalinen ryhmä: i ≤ log 0,90. Pelkästään nimellinen ryhmä: i > log 0,95. Väliin jäävät jätetään pois. Verrataan y:n mediaaneja; yksisuuntainen permutaatiotesti ryhmämerkinnöillä, 10 000 permutaatiota | Tukee: reaalisen ryhmän mediaani on suurempi ja p < 0,05. Kumoaa: reaalisen ryhmän mediaani on enintään nimellisen ryhmän mediaani. Muuten: ei ratkea |
+
+- **Rajaus:**
+  - Valuuttakriisimerkintä perustuu kurssin heikkenemiseen suhteessa Yhdysvaltain dollariin. Siksi
+    osa tapahtumista on dollarin vahvistumista eikä oman valuutan devalvaatiota. Tällaiset tapaukset
+    näkyvät pieninä REER-muutoksina, joten ne kuuluvat testin vertailuryhmään.
