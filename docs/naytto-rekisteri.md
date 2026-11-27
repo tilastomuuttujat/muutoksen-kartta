@@ -1017,3 +1017,24 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Ennustettua vakavuuden laskua ei näkynyt: loukkaantumiset vähenivät lähes samassa suhteessa kuin
     kuolemat. Se sopii yhtä hyvin liikenteen vähenemiseen öljykriisissä kuin nopeuden laskuun.
   - Kansallinen aikasarja ei siksi erota näitä selityksiä toisistaan.
+
+## H20. Keskiolut ruokakauppoihin 1969
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Uusi teema.
+- **Väite:** vuoden 1969 alkoholilaki lisäsi alkoholin kulutusta ja alkoholiin liittyvää väkivaltaa.
+  - Keskiolut tuli ruokakauppoihin ja kahviloihin 1.1.1969.
+  - Alkoholiliikkeitä sai perustaa myös maaseudulle.
+- **Aineisto:**
+  - Alkoholin myynti asukasta kohden Suomessa, Ruotsissa, Norjassa ja Tanskassa (Turso, 1960–).
+  - Poliisin tietoon tulleet pahoinpitelyt ja petokset (Turso: HCS-sarjat, 1927–2022).
+  - Väkiluku (StatFin 121v).
+- **Menetelmä:**
+  - Muutos on log-muutos vuodesta 1968 vuoteen 1969.
+  - Lumevuodet ovat sarjan kaikki muut vuosimuutokset: myynnissä 1961–2024, rikoksissa 1950–2022.
+  - Vuotta 2004 ei poisteta lumevuosista.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Luonnollinen koe | Suomen myynnin muutos miinus Ruotsin, Norjan ja Tanskan keskimääräinen muutos 1968→1969, verrattuna saman erotuksen lumevuosiin | Tukee: ero > 0 ja suurempi kuin 95 %:ssa lumevuosista. Kumoaa: ero ≤ 0. Muuten: ei ratkea |
+| T2 Täsmällisyys | Pahoinpitelyt 100 000 asukasta kohden, muutos 1968→1969 verrattuna lumevuosiin | Tukee: muutos > 0 ja suurempi kuin 95 %:ssa lumevuosista. Kumoaa: muutos ≤ 0. Muuten: ei ratkea |
+| T3 Kontrolli | Petokset samalla tavalla. Niiden ei pitäisi reagoida alkoholiin. | Kumoaa: petosten muutos ≥ pahoinpitelyjen muutos, jolloin kyse voi olla kirjaamisesta. Tukee: T2 tukee ja petosten muutos jää alle 95 %:n. Muuten: ei ratkea |
