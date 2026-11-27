@@ -577,3 +577,21 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Samanaikainen yhteys (viive 0) ei kerro suuntaa.
   - Suomessa yhteys on päinvastainen.
   - Suomen itsemurhien suurin lasku (1990–2000) on ennen lääkeaineiston alkua.
+
+## H10. Oppivelvollisuuden laajennus 2021 → nuorten syrjäytyminen koulutuksesta ja työstä
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Uusi teema.
+- **Tausta:** oppivelvollisuus laajeni 18 ikävuoteen ikäluokasta 2005 alkaen (peruskoulun päättäneet
+  keväällä 2021). Ikäluokka 2005 täytti 18 vuotta 2023, ikäluokka 2006 vuonna 2024.
+- **Väite:** laajennus vähensi niiden 18-vuotiaiden osuutta, jotka eivät opiskele eivätkä ole töissä.
+- **Aineisto:** StatFin 115c, väestö pääasiallisen toiminnan mukaan ikävuosittain 31.12., 1987–2024.
+  - Mittari: (työttömät + muut työvoiman ulkopuolella olevat) / koko ikäluokka, %.
+  - Alle 18-vuotiaat on luokiteltu opiskelijoiksi vuodesta 2005, joten testi tehdään 18-vuotiailla.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Luonnollinen koe | 18-vuotiaat: osuuden lineaarinen trendi 2011–2022, poikkeama siitä keskimäärin 2023–2024 (%-yks.). Lumejaksot: kaikki kaksivuotiset jaksot, joiden alkuvuosi on 1999–2021 ja joilla on 12 vuoden esijakso, laskettuina samoin. | Tukee: poikkeama < 0 ja pienempi kuin 95 %:ssa lumejaksoista. Kumoaa: poikkeama ≥ 0. Muuten: ei ratkea |
+| T2 Vertailuryhmä | 21-vuotiaat (ikäluokat 2002–2003, eivät laajennuksen piirissä), sama laskenta | Tukee: T1 tukee ja 21-vuotiaiden poikkeama ei ole lumejaksojen alimman 5 %:n joukossa. Kumoaa: 21-vuotiaiden poikkeama on yhtä suuri tai suurempi lasku kuin 18-vuotiaiden. Muuten: ei ratkea |
+
+- **Lisätieto, ei vaikuta tulokseen:** opiskelijoiden osuus 18-vuotiaista, tytöt ja pojat
+  erikseen, sekä 19-vuotiaat vuonna 2024 (ikäluokka 2005).
