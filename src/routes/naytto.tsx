@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Yksitoista hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Kaksitoista hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Neljä väitettä kumoutui, yksi on tuettu, kaksi on ehdokkaita ja neljän näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Neljä väitettä kumoutui, yksi on tuettu, kolme on ehdokkaita ja neljän näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -225,6 +225,7 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h4" && t.id === "toisto-maat" && <SimpleDots rows={toDots(t.detail as Pooled, "Palvelut")} side="neg" band="H4:n ennuste: vasemmalla" note="Työttömyyden muutos ja julkisten palvelujen (D63) reaalikasvu 1–2 vuotta myöhemmin. Yhdistetty Ruotsi ja Tanska; Suomi näytetään vertailuksi." />}
       {h.id === "h4" && t.id === "palvelut-vs-rahat" && <ServicesVsCash detail={t.detail as SvC} />}
       {h.id === "h5" && t.id === "pysyvyys" && <PersistenceDots detail={t.detail as Persist} />}
+      {h.id === "h6" && t.id === "katkos" && <BreakChart detail={t.detail as Break} />}
       {h.id === "h5" && t.id === "ikaluokat" && <CohortChart detail={t.detail as Cohorts} />}
       {t.id === "esikoisika" && <CohortChart detail={t.detail as Cohorts} outcomeLabel="Esikoisia naista kohden 30 ikävuoteen mennessä (20–29-v.)" scale={100} unit="/100" zero={false}
         note={`Jos huono tulovaihe lykkäisi perheen perustamista, alemman käyrän pitäisi painua laman ikäluokkien ja finanssikriisin ikäluokkien kohdalla trendin alle. Testissä molemmista poistettiin ikäluokkien suora trendi. Esikoiset 40 ikävuoteen mennessä: r = ${nf((t.detail as { by40: { r: number } }).by40.r)}.`} />}
@@ -394,6 +395,38 @@ function CohortChart({ detail, outcomeLabel = "Työllisyys 33–37-vuotiaana mii
       </svg>
       <p className="text-xs text-muted-foreground">
         Syntymävuosi vaaka-akselilla. {note ?? `Jos huono tulovaihe jättäisi pysyvän jäljen, alemman käyrän pitäisi painua alas laman ikäluokkien kohdalla. Testissä molemmista poistettiin ikäluokkien suora trendi. Naiset r = ${nf(detail.women.r)}, miehet r = ${nf(detail.men.r)}.`}
+      </p>
+    </div>
+  );
+}
+
+type Break = { dev: number; pct: number; percentile: number; placebo: number; above: number; series: [number, number][] };
+
+function BreakChart({ detail }: { detail: Break }) {
+  const pts = detail.series.filter(([y]) => y >= 1985);
+  const pre = detail.series.filter(([y]) => y >= 1992 && y <= 2003);
+  const n = pre.length;
+  const mx = pre.reduce((a, p) => a + p[0], 0) / n, my = pre.reduce((a, p) => a + Math.log(p[1]), 0) / n;
+  const b = pre.reduce((a, p) => a + (p[0] - mx) * (Math.log(p[1]) - my), 0) / pre.reduce((a, p) => a + (p[0] - mx) ** 2, 0);
+  const trend = (y: number) => Math.exp(my + b * (y - mx));
+  const W = 620, H = 200, L = 40, R = 600, TOP = 12, BOT = 170;
+  const x0 = pts[0]![0], x1 = pts.at(-1)![0];
+  const x = (y: number) => L + ((y - x0) / (x1 - x0)) * (R - L);
+  const hi = Math.max(...pts.map((p) => p[1])) * 1.05, lo = 0;
+  const y = (v: number) => BOT - ((v - lo) / (hi - lo)) * (BOT - TOP);
+  return (
+    <div className="mt-2 overflow-x-auto">
+      <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[460px] max-w-2xl" role="img"
+        aria-label={`Alkoholiperäinen kuolleisuus ${x0}–${x1}, trendi 1992–2003 jatkettuna vuoteen 2007`}>
+        <rect x={x(2004)} y={TOP} width={x(2007) - x(2004)} height={BOT - TOP} fill="var(--primary)" fillOpacity={0.08} />
+        <text x={x(2004) + 3} y={TOP + 10} className="fill-primary text-[10px]">veronalennus 3/2004</text>
+        <path d={[1992, 2007].map((yr, i) => `${i ? "L" : "M"}${x(yr)},${y(trend(yr))}`).join(" ")} fill="none" stroke="var(--muted-foreground)" strokeDasharray="5 4" strokeWidth={1.5} />
+        <path d={pts.map(([a, v], i) => `${i ? "L" : "M"}${x(a).toFixed(1)},${y(v).toFixed(1)}`).join(" ")} fill="none" stroke="var(--primary)" strokeWidth={2.2} />
+        {[0, 20, 40].filter((t) => t < hi).map((t) => <text key={t} x={L - 6} y={y(t) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">{t}</text>)}
+        {[1985, 1995, 2004, 2015, x1].map((t) => <text key={t} x={x(t)} y={H - 12} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
+      </svg>
+      <p className="text-xs text-muted-foreground">
+        Alkoholiperäiset taudit ja alkoholimyrkytykset, ikävakioitu kuolleisuus / 100 000 (StatFin 11ay). Katkoviiva: vuosien 1992–2003 trendi jatkettuna. Poikkeama 2004–2007 oli suurempi kuin {detail.above}:ssä {detail.placebo} tavallisesta jaksosta; kirjattu raja oli 95 %.
       </p>
     </div>
   );

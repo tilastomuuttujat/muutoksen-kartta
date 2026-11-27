@@ -44,6 +44,7 @@ describe("pilot results", () => {
     expect(statusOfHypothesis(hypothesis("h1g")!)).toBe("kumottu");
     expect(statusOfHypothesis(hypothesis("h4")!)).toBe("ristiriita");
     expect(statusOfHypothesis(hypothesis("h5")!)).toBe("kumottu");
+    expect(statusOfHypothesis(hypothesis("h6")!)).toBe("ehdokas");
     expect(statusOfHypothesis(hypothesis("h2")!)).toBe("kumottu");
     expect(statusOfHypothesis(hypothesis("h3")!)).toBe("tuettu");
   });
@@ -177,6 +178,25 @@ describe("pilot results", () => {
     for (const b of [1970, 1971, 1972, 1973, 1974, 1975]) expect(o[b]!).toBeGreaterThanOrEqual(0.465);
     for (const b of [1980, 1985]) expect(o[b]!).toBeLessThan(0.465);
     expect(o[1996]!).toBeCloseTo(0.3, 2);
+  });
+  it("H6 numbers quoted in the register", () => {
+    const [k, c, m] = NAYTTO.hypotheses.h6.tests as { result: string; detail: Record<string, unknown> }[];
+    expect(k!.result).toBe("ei-ratkea");
+    expect(k!.detail["pct"]).toBeCloseTo(15, 0);
+    expect(k!.detail["above"]).toBe(19);
+    expect(k!.detail["placebo"]).toBe(21);
+    const ser = Object.fromEntries(k!.detail["series"] as [number, number][]);
+    expect(ser[2003]).toBeCloseTo(30.2, 1);
+    expect(ser[2004]).toBeCloseTo(35.4, 1);
+    expect(ser[2007]).toBeCloseTo(40.2, 1);
+    expect(c!.result).toBe("ei-ratkea");
+    expect(c!.detail["pct"]).toBeCloseTo(-5, 0);
+    expect(m!.result).toBe("tukee");
+    expect(m!.detail["r"] as number).toBeCloseTo(0.34, 2);
+    const e = NAYTTO.hypotheses.h6.extra;
+    expect(e["men"]!.pct).toBeCloseTo(16, 0);
+    expect(e["women"]!.pct).toBeCloseTo(10.5, 1);
+    expect(e["homicide"]!.pct).toBeCloseTo(3, 0);
   });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {

@@ -76,7 +76,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -229,6 +229,19 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Työttömyyden nousua seuraa pitkäaikaistyöttömyyden kasvu, joka on vielä kolmen vuoden päästä koholla kaikissa neljässä Pohjoismaassa. Pitkän aikavälin jälki ei kuitenkaan näy: 1990-luvun laman aikana työmarkkinoille tulleet ikäluokat olivat 33–37-vuotiaina työllisyydeltään muiden tasolla. Työllisyydellä mitattuna jälki haalistuu noin kymmenessä vuodessa. Tulot, terveys ja perheen perustaminen ovat eri kysymyksiä, joita tämä testi ei mittaa.",
     next: "Tarkennus: jälki voi näkyä muualla kuin työllisyydessä. Seuraavaksi kannattaisi testata laman ikäluokkien tulot ja esikoisen saamisen ikä samalla ikäluokka-asetelmalla (aineisto: StatFin tulonjako ja 12dm).",
+  },
+  {
+    id: "h6",
+    title: "Alkoholiveron alennus 2004 → alkoholikuolleisuus",
+    claim: "Alkoholiveron alennus maaliskuussa 2004 (noin kolmannes, samaan aikaan kun Viro liittyi EU:hun) nosti alkoholiperäistä kuolleisuutta. Muihin kuolinsyihin se ei vaikuttanut.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. Uusi teema, ei seulasta.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h6.tests,
+    predictions: [],
+    reading:
+      "Alkoholikuolleisuus nousi vuodesta 2003 vuoteen 2007 noin kolmanneksella ja oli 2004–2007 keskimäärin 15 % korkeammalla kuin aiempi trendi ennusti, kun muiden tautien kuolleisuus oli samaan aikaan trendin alapuolella. Kuolleisuus oli kuitenkin noussut jyrkästi jo ennen alennusta, joten nousu oli vain 90 %:n tasolla tavallisiin jaksoihin verrattuna, ei kirjatun 95 %:n. Myynnin ja kuolleisuuden yhteys vuositasolla tukee mekanismia. Miehillä katkos oli selvempi kuin naisilla; henkirikoksissa sitä ei näy.",
+    next: "Vahvempi asetelma: myöhemmät veronkorotukset (2008–2009 ja 2012–) annoksina vastakkaiseen suuntaan. Jos vero vaikuttaa, kuolleisuuden pitäisi laskea korotusten jälkeen. Toinen vaihtoehto: alue-erot, sillä Viron tuonnin pitäisi näkyä eniten Etelä-Suomessa.",
   },
   {
     id: "h2",

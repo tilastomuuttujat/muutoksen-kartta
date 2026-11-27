@@ -440,3 +440,21 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 
 - **Lisätieto, ei vaikuta tulokseen:** sama T1-laskenta henkirikoksille (koodi 51) sekä miehille ja
   naisille erikseen.
+
+## H6: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Luonnollinen koe: ei ratkea.**
+  - Alkoholikuolleisuus oli 2004–2007 keskimäärin +15 % vuosien 1992–2003 trendistä.
+  - Se on suurempi kuin 19:ssä 21 lumejaksosta (90 %), kun kirjattu raja oli 95 %.
+  - Kuolleisuus nousi jo ennen alennusta (22 → 30 / 100 000 vuosina 1994–2003), mikä vaikeuttaa
+    katkoksen erottamista.
+  - Raakaluvut: 2003: 30,2 → 2004: 35,4 → 2007: 40,2.
+- **T2 Negatiivinen kontrolli: ei ratkea.** Muut taudet −5 % trendistä (persentiili 5). Kontrolli
+  käyttäytyi ennustetusti, mutta tukeminen edellytti, että alkoholi ylittää 95. persentiilin.
+- **T3 Ajoitus: tukee.** Myynnin muutos → alkoholikuolleisuuden muutos r = +0,34 (viive 1 v,
+  p = 0,03, n = 52).
+- **Lisätieto:**
+  - Miehet +16 % (persentiili 95), naiset +10 % (persentiili 86).
+  - Henkirikokset +3 % (persentiili 52), eli henkirikoksissa ei näy katkosta.
+- **Tila:** ehdokas, koska yksi heikko testi tukee eikä mikään kumoa.

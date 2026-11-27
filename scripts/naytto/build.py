@@ -859,6 +859,68 @@ def h1d_cohorts():
             "detail": {**main, "by40": by40}}
 
 
+def h6():
+    """H6 (docs/naytto-rekisteri.md): alkoholiveron alennus 2004. Katkos trendistä vs. lumejaksot, kontrolli, ajoitus."""
+    ids, d = px("ksyyt/11ay.px", [("sukupuoli_9_20180101", ["SSS", "1", "2"]), ("kuolinsyyt_1_20210101", ["00-41", "41", "51"]),
+                                 ("contentscode", ["ksyyikav"]), ("timeperiod_y", "*")])
+    isx, ic, iy = ids.index("sukupuoli_9_20180101"), ids.index("kuolinsyyt_1_20210101"), ids.index("timeperiod_y")
+    ser = {}
+    for k, v in d.items():
+        if v:
+            ser.setdefault((k[isx], k[ic]), {})[int(k[iy])] = v
+    for sx in ("SSS", "1", "2"):
+        a, t = ser[(sx, "41")], ser[(sx, "00-41")]
+        ser[(sx, "other")] = {y: t[y] - a[y] for y in t if y in a}
+
+    def dev(series, start):
+        pre = [(y, math.log(series[y])) for y in range(start - 12, start) if y in series]
+        if len(pre) < 10 or not all(y in series for y in range(start, start + 4)):
+            return None
+        b = np.polyfit([p_[0] for p_ in pre], [p_[1] for p_ in pre], 1)
+        return float(np.mean([math.log(series[y]) - np.polyval(b, y) for y in range(start, start + 4)]))
+
+    starts = [s_ for s_ in range(1983, 2023) if s_ + 3 <= 2025 and (s_ + 3 < 2004 or s_ - 12 > 2007)]
+
+    def katkos(series):
+        obs = dev(series, 2004)
+        plac = [v for v in (dev(series, s_) for s_ in starts) if v is not None]
+        pct = sum(1 for v in plac if v < obs) / len(plac)
+        return {"dev": round(obs, 4), "pct": round((math.exp(obs) - 1) * 100, 1), "percentile": round(pct, 3), "placebo": len(plac),
+                "above": sum(1 for v in plac if v < obs),
+                "placeboMax": round(max(plac), 4), "series": sorted((y, round(v, 1)) for y, v in series.items())}
+
+    alc, oth = katkos(ser[("SSS", "41")]), katkos(ser[("SSS", "other")])
+    r1 = "tukee" if alc["dev"] > 0 and alc["percentile"] >= 0.95 else "kumoaa" if alc["dev"] <= 0 else "ei-ratkea"
+    t1 = {"id": "katkos", "design": "luonnollinen", "result": r1, "date": str(date.today()),
+          "summary": f"Alkoholikuolleisuus 2004–2007 {alc['pct']:+.0f} % vuosien 1992–2003 trendistä; suurempi kuin {alc['above']}:ssä {alc['placebo']} lumejaksosta",
+          "detail": alc}
+    if oth["dev"] >= alc["dev"]:
+        r2_ = "kumoaa"
+    elif alc["percentile"] >= 0.95 and oth["percentile"] < 0.95:
+        r2_ = "tukee"
+    else:
+        r2_ = "ei-ratkea"
+    t2 = {"id": "kontrolli", "design": "tasmallisyys", "result": r2_, "date": str(date.today()),
+          "summary": f"Muut taudit 2004–2007 {oth['pct']:+.1f} % trendistä (persentiili {oth['percentile'] * 100:.0f}); alkoholi {alc['pct']:+.0f} %",
+          "detail": oth}
+    sales = {}
+    for line in open(os.path.join(D, "values.ndjson")):
+        k, y, g_, v, kind = json.loads(line)
+        if k == "nordics2.alcohol_sales_1960_2024" and g_ == "FI" and v is not None and kind in ("observed", "estimate"):
+            sales[int(y)] = float(v)
+    ps = prewhiten(changes(sales, True))
+    pm = prewhiten(changes({y: v for y, v in ser[("SSS", "41")].items() if y <= 2024}, True))
+    lc = lead_corr(ps, pm, lags=(0, 1))
+    r3 = "tukee" if lc["r"] > 0 and lc["p"] < 0.05 else "kumoaa" if lc["r"] <= 0 else "ei-ratkea"
+    t3 = {"id": "myynti", "design": "ajoitus", "result": r3, "date": str(date.today()),
+          "summary": f"Alkoholin myynnin muutos → alkoholikuolleisuuden muutos r = {r2(lc['r'])} (viive {lc['lag']} v, p = {lc['p']:.3f}, n = {lc['n']})",
+          "detail": {**lc, "sales": sorted(sales.items())}}
+    extra = {"homicide": {k: v for k, v in katkos(ser[("SSS", "51")]).items() if k != "series"},
+             "men": {k: v for k, v in katkos(ser[("1", "41")]).items() if k != "series"},
+             "women": {k: v for k, v in katkos(ser[("2", "41")]).items() if k != "series"}}
+    return {"tests": [t1, t2, t3], "predictions": [], "extra": extra}
+
+
 def h1_regional():
     ids_t, tf = px("synt/12du.px", [("alue_23_20260101", "*"), ("contentscode", ["tfr"]), ("timeperiod_y", "*")])
     ids_w, pop = px("tyokay/115w.px", [("alue_28_20250101", "*"), ("timeperiod_y", "*"), ("paaasial_toimin_3_20180101", ["11+12", "12"]), ("ikaryhma_10_20180101", ["25-29", "30-34"]),
@@ -964,7 +1026,7 @@ def h2():
 def main():
     _, t = px("synt/12dt.px", [("contentscode", ["tfr"]), ("timeperiod_y", "*")])
     fi_tfr = {int(k[0]): v for k, v in t.items()}
-    out = {"built": str(date.today()), "hypotheses": {"h1": h1(turso_nordic(), fi_tfr), "h1e": h1e(fi_tfr), "h1f": h1f(fi_tfr), "h1g": h1g(fi_tfr), "h2": h2(), "h3": h3(), "h4": h4(), "h5": h5()}}
+    out = {"built": str(date.today()), "hypotheses": {"h1": h1(turso_nordic(), fi_tfr), "h1e": h1e(fi_tfr), "h1f": h1f(fi_tfr), "h1g": h1g(fi_tfr), "h2": h2(), "h3": h3(), "h4": h4(), "h5": h5(), "h6": h6()}}
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
@@ -1006,6 +1068,9 @@ def main():
     print("esikoisika", fc["result"], fc["summary"]); print("  by40", {k: fc["detail"]["by40"][k] for k in ("r", "p", "n", "per5")})
     print("  rows", [(r["born"], r["exposure"], round(r["outcome"], 3)) for r in fc["detail"]["rows"]])
     print("  rows40", [(r["born"], round(r["outcome"], 3)) for r in fc["detail"]["by40"]["rows"]])
+    e6 = out["hypotheses"]["h6"]
+    for t in e6["tests"]: print("h6", t["id"], t["result"], "|", t["summary"])
+    print("  extra", e6["extra"])
     print("malli", out["hypotheses"]["h1"]["model"])
     print("toisto maittain", json.dumps(out["hypotheses"]["h1"]["tests"][0]["detail"]["countries"]))
     print("miehet maittain", json.dumps(out["hypotheses"]["h1"]["tests"][2]["detail"]["menCountries"]))
