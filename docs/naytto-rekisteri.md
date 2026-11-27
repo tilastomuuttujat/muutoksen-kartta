@@ -217,3 +217,21 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 - **Tunnettu ongelma:** asuntojen hinnat nousevat yleensä hyvinä aikoina. Positiivinen yhteys
   syntyvyyteen olisi siksi suhdanteen merkki, ei hintojen kustannusvaikutus. Se kumoaa väitteen, mutta
   sitä ei tulkita todisteeksi vauraudesta.
+
+## H1f: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Asuntojen reaalihinnat: ei ratkea.**
+  - r = −0,15 (viive 2 v, p = 0,42).
+  - Työllisyys 30–34 samoina vuosina: r = +0,43 (p = 0,001).
+  - Maittain: Suomi −0,41, Ruotsi −0,30, Norja −0,23, Tanska +0,16. Yksikään ei ole merkitsevä, ja
+    vuosia on vain 17.
+- **T2 Pitkä korko: ei ratkea.**
+  - r = −0,12 (viive 1 v, p = 0,51).
+  - Työllisyys samoina vuosina: r = +0,45 (p < 0,001).
+  - Suomessa suunta oli päinvastainen (+0,39).
+- **Tulkinta:**
+  - Asuntojen hinnat ja korot liikkuvat odotettuun suuntaan, mutta ennustavat syntyvyyttä selvästi
+    heikommin kuin työllisyys samoilla vuosilla ja samoissa maissa.
+  - Asuntomarkkinat eivät näillä mittareilla selitä työllisyyden ja syntyvyyden yhteyttä.
+  - Hintatesti on heikkovoimainen (2005–).

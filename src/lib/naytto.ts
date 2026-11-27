@@ -68,7 +68,7 @@ type H1Data = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] } };
+  hypotheses: { h1: H1Data; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -155,7 +155,20 @@ export const HYPOTHESES: Hypothesis[] = [
     predictions: NAYTTO.hypotheses.h1e.predictions,
     reading:
       "Seula löysi yhteyden Suomesta, ja se vahvistui Ruotsissa, Norjassa ja Tanskassa. Maakuntien välillä se ei kuitenkaan näy: alueilla, joissa nuorten aikuisten työllisyys parani muita enemmän, syntyvyys ei noussut muita enemmän. Sama kuvio toistui työttömyydellä (H1). Työmarkkinat ja syntyvyys liikkuvat yhdessä koko maan tasolla, mutta oman alueen työtilanne ei näytä olevan reitti.",
-    next: "Koko maan tasolla vaikuttavien tekijöiden testi: jos yhteys kulkee asuntomarkkinoiden kautta, asuntojen hintojen ja korkojen pitäisi ennustaa syntyvyyttä vähintään yhtä hyvin kuin työllisyyden. Muuttoliikkeen vaikutuksen voi tarkistaa vertaamalla maakuntia, joista muutetaan vähän.",
+    next: "Asuntomarkkinareitti testattiin (H1f). Muuttoliikkeen vaikutuksen voi tarkistaa vertaamalla maakuntia, joista muutetaan vähän.",
+  },
+  {
+    id: "h1f",
+    title: "Asuntomarkkinat → syntyvyys",
+    claim: "Perheasunnon hinta ratkaisee: kun asuntojen reaalihinnat tai korot nousevat, syntyvyys laskee noin 1–2 vuoden päästä. Yhteys on vähintään yhtä vahva kuin työllisyyden.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa H1:n ja H1e:n tulosten jälkeen.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h1f.tests,
+    predictions: [],
+    reading:
+      "Asuntojen hinnat ja korot liikkuivat odotettuun suuntaan, mutta yhteys syntyvyyteen oli heikko ja selvästi heikompi kuin työllisyyden samoilla vuosilla ja samoissa maissa. Asuntomarkkinat eivät näillä mittareilla selitä, miksi syntyvyys seuraa koko maan työmarkkinoita. Hintatesti kattaa vain vuodet 2005–, joten pieni vaikutus voi jäädä näkymättä.",
+    next: "Seuraava kansallinen reitti: perhepolitiikka. Jos etuuksien ja päivähoidon muutokset reagoivat työttömyyteen ja syntyvyys niihin, päätösten ajoitus kertoo sen.",
   },
   {
     id: "h3",

@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Pilotti: seitsemän hypoteesia, joista yksi tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Pilotti: kahdeksan hypoteesia, joista yksi tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Kaksi väitettä kumoutui, yksi on tuettu, kaksi on ehdokkaita ja kahden näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Kaksi väitettä kumoutui, yksi on tuettu, kaksi on ehdokkaita ja kolmen näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -158,6 +158,7 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {t.id === "odotukset" && <ExpectationDots detail={t.detail as Expect} />}
       {t.id === "maaraaikaisuus" && <TemporaryDots detail={t.detail as Temporary} />}
       {t.id === "esikoiset" && <FirstbornDots detail={t.detail as Firstborn} />}
+      {(t.id === "hinnat" || t.id === "korot") && <HousingDots id={t.id} detail={t.detail as Housing} />}
     </li>
   );
 }
@@ -218,6 +219,25 @@ function FirstbornDots({ detail }: { detail: Firstborn }) {
       side="neg"
       band="H1d:n ennuste esikoisille"
       note={`Selittäjä on naisten 25–34 työttömyys. Jos H1d pitää, esikoisten pallojen pitäisi olla nollan vasemmalla puolella ja kauempana kuin myöhempien lasten. Esikoisten hedelmällisyys on laskettu TFR:stä ja esikoisten osuudesta syntyneistä; Suomen tarkan sarjan kanssa vuosimuutosten korrelaatio on ${nf(detail.check, 3)}.`}
+    />
+  );
+}
+
+type Housing = { predictor: Rc; employment: Rc; countries: Record<string, Rc> };
+const CNAME: Record<string, string> = { FI: "Suomi", SE: "Ruotsi", NO: "Norja", DK: "Tanska" };
+
+function HousingDots({ id, detail }: { id: string; detail: Housing }) {
+  const label = id === "hinnat" ? "Reaalihinnat" : "Korko";
+  return (
+    <CompareDots
+      rows={[
+        ...Object.entries(detail.countries).map(([c, r]) => [`${label}: ${CNAME[c]}`, r, "test", false] as DotRow),
+        [`${label} yhdessä`, detail.predictor, "test", true],
+        ["Työllisyys 30–34 yhdessä", detail.employment, "unemp", true],
+      ]}
+      side="neg"
+      band={`H1f:n ennuste: ${id === "hinnat" ? "hinnat" : "korot"} vasemmalla`}
+      note="Jos H1f pitäisi, asuntomarkkinoiden pallojen pitäisi olla nollan vasemmalla puolella vähintään yhtä kaukana kuin työllisyyden pallo on oikealla."
     />
   );
 }

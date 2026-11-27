@@ -40,6 +40,7 @@ describe("pilot results", () => {
     expect(statusOfHypothesis(hypothesis("h1c")!)).toBe("oletus");
     expect(statusOfHypothesis(hypothesis("h1d")!)).toBe("ehdokas");
     expect(statusOfHypothesis(hypothesis("h1e")!)).toBe("ehdokas");
+    expect(statusOfHypothesis(hypothesis("h1f")!)).toBe("oletus");
     expect(statusOfHypothesis(hypothesis("h2")!)).toBe("kumottu");
     expect(statusOfHypothesis(hypothesis("h3")!)).toBe("tuettu");
   });
@@ -99,6 +100,18 @@ describe("pilot results", () => {
     expect(d.p).toBeCloseTo(0.45, 2);
     expect(d.regions).toBe(18);
     expect(h.predictions.map((p) => p.point)).toEqual([1.273, 1.257]);
+  });
+  it("H1f numbers quoted in the register", () => {
+    const [prices, rates] = NAYTTO.hypotheses.h1f.tests as { result: string; detail: { predictor: { r: number; p: number }; employment: { r: number }; countries: Record<string, { r: number }> } }[];
+    expect(prices!.result).toBe("ei-ratkea");
+    expect(prices!.detail.predictor.r).toBeCloseTo(-0.15, 2);
+    expect(prices!.detail.predictor.p).toBeCloseTo(0.42, 2);
+    expect(prices!.detail.employment.r).toBeCloseTo(0.43, 2);
+    expect(prices!.detail.countries["FI"]!.r).toBeCloseTo(-0.41, 2);
+    expect(rates!.result).toBe("ei-ratkea");
+    expect(rates!.detail.predictor.r).toBeCloseTo(-0.12, 2);
+    expect(rates!.detail.employment.r).toBeCloseTo(0.45, 2);
+    expect(rates!.detail.countries["FI"]!.r).toBeCloseTo(0.39, 2);
   });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {

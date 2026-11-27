@@ -476,6 +476,67 @@ def h1e(fi_tfr):
             "model": {"a": round(float(coef[0]), 4), "b": round(float(coef[1]), 4), "sd": round(sd, 4), "n": len(xs)}}
 
 
+def eurostat_annual(dataset, params):
+    """Eurostat-taulun vuosiarvot maittain, kun muut ulottuvuudet on rajattu yhteen arvoon."""
+    url = f"https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/{dataset}?{params}&format=JSON&lang=en"
+    with urllib.request.urlopen(url, timeout=120) as r:
+        d = json.load(r)
+    geo = {v: k for k, v in d["dimension"]["geo"]["category"]["index"].items()}
+    tim = {v: k for k, v in d["dimension"]["time"]["category"]["index"].items()}
+    nt = len(tim)
+    out = {}
+    for pos, v in d["value"].items():
+        p = int(pos)
+        out.setdefault(geo[p // nt], {})[int(tim[p % nt][:4])] = float(v)
+    return out
+
+
+def h1f(fi_tfr):
+    """H1f (docs/naytto-rekisteri.md): asuntojen reaalihinnat ja pitkät korot vs. työllisyys 30–34."""
+    E = {c: {} for c in COUNTRIES}; T = {c: {} for c in COUNTRIES}
+    for line in open(os.path.join(D, "values.ndjson")):
+        k, y, g_, v, kind = json.loads(line)
+        if g_ in COUNTRIES and v is not None and kind in ("observed", "estimate"):
+            if k == "safe_corridor.employment_rate_30_34":
+                E[g_][int(y)] = float(v)
+            elif k == "nordics.tfr_1950_2024" and int(y) >= 1990:
+                T[g_][int(y)] = float(v)
+    T["FI"].update({y: v for y, v in fi_tfr.items() if y >= 1990})
+    pw = {c: prewhiten(changes(T[c], True)) for c in COUNTRIES}
+    pe = {c: prewhiten(changes(E[c], False)) for c in COUNTRIES}
+    geos = "&".join(f"geo={c}" for c in COUNTRIES)
+    hpi = eurostat_annual("prc_hpi_a", f"{geos}&purchase=TOTAL&unit=I15_A_AVG")
+    hicp = eurostat_annual("prc_hicp_aind", f"{geos}&coicop=CP00&unit=INX_A_AVG")
+    rate = eurostat_annual("irt_lt_mcby_a", "geo=FI&geo=SE&geo=DK&int_rt=MCBY")
+    real = {c: {y: hpi[c][y] / hicp[c][y] * 100 for y in hpi.get(c, {}) if y in hicp.get(c, {})} for c in COUNTRIES}
+
+    def run(pred, log, cs, y_from, tid, label):
+        pp = {c: prewhiten(changes({y: v for y, v in pred[c].items() if y >= y_from - 1}, log)) for c in cs}
+
+        def pooled(src):
+            best = None
+            for k in (1, 2):
+                ps = [(src[c][t - k], pw[c][t]) for c in cs for t in pw[c] if t - k in pp[c] and t - k in pe[c]]
+                r, n = corr(ps)
+                if r is not None and (best is None or abs(r) > abs(best[0])):
+                    best = (r, n, k)
+            r, n, k = best
+            return {"r": round(r, 3), "n": n, "lag": k, "p": round(1 - (1 - p_two_sided(r, n)) ** 2, 4)}
+
+        a, b = pooled(pp), pooled(pe)
+        per = {c: lead_corr(pp[c], pw[c]) for c in cs}
+        res = "kumoaa" if a["r"] >= 0 else "tukee" if a["p"] < 0.05 and abs(a["r"]) >= abs(b["r"]) else "ei-ratkea"
+        return {"id": tid, "design": "ajoitus", "result": res, "date": str(date.today()),
+                "summary": (f"{label} r = {a['r']:.2f} (viive {a['lag']} v, p = {a['p']:.3f}), työllisyys 30–34 samoina vuosina "
+                            f"r = {b['r']:.2f} (p = {b['p']:.3f}); {', '.join({'FI': 'Suomi', 'SE': 'Ruotsi', 'NO': 'Norja', 'DK': 'Tanska'}[c] for c in cs)}"),
+                "detail": {"predictor": a, "employment": b, "countries": per,
+                           "series": {c: sorted((y, round(v, 2)) for y, v in pred[c].items() if y >= y_from) for c in cs}}}
+
+    t1 = run(real, True, COUNTRIES, 2005, "hinnat", "Asuntojen reaalihinnat")
+    t2 = run(rate, False, ["FI", "SE", "DK"], 1990, "korot", "Pitkä korko")
+    return {"tests": [t1, t2], "predictions": []}
+
+
 def h1_regional():
     ids_t, tf = px("synt/12du.px", [("alue_23_20260101", "*"), ("contentscode", ["tfr"]), ("timeperiod_y", "*")])
     ids_w, pop = px("tyokay/115w.px", [("alue_28_20250101", "*"), ("timeperiod_y", "*"), ("paaasial_toimin_3_20180101", ["11+12", "12"]), ("ikaryhma_10_20180101", ["25-29", "30-34"]),
@@ -581,7 +642,7 @@ def h2():
 def main():
     _, t = px("synt/12dt.px", [("contentscode", ["tfr"]), ("timeperiod_y", "*")])
     fi_tfr = {int(k[0]): v for k, v in t.items()}
-    out = {"built": str(date.today()), "hypotheses": {"h1": h1(turso_nordic(), fi_tfr), "h1e": h1e(fi_tfr), "h2": h2(), "h3": h3()}}
+    out = {"built": str(date.today()), "hypotheses": {"h1": h1(turso_nordic(), fi_tfr), "h1e": h1e(fi_tfr), "h1f": h1f(fi_tfr), "h2": h2(), "h3": h3()}}
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
