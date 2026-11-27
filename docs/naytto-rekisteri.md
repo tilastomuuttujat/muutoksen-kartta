@@ -746,3 +746,18 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Suomessa yhteys on heikompi, ja 2000-luvulla jopa päinvastainen.
   - Maakuntien välinen yhteys selittyy alueiden pitkillä kehityssuunnilla: liikennekuolemat ovat
     vähentyneet eniten maakunnissa, joissa työttömyys on kehittynyt muita heikommin.
+
+## H13. Talouskasvun ja päästöjen irtikytkentä 2000-luvulla
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Uusi teema.
+- **Väite:** talouskasvu ja päästöt kulkivat ennen tiiviisti yhdessä, mutta vuodesta 2005 alkaen
+  yhteys heikkeni. Päästöjen jousto BKT:n suhteen on pienempi kuin ennen, ja päästöt laskevat
+  vaikka talous kasvaa.
+- **Jousto:** kulmakerroin, kun päästöjen log-muutosta selitetään BKT:n log-muutoksella samana vuonna.
+  Muutoksia ei suodateta.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Suomi pitkällä aikavälillä | OWID: alueperusteiset CO₂-päästöt ja Maddison: BKT yhteensä (Turso), jousto 1961–2004 vs. 2005–2022. Ero testataan lohkobootstrapilla (3 vuoden lohkot, 5 000 toistoa). | Tukee: jousto pienempi 2005– ja yksisuuntainen p < 0,05. Kumoaa: jousto ei pienempi. Muuten: ei ratkea |
+| T2 Toisto Pohjoismaissa | Ruotsi, Norja ja Tanska: kasvihuonekaasupäästöt ilman maankäyttösektoria (Eurostat env_air_gge, TOTX4_MEMO) ja kiinteähintainen BKT (nama_10_gdp CLV10_MNAC). Jousto 1996–2004 vs. 2005–2024, maakohtaiset vakiot, lohkobootstrap kuten T1. | Kuten T1 |
+| T3 Absoluuttinen irtikytkentä | Suomi, Ruotsi, Norja ja Tanska: BKT:n ja kasvihuonekaasupäästöjen kokonaismuutos 2005 → 2024 | Tukee: kaikissa neljässä BKT kasvoi ja päästöt laskivat. Kumoaa: vähintään kahdessa päästöt kasvoivat. Muuten: ei ratkea |
