@@ -854,3 +854,23 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Ravintoloiden ja kahviloiden hinnat, joissa pyöristyksen pitäisi näkyä selvimmin, nousivat
     Suomessa vähemmän kuin vertailumaissa.
   - Testi mittaa tilastoitua hintatasoa, ei koettua inflaatiota.
+
+## H16. Kieltolain kumoaminen 1932 → henkirikokset
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Uusi teema.
+- **Tausta:** kieltolaki oli voimassa 1.6.1919–5.4.1932. Sen aikana salakauppa ja trokaus
+  yleistyivät.
+- **Väite:** kieltolain kumoaminen vähensi henkirikoksia, koska laittomien alkoholimarkkinoiden
+  väkivalta väheni.
+- **Aineisto:** poliisin tietoon tulleet tapot ja murhat (Turso: Vuorela, historiallinen
+  rikostilasto, 1927–2022, lukumäärät) ja väkiluku (StatFin 121v). Mittari on rikokset 100 000
+  asukasta kohden.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Luonnollinen koe | Log-muutos viiden vuoden keskiarvosta 1927–1931 keskiarvoon 1933–1937. Lumejaksot: sama tunnusluku jokaiselle vuodelle t, jolla jaksot t − 5 … t + 4 ovat vuosien 1949–2022 sisällä (sotavuodet ja niiden jälkeinen aika pois). | Tukee: muutos < 0 ja jyrkempi kuin 95 %:ssa lumejaksoista. Kumoaa: muutos ≥ 0. Muuten: ei ratkea |
+| T2 Täsmällisyys | Poliisin tietoon tulleet pahoinpitelyt, sama laskenta | Kuten T1 |
+
+- **Rajoitteet:**
+  - 1930-luvun lama (1929–1933) osuu samaan aikaan.
+  - Ennen kumoamista on vain viisi vuotta aineistoa, joten trendiä ei voi sovittaa.
