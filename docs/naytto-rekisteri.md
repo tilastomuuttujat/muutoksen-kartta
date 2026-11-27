@@ -817,3 +817,22 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 - **Lisätieto:** 1992–1999 avioeroja oli edelleen +50 % vanhan trendin yläpuolella. Uudistus nosti
   tasoa pysyvästi, eikä se vain purkanut kasautuneita eroja.
 - **Tila:** tuettu, koska kaksi eri asetelmaa tukee, niistä yksi vahva, eikä mikään kumoa.
+
+## H15. Euron käyttöönotto 2002 → hinnat
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Uusi teema.
+- **Väite:** euron käyttöönotto käteisenä tammikuussa 2002 nosti hintoja Suomessa, koska hintoja
+  pyöristettiin ylöspäin. Vaikutus näkyy eniten pienissä ostoksissa, kuten ravintoloissa ja
+  kahviloissa.
+- **Aineisto:** Eurostat prc_hicp_aind, yhdenmukaistettu kuluttajahintaindeksi, vuosimuutos %
+  (RCH_A_AVG). Vertailuryhmä on Ruotsi, Tanska ja Norja, joissa euroa ei otettu käyttöön.
+- **Tunnusluku:** Suomen inflaatio miinus vertailumaiden keskiarvo samana vuonna.
+- **Lumevuodet:** 1997–2019 ilman vuosia 2001–2003. Vuodet 2020– jätetään pois, koska pandemia ja
+  energiakriisi osuivat maihin eri tavoin.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Kokonaisindeksi | CP00, vuosi 2002 | Tukee: ero > 0 ja suurempi kuin 95 %:ssa lumevuosista. Kumoaa: ero ≤ 0. Muuten: ei ratkea |
+| T2 Täsmällisyys | CP111 ravintolat ja kahvilat, vuosi 2002 | Kuten T1 |
+
+- **Lisätieto:** samat erot vuosina 2001 ja 2003.
