@@ -458,3 +458,22 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Miehet +16 % (persentiili 95), naiset +10 % (persentiili 86).
   - Henkirikokset +3 % (persentiili 52), eli henkirikoksissa ei näy katkosta.
 - **Tila:** ehdokas, koska yksi heikko testi tukee eikä mikään kumoa.
+
+## H6 / T4–T5 Hinta-annos ja korotusvuodet
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa.
+- **Miksi hinta eikä verokalenteri:** kattavaa virallista luetteloa veronmuutoksista ei löytynyt.
+  Annos mitataan siksi alkoholijuomien reaalihinnan muutoksena, jota verotus pääosin ohjaa.
+- **Aineisto:**
+  - StatFin 15b5, kuluttajahintaindeksi kuukausittain 1995–: 02.1 Alkoholijuomat ja 0 Yhteensä.
+  - Vuoden reaalihinta = alkoholijuomien vuosikeskiarvo / kokonaisindeksin vuosikeskiarvo.
+  - Kuolleisuus kuten T1:ssä (11ay, koodi 41, ikävakioitu).
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T4 Hinta-annos | Reaalihinnan log-muutos ja alkoholikuolleisuuden log-muutos 1996–2025. Rajaus, AR(1), viive 0–1 v, Šidák. | Tukee: r < 0 ja p < 0,05. Kumoaa: r ≥ 0. Muuten: ei ratkea |
+| T5 Korotusvuodet | Vuodet 2005–2024, joina reaalihinta nousi vähintään 3 % (määräytyy aineistosta). Verrataan alkoholikuolleisuuden log-muutoksen keskiarvoa seuraavana vuonna (t + 1) korotusvuosien ja muiden vuosien välillä. Permutaatiotesti: korotusvuosien leimat sekoitetaan 5 000 kertaa. | Tukee: korotusvuosien jälkeen kuolleisuus laskee enemmän ja yksisuuntainen p < 0,05. Kumoaa: ei laske enemmän. Muuten: ei ratkea |
+
+- **Lisätieto, ei vaikuta tulokseen:**
+  - T4 ilman vuotta 2004, jolloin jäljelle jäävät korotukset ja pienet muutokset.
+  - Myynnin vaste samalla asetelmalla.
