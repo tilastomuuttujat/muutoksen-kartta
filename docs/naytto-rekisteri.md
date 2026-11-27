@@ -528,3 +528,24 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 - **Tulkinta:** maakuntien väliset työttömyyserot eivät ennusta itsemurhien eroja. Koko maan
   tasollakin yhteys on heikko. Itsemurhien nousu 1980-luvun lopulla alkoi ennen lamaa, ja niiden
   pitkä lasku 1990-luvun puolivälistä alkaen tapahtui työttömyyden ollessa yhä korkea.
+
+## H8. Alkoholi → itsemurhat
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. H7:n testaamaton selitys.
+- **Väite:** alkoholinkäytön kasvu lisää itsemurhia.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Ajoitus Suomessa | Alkoholin myynti 15 vuotta täyttäneille (Turso) → itsemurhat 25–64-vuotiailla (StatFin 11by), 1961–2024. Log-muutokset, rajaus, AR(1), viive 0–1 v, Šidák. | Tukee: r > 0 ja p < 0,05. Kumoaa: r ≤ 0. Muuten: ei ratkea |
+| T2 Toisto Pohjoismaissa | Ruotsi, Norja ja Tanska: alkoholin myynti (Turso) → ikävakioitu itsemurhakuolleisuus (Eurostat hlth_cd_asdr 1994–2010 ja hlth_cd_asdr2 2011–2023, sauman yli ei lasketa muutosta). Menetelmä kuten T1, maat yhdessä. | Kuten T1 |
+| T3 Luonnollinen koe 2004 | Itsemurhien ikävakioitu kuolleisuus (StatFin 11ay, koodi 50). Menetelmä kuten H6:n T1:ssä (trendi 1992–2003, poikkeama 2004–2007, samat lumejaksot). | Tukee: poikkeama > 0 ja suurempi kuin 95 %:ssa lumejaksoista. Kumoaa: poikkeama ≤ 0. Muuten: ei ratkea |
+
+## H9. Masennuslääkkeet → itsemurhat
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. H7:n testaamaton selitys.
+- **Väite:** masennuslääkkeiden käytön kasvu vähentää itsemurhia.
+- **Rajoite:** Suomen itsemurhien suurin lasku (1990–2000) on ennen lääkeaineiston alkua.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Toisto Pohjoismaissa | Suomi, Ruotsi, Norja ja Tanska 2000–2023: masennuslääkkeiden käyttö (Turso: N06A, DDD / 1 000 as. / vrk) → ikävakioitu itsemurhakuolleisuus (Eurostat, kuten H8:n T2). Log-muutokset, rajaus, AR(1), viive 0–1 v, Šidák, maat yhdessä. | Tukee: r < 0 ja p < 0,05. Kumoaa: r ≥ 0. Muuten: ei ratkea |
