@@ -618,3 +618,23 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
     nuoret koulussa oppivelvollisuuden aikana, se ei mittaa, koska alle 18-vuotiaat on luokiteltu
     opiskelijoiksi.
   - Kumottu koskee siis vain kirjattua väitettä 18-vuotiaiden tilanteesta.
+
+## H11. Ulkomaan kansalaisten osuus → Suomen kansalaisten työllisyys
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Uusi teema. Väite esiintyy usein julkisessa
+  keskustelussa.
+- **Väite:** kun ulkomaan kansalaisten osuus työikäisistä kasvaa, Suomen kansalaisten työllisyys
+  heikkenee.
+- **Aineisto:** StatFin 115f, väestö pääasiallisen toiminnan ja kansalaisuuden mukaan maakunnittain
+  2000–2024. Ikäryhmä 18–64, nuorempaa ryhmää ei ole saatavilla. 18 maakuntaa ilman Ahvenanmaata.
+- **Tunnettu vinouma:**
+  - Maahanmuuttajat muuttavat alueille, joilla työpaikat lisääntyvät. Se vinouttaa tulosta
+    myönteiseen suuntaan.
+  - Kumoava tulos (kerroin ≥ 0) ei siksi todista myönteistä vaikutusta. Se kertoo vain, ettei
+    väitettyä heikkenemistä näy.
+  - Vinouma ei voi tuottaa väitteen suuntaista tulosta, joten tukeva tulos olisi merkittävä.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Annos–vaste | Suomen kansalaisten työllisyysaste 18–64 (työlliset / väestö, %) vuonna t vs. ulkomaan kansalaisten osuus 18–64-vuotiaista (%) vuonna t − 1. Kiinteät alue- ja vuosivaikutukset, 2001–2024. Permutaatio: maakuntien osuussarjojen sekoitus 2 000 kertaa. | Tukee: kerroin < 0 ja yksisuuntainen p < 0,05. Kumoaa: kerroin ≥ 0. Muuten: ei ratkea |
+| T2 Täsmällisyys | Sama asetelma, seurauksena Suomen kansalaisten työttömyysaste 18–64 (työttömät / työvoima) | Tukee: kerroin > 0 ja p < 0,05. Kumoaa: kerroin ≤ 0. Muuten: ei ratkea |
