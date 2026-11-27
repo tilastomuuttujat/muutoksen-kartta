@@ -167,3 +167,18 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
     - Norja: −0,12 ja −0,26.
     - Tanska: +0,16 ja +0,24, ja vain 19 vuotta aineistoa.
   - Tulos on heikko asetelma (täsmällisyys), joka nostaa H1d:n enintään ehdokkaaksi.
+
+## H1e. Nuorten aikuisten työllisyys → syntyvyys (seulan jyvä)
+
+- **Kirjattu:** 27.11.2026, ennen alla olevien testien laskentaa.
+- **Lähde:** seulan maajako (`docs/seula.md`).
+  - Löytö Suomessa: työllisyysaste 30–34 → kokonaishedelmällisyys, viive 2 v, r = 0,65.
+  - Vahvistus Ruotsissa, Norjassa ja Tanskassa: r = 0,38, p = 0,0003.
+  - Seulan vahvistus on jo tehty, joten se ei ole tälle merkinnälle ennalta kirjattu.
+- **Väite:** kun 30–34-vuotiaiden työllisyys paranee, syntyvyys nousee noin kahden vuoden päästä.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Toisto (seula) | Seulan maajako, ks. yllä | Tehty seulassa: tukee |
+| T2 Annos–vaste | 18 maakuntaa: rekisteriperusteinen työllisyysaste 30–34 (115w: työlliset / koko väestö, molemmat sukupuolet) ja kokonaishedelmällisyys (12du). Kiinteät alue- ja vuosivaikutukset, log TFR, viive 2 v, 1992–2025. Permutaatio: maakuntien työllisyyssarjojen sekoitus 2 000 kertaa. Asetelma on sama kuin H1:n annos–vaste-testissä. | Tukee: kerroin > 0 ja p < 0,05. Kumoaa: kerroin ≤ 0. Muuten: ei ratkea |
+| E2 Ennuste | Pohjoismaiden yhdistetty malli Δlog TFR(t) = a + b · ΔE(t−2), jossa E on Turson työllisyysaste 30–34, maat FI, SE, NO ja DK | TFR 2026 ja 2027 Suomessa, 80 %:n väli. Osuma: toteutunut arvo välillä |
