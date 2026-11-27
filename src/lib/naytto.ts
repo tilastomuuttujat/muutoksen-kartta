@@ -5,7 +5,7 @@ import raw from "@/data/naytto.json";
 
 export type Design = "annos" | "luonnollinen" | "toisto" | "ajoitus" | "tasmallisyys";
 export type Result = "tukee" | "kumoaa" | "ei-ratkea" | "ei-testattu";
-export type Status = "oletus" | "ehdokas" | "tuettu" | "vahvasti-tuettu" | "kumottu";
+export type Status = "oletus" | "ristiriita" | "ehdokas" | "tuettu" | "vahvasti-tuettu" | "kumottu";
 
 export const DESIGNS: Record<Design, { label: string; strength: "vahva" | "keski" | "heikko"; question: string }> = {
   annos: { label: "Annos–vaste", strength: "vahva", question: "Muuttuvatko enemmän altistuneet alueet tai ryhmät enemmän?" },
@@ -21,7 +21,8 @@ export const RESULTS: Record<Result, { label: string; symbol: string }> = {
   "ei-testattu": { label: "Ei testattu", symbol: "?" },
 };
 export const STATUSES: Record<Status, { label: string; info: string; step: number }> = {
-  oletus: { label: "Oletus", info: "ei vielä testattu", step: 0 },
+  oletus: { label: "Oletus", info: "ei vielä testattu, tai testit eivät ratkaisseet", step: 0 },
+  ristiriita: { label: "Ristiriitainen", info: "testejä puolesta ja vastaan, mutta kumoavat eivät riitä kumoamaan (sääntö lisätty 27.11.2026)", step: 0 },
   ehdokas: { label: "Ehdokas", info: "vähintään yksi testi tukee, mikään ei kumoa", step: 1 },
   tuettu: { label: "Tuettu", info: "kaksi eri asetelmaa tukee, niistä yksi vahva, mikään ei kumoa", step: 2 },
   "vahvasti-tuettu": { label: "Vahvasti tuettu", info: "lisäksi vähintään yksi ennuste on osunut", step: 3 },
@@ -45,8 +46,8 @@ export function statusOf(tests: Pick<Test, "design" | "result">[], predictions: 
   if (against.some((t) => DESIGNS[t.design].strength === "vahva") || against.length >= 2) return "kumottu";
   const support = done.filter((t) => t.result === "tukee");
   if (support.length === 0) return "oletus";
-  // Yksi heikko kumoava testi ja tukevia testejä: näyttö on ristiriitaista, ei ehdokas (sääntö: mikään ei kumoa).
-  if (against.length > 0) return "oletus";
+  // Tukevia testejä ja yksi heikko kumoava: ristiriitainen (sääntölisäys 27.11.2026).
+  if (against.length > 0) return "ristiriita";
   const designs = new Set(support.map((t) => t.design));
   const strong = support.some((t) => DESIGNS[t.design].strength === "vahva");
   if (designs.size >= 2 && strong) {
@@ -57,6 +58,7 @@ export function statusOf(tests: Pick<Test, "design" | "result">[], predictions: 
 
 type H1Data = {
   tests: Test[];
+  expectations: Test;
   predictions: Prediction[];
   model: { a: number; b: number; sd: number; n: number };
   fiTfrLast: [number, number];
@@ -107,11 +109,12 @@ export const HYPOTHESES: Hypothesis[] = [
     map: { edge: "Globaali finanssikriisi → Historiallisen matalan syntyvyyden aika", confidence: "heikko" },
     tests: [
       { ...t("toisto", h1.tests), summary: `${t("toisto", h1.tests).summary}. Testi tehtiin H1:lle ennen tätä merkintää.` },
-      { id: "odotukset", design: "ajoitus", result: "ei-testattu", summary: "Kuluttajien luottamus edeltää syntyvyyttä Pohjoismaissa (ei vielä tehty)" },
+      h1.expectations,
     ],
     predictions: h1.predictions,
-    reading: "Ennusteet perustuvat Pohjoismaiden yhteiseen malliin. Ne ratkeavat, kun Tilastokeskus julkaisee vuosien 2026 ja 2027 syntyvyysluvut.",
-    next: "Odotustesti: jos kuluttajien luottamus edeltää syntyvyyttä vahvemmin kuin työttömyys, tarkennus vahvistuu.",
+    reading:
+      "Odotustesti kumosi mielialaan perustuvan selityksen: kuluttajien luottamuksen nousua ei seurannut syntyvyyden nousu, vaikka nuorten naisten työttömyys samoissa maissa ja samoina vuosina ennusti syntyvyyttä selvästi. Syntyvyys näyttää seuraavan koko maan työmarkkinatilannetta, ei yleistä talousmielialaa eikä oman alueen työttömyyttä. Ennusteet vuosille 2026 ja 2027 ratkeavat, kun Tilastokeskus julkaisee syntyvyysluvut.",
+    next: "Tarkennus kannattaa kirjata uudeksi hypoteesiksi: koko maan nuorten aikuisten työmarkkinat (esim. määräaikaisuus, työllistymisen kesto) eivätkä odotukset. Sen testi olisi, ennustaako määräaikaisten osuus syntyvyyttä paremmin kuin työttömyys.",
   },
   {
     id: "h3",

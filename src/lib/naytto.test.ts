@@ -20,6 +20,9 @@ describe("status rules (docs/naytto-rekisteri.md)", () => {
     expect(statusOf([T("toisto", "tukee"), T("annos", "tukee")], [pred(1.25)])).toBe("vahvasti-tuettu");
     expect(statusOf([T("toisto", "tukee"), T("annos", "tukee")], [pred(1.4)])).toBe("tuettu");
   });
+  it("support and a single weak refutation is contradictory", () => {
+    expect(statusOf([T("toisto", "tukee"), T("ajoitus", "kumoaa")])).toBe("ristiriita");
+  });
   it("untested and unresolved tests do not count", () => {
     expect(statusOf([T("annos", "ei-testattu"), T("toisto", "ei-ratkea")])).toBe("oletus");
   });
@@ -33,7 +36,7 @@ describe("status rules (docs/naytto-rekisteri.md)", () => {
 describe("pilot results", () => {
   it("statuses", () => {
     expect(statusOfHypothesis(hypothesis("h1")!)).toBe("kumottu");
-    expect(statusOfHypothesis(hypothesis("h1b")!)).toBe("ehdokas");
+    expect(statusOfHypothesis(hypothesis("h1b")!)).toBe("ristiriita");
     expect(statusOfHypothesis(hypothesis("h2")!)).toBe("kumottu");
     expect(statusOfHypothesis(hypothesis("h3")!)).toBe("tuettu");
   });
@@ -51,6 +54,15 @@ describe("pilot results", () => {
     expect(h3.of).toBe(23);
     const ps = Object.entries(h3.did).sort((a, b) => a[1] - b[1]).findIndex(([k]) => k === "HVA13") + 1;
     expect(ps).toBe(4);
+  });
+  it("expectation test numbers quoted in the register and the summary", () => {
+    const e = NAYTTO.hypotheses.h1.expectations;
+    expect(e.result).toBe("kumoaa");
+    const d = e.detail as { confidence: { r: number; p: number; lag: number }; unemployment: { r: number } };
+    expect(d.confidence.r).toBeCloseTo(-0.23, 2);
+    expect(d.confidence.p).toBeCloseTo(0.08, 2);
+    expect(d.confidence.lag).toBe(1);
+    expect(d.unemployment.r).toBeCloseTo(-0.41, 2);
   });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {

@@ -5,7 +5,7 @@ Tilastokeskuksen PxWeb (12dt, 12du, 115w, 13u5, 11ay) sekä aiemmin tehdyt testi
 (scripts/skannauskoe/h1990_test.py, src/data/mitajos.json). Ajo:
 SKANNAUS_DIR=scan-data/ H1990_RESULT=scan-data/h1990_result.json python3 scripts/naytto/build.py
 """
-import json, math, os, random, time, urllib.request
+import json, math, os, random, re, time, urllib.request
 from datetime import date
 import numpy as np
 
@@ -177,7 +177,9 @@ def h1(nordic, fi_tfr):
                       "basis": f"Naisten 25–34 työttömyyden muutos {target - 2}: {du_fi[target - 2]:+.1f} %-yks.",
                       "actual": None})
     regional = h1_regional()
+    expect = h1b_expectations(nordic, tfr, pw)
     return {
+        "expectations": expect,
         "tests": [
             {"id": "toisto", "design": "toisto", "result": t1_result,
              "summary": f"Yhdistetty r = {t1['pooled']['r']:.2f} (viive {t1['pooled']['lag']} v, n = {t1['pooled']['n']}, p = {t1['pooled']['p']:.3f})",
@@ -191,6 +193,65 @@ def h1(nordic, fi_tfr):
         "predictions": preds,
         "nordic": {"tfr": {c: sorted(tfr[c].items()) for c in COUNTRIES}, "uw": {c: sorted(nordic["uw"][c].items()) for c in COUNTRIES}},
     }
+
+
+def confidence_annual():
+    """Eurostat ei_bsco_m: kuluttajien luottamus (BS-CSMCI, SA, saldoluku), vuoden kuukausien keskiarvo."""
+    url = ("https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ei_bsco_m?"
+           "geo=FI&geo=SE&geo=DK&indic=BS-CSMCI&s_adj=SA&unit=BAL&format=JSON&lang=en")
+    with urllib.request.urlopen(url, timeout=120) as r:
+        d = json.load(r)
+    geo = {v: k for k, v in d["dimension"]["geo"]["category"]["index"].items()}
+    tim = {v: k for k, v in d["dimension"]["time"]["category"]["index"].items()}
+    nt = len(tim)
+    months = {}
+    for pos, v in d["value"].items():
+        p = int(pos)
+        g, t = geo[p // nt], tim[p % nt]
+        months.setdefault(g, {}).setdefault(int(t[:4]), []).append(v)
+    # vain täydet vuodet
+    return {g: {y: sum(v) / len(v) for y, v in ys.items() if len(v) == 12} for g, ys in months.items()}
+
+
+def h1b_expectations(nordic, tfr, pw):
+    """T4 (docs/naytto-rekisteri.md, kirjattu ennen laskentaa): luottamus vs. naisten 25–34 työttömyys
+    samoissa maissa (FI, SE, DK) ja samoina vuosina."""
+    conf = confidence_annual()
+    cs = ["FI", "SE", "DK"]
+    pc = {c: prewhiten(changes(conf[c], False)) for c in cs}
+    pu = {c: prewhiten(changes(nordic["uw"][c], False)) for c in cs}
+
+    def pooled(src, years_ok):
+        best = None
+        for k in (1, 2):
+            ps = []
+            for c in cs:
+                ps += [(src[c][t - k], pw[c][t]) for t in pw[c] if t - k in src[c] and years_ok(c, t, k)]
+            r, n = corr(ps)
+            if r is not None and (best is None or abs(r) > abs(best[0])):
+                best = (r, n, k)
+        r, n, k = best
+        return {"r": round(r, 3), "n": n, "lag": k, "p": round(1 - (1 - p_two_sided(r, n)) ** 2, 4)}
+
+    # yhteiset vuodet: molemmilla selittäjillä on suodatettu muutos samalla viiveellä
+    common = lambda c, t, k: t - k in pc[c] and t - k in pu[c]
+    conf_c, unemp_c = pooled(pc, common), pooled(pu, common)
+    conf_long = pooled(pc, lambda c, t, k: True)
+    per = {c: lead_corr(pc[c], pw[c]) for c in cs}
+    if conf_c["r"] <= 0:
+        result = "kumoaa"
+    elif conf_c["p"] < 0.05 and abs(conf_c["r"]) >= abs(unemp_c["r"]):
+        result = "tukee"
+    else:
+        result = "ei-ratkea"
+    yrs = sorted({y for c in cs for y in conf[c]})
+    return {"id": "odotukset", "design": "ajoitus", "result": result,
+            "summary": (f"Luottamus r = {conf_c['r']:.2f} (viive {conf_c['lag']} v, p = {conf_c['p']:.3f}), "
+                        f"työttömyys samoina vuosina r = {unemp_c['r']:.2f} (p = {unemp_c['p']:.3f}); Suomi, Ruotsi, Tanska"),
+            "detail": {"confidence": conf_c, "unemployment": unemp_c, "confidenceLong": conf_long, "countries": per,
+                       "confidenceYears": [yrs[0], yrs[-1]],
+                       "series": {c: sorted((y, round(v, 2)) for y, v in conf[c].items()) for c in cs}},
+            "date": str(date.today())}
 
 
 def h1_regional():
@@ -300,6 +361,27 @@ def main():
     fi_tfr = {int(k[0]): v for k, v in t.items()}
     out = {"built": str(date.today()), "hypotheses": {"h1": h1(turso_nordic(), fi_tfr), "h2": h2(), "h3": h3()}}
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
+    # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
+    # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
+    if os.path.exists(OUT):
+        old = json.load(open(OUT))
+        for hk, h in out["hypotheses"].items():
+            prev = {p["id"]: p for p in old.get("hypotheses", {}).get(hk, {}).get("predictions", [])}
+            kept = []
+            for p in h["predictions"]:
+                q = dict(prev.get(p["id"], p))
+                if q.get("actual") is None and q["year"] in fi_tfr and hk == "h1":
+                    q["actual"] = fi_tfr[q["year"]]
+                kept.append(q)
+            kept += [q for pid, q in prev.items() if pid not in {p["id"] for p in h["predictions"]}]
+            h["predictions"] = kept
+    # Suomalainen lukuasu teksteihin: desimaalipilkku ja miinusmerkki.
+    fi = lambda t: re.sub(r"(?<![\w])-(?=\d)", "−", re.sub(r"(?<=\d)\.(?=\d)", ",", t))
+    for h in out["hypotheses"].values():
+        for t in h["tests"] + ([h["expectations"]] if "expectations" in h else []):
+            t["summary"] = fi(t["summary"])
+        for p in h["predictions"]:
+            p["basis"] = fi(p["basis"])
     json.dump(out, open(OUT, "w"), ensure_ascii=False, separators=(",", ":"))
     for k, h in out["hypotheses"].items():
         print(k)
@@ -308,6 +390,9 @@ def main():
         for p in h["predictions"]:
             print("   ennuste", p["year"], p["point"], [p["lo"], p["hi"]], p["basis"])
     print("ilman Suomea", out["hypotheses"]["h1"]["tests"][0]["detail"]["others"], "TFR viimeisin", out["hypotheses"]["h1"]["fiTfrLast"])
+    print("odotukset", json.dumps({k: v for k, v in out["hypotheses"]["h1"]["expectations"].items() if k != "detail"}, ensure_ascii=False))
+    e = out["hypotheses"]["h1"]["expectations"]["detail"]
+    print("  maittain", e["countries"], "pitkä", e["confidenceLong"], e["confidenceYears"])
     print("malli", out["hypotheses"]["h1"]["model"])
     print("toisto maittain", json.dumps(out["hypotheses"]["h1"]["tests"][0]["detail"]["countries"]))
     print("miehet maittain", json.dumps(out["hypotheses"]["h1"]["tests"][2]["detail"]["menCountries"]))

@@ -27,10 +27,11 @@ export const Route = createFileRoute("/naytto")({
   component: EvidencePage,
 });
 
-const ORDER: Status[] = ["kumottu", "oletus", "ehdokas", "tuettu", "vahvasti-tuettu"];
+const ORDER: Status[] = ["kumottu", "ristiriita", "oletus", "ehdokas", "tuettu", "vahvasti-tuettu"];
 const STATUS_CLS: Record<Status, string> = {
   kumottu: "border-foreground/60 bg-foreground/80 text-background",
   oletus: "border-border bg-muted text-muted-foreground",
+  ristiriita: "border-foreground/40 border-dashed text-foreground",
   ehdokas: "border-primary/60 text-primary",
   tuettu: "border-primary bg-primary/15 text-primary",
   "vahvasti-tuettu": "border-primary bg-primary text-primary-foreground",
@@ -90,8 +91,8 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Kaksi väitettä kumoutui, yksi nousi tuetuksi, yksi odottaa ennusteitaan</h2>
-      <div className="mt-4 grid gap-2 sm:grid-cols-5">
+      <h2 id="ladder-h" className="font-display text-xl">Kaksi väitettä kumoutui, yksi on tuettu ja yhden näyttö on ristiriitaista</h2>
+      <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
             <div className={`inline-block rounded-full border px-2 py-0.5 text-[11px] font-semibold ${STATUS_CLS[s]}`}>{STATUSES[s].label}</div>
@@ -104,7 +105,7 @@ function Ladder() {
           </div>
         ))}
       </div>
-      <p className="mt-3 text-xs text-muted-foreground">Portaat vasemmalta oikealle: kumottu, oletus, ehdokas, tuettu, vahvasti tuettu. Vahvasti tuetuksi pääsee vain osuneella ennusteella.</p>
+      <p className="mt-3 text-xs text-muted-foreground">Portaat vasemmalta oikealle: kumottu, ristiriitainen, oletus, ehdokas, tuettu, vahvasti tuettu. Vahvasti tuetuksi pääsee vain osuneella ennusteella.</p>
     </section>
   );
 }
@@ -154,6 +155,7 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
         <p className="mt-1 text-xs text-muted-foreground">Alue- ja vuosivaikutukset poistettu: vertailu kertoo, laskeeko syntyvyys niissä maakunnissa, joissa työttömyys nousi samana vuonna muita enemmän. Permutaatiotesti sekoittaa maakuntien työttömyyssarjat 2 000 kertaa.</p>
       )}
       {h.id === "h3" && t.id === "annos" && <RegionStrip detail={t.detail as Regions} />}
+      {t.id === "odotukset" && <ExpectationDots detail={t.detail as Expect} />}
     </li>
   );
 }
@@ -191,6 +193,46 @@ function CountryDots({ detail }: { detail: Replication }) {
         {[-1, -0.5, 0].map((t) => <text key={t} x={x(t)} y={rows.length * ROW + 20} textAnchor="middle" className="fill-muted-foreground text-[10px]">{nf(t, 1)}</text>)}
       </svg>
       <p className="text-xs text-muted-foreground">Korrelaatio: naisten 25–34 työttömyyden muutos ja syntyvyyden muutos 1–2 vuotta myöhemmin (sarjojen oma jatkuvuus poistettu). Täytetty pallo: p &lt; 0,05.</p>
+    </div>
+  );
+}
+
+type Expect = { confidence: Rc; unemployment: Rc; confidenceLong: Rc; countries: Record<string, Rc> };
+
+function ExpectationDots({ detail }: { detail: Expect }) {
+  const rows: [string, Rc, "conf" | "unemp", boolean][] = [
+    ["Luottamus: Suomi", detail.countries["FI"]!, "conf", false],
+    ["Luottamus: Ruotsi", detail.countries["SE"]!, "conf", false],
+    ["Luottamus: Tanska", detail.countries["DK"]!, "conf", false],
+    ["Luottamus yhdessä", detail.confidence, "conf", true],
+    ["Työttömyys yhdessä", detail.unemployment, "unemp", true],
+  ];
+  const W = 560, L = 150, R = 540, ROW = 20;
+  const x = (r: number) => L + ((r + 1) / 1.6) * (R - L); // −1 … +0,6
+  return (
+    <div className="mt-2 overflow-x-auto">
+      <svg viewBox={`0 0 ${W} ${rows.length * ROW + 40}`} className="h-auto w-full min-w-[440px] max-w-xl" role="img"
+        aria-label={rows.map(([n, c]) => `${n} r ${nf(c.r)}`).join(", ")}>
+        <rect x={x(0)} y={4} width={R - x(0)} height={rows.length * ROW} fill="var(--primary)" fillOpacity={0.06} />
+        <text x={R - 4} y={rows.length * ROW + 0} textAnchor="end" className="fill-primary text-[10px]">H1b:n ennuste luottamukselle</text>
+        <line x1={x(0)} x2={x(0)} y1={4} y2={rows.length * ROW + 4} stroke="var(--foreground)" strokeOpacity={0.5} />
+        {rows.map(([name, c, kind, pooled], i) => {
+          const y = 14 + i * ROW;
+          const col = kind === "conf" ? "var(--primary)" : "var(--foreground)";
+          return (
+            <g key={name}>
+              <text x={L - 8} y={y + 4} textAnchor="end" className={`text-[11px] ${pooled ? "fill-foreground font-semibold" : "fill-muted-foreground"}`}>{name}</text>
+              <line x1={x(0)} x2={x(c.r)} y1={y} y2={y} stroke={col} strokeOpacity={0.35} strokeWidth={2} />
+              <circle cx={x(c.r)} cy={y} r={pooled ? 5.5 : 4} fill={c.p < 0.05 ? col : "var(--card)"} stroke={col} strokeWidth={1.5} />
+              <text x={c.r < 0 ? x(c.r) - 8 : x(c.r) + 8} y={y + 4} textAnchor={c.r < 0 ? "end" : "start"} className="fill-muted-foreground text-[10px]">{nf(c.r)}</text>
+            </g>
+          );
+        })}
+        {[-1, -0.5, 0, 0.5].map((t) => <text key={t} x={x(t)} y={rows.length * ROW + 34} textAnchor="middle" className="fill-muted-foreground text-[10px]">{nf(t, 1)}</text>)}
+      </svg>
+      <p className="text-xs text-muted-foreground">
+        Korrelaatio: selittäjän muutos ja syntyvyyden muutos 1–2 vuotta myöhemmin, samoissa maissa ja samoina vuosina. Jos H1b pitäisi, luottamuksen pallojen pitäisi olla nollan oikealla puolella. Täytetty pallo: p &lt; 0,05. Norjan luottamustietoa ei ole Eurostatissa.
+      </p>
     </div>
   );
 }
