@@ -180,7 +180,9 @@ def h1(nordic, fi_tfr):
     expect = h1b_expectations(nordic, tfr, pw)
     temporary = h1c_temporary(nordic, pw)
     firstborn = h1d_firstborn(nordic, tfr)
+    firstborn_cohorts = h1d_cohorts()
     return {
+        "firstbornCohorts": firstborn_cohorts,
         "firstborn": firstborn,
         "temporary": temporary,
         "expectations": expect,
@@ -793,6 +795,70 @@ def h5_cohorts():
             "detail": {**tot, "women": {k: women[k] for k in ("r", "p", "per5")}, "men": {k: men[k] for k in ("r", "p", "per5")}}}
 
 
+def cohort_test(rows):
+    """Ikäluokkatesti: lineaarinen trendi pois, Pearson r, kehämäinen permutaatio (yksisuuntainen, r < 0)."""
+    bs = np.array([r[0] for r in rows], float)
+    X = np.array([r[1] for r in rows]); Y = np.array([r[2] for r in rows])
+    detr = lambda v: v - np.polyval(np.polyfit(bs, v, 1), bs)
+    x, y = detr(X), detr(Y)
+    r = float(np.corrcoef(x, y)[0, 1]); m = len(x)
+    null = [float(np.corrcoef(np.roll(x, s_), y)[0, 1]) for s_ in range(1, m)]
+    p = (1 + sum(1 for v in null if v <= r)) / m
+    slope = float(np.polyfit(x, y, 1)[0])
+    return {"r": round(r, 3), "p": round(p, 4), "n": m, "cohorts": [int(bs[0]), int(bs[-1])], "slope": round(slope, 4),
+            "per5": round(slope * 5, 3), "rows": [{"born": int(b), "exposure": round(e, 2), "outcome": round(o, 4)} for b, e, o in rows]}
+
+
+def h1d_cohorts():
+    """H1d / T7 (docs/naytto-rekisteri.md): tulovaiheen työttömyys → esikoiset 30 ikävuoteen mennessä."""
+    ages = [f"{a:03d}" for a in range(15, 55)]
+    ids, d = px("tyokay/115c.px", [("paaasial_toimin_3_20180101", ["SSS", "11", "12"]), ("sukupuoli_9_20180101", ["SSS", "2"]),
+                                  ("ikaryhma_10_20180101", ages), ("timeperiod_y", "*")])
+    ia, isx, iy, it = (ids.index(x) for x in ("ikaryhma_10_20180101", "sukupuoli_9_20180101", "timeperiod_y", "paaasial_toimin_3_20180101"))
+    tab = {(k[isx], int(k[ia]), int(k[iy]), k[it]): v for k, v in d.items()}
+    years = sorted({k[2] for k in tab})
+    un = {}
+    for y in years:
+        n = sum(tab.get(("SSS", a, y, "12"), 0) for a in range(25, 55))
+        m = sum(tab.get(("SSS", a, y, c), 0) for a in range(25, 55) for c in ("11", "12"))
+        un[y] = 100 * n / m
+    women = lambda a, y: tab.get(("2", a, y, "SSS"))
+    idb, b = px("synt/12dm.px", [("Vuosi", "*"), ("Äidin ikä", [f"{a:03d}" for a in range(20, 40)]), ("Sukupuoli", ["SSS"]), ("Lapsen järjestysluku", ["1"])])
+    iv, iag = idb.index("Vuosi"), idb.index("Äidin ikä")
+    first = {(int(k[iv]), int(k[iag])): v for k, v in b.items()}
+
+    def rate(a, y):
+        w0, w1 = women(a, y - 1), women(a, y)
+        w = (w0 + w1) / 2 if w0 and w1 else (w0 if y == 2025 and w0 else None)
+        if y == 2025 and w is None:
+            w = women(a, 2024)
+        return first.get((y, a), 0) / w if w else None
+
+    def cumulative(born, a0, a1):
+        vals = [rate(a, born + a) for a in range(a0, a1 + 1)]
+        return sum(vals) if all(v is not None for v in vals) and all((born + a, a) in first for a in range(a0, a1 + 1)) else None
+
+    def rows_for(a1, lo, hi):
+        out = []
+        for born in range(lo, hi + 1):
+            ex_y = [born + a for a in range(21, 25)]
+            if not all(y in un for y in ex_y):
+                continue
+            c = cumulative(born, 20, a1)
+            if c is not None:
+                out.append((born, sum(un[y] for y in ex_y) / 4, c))
+        return out
+
+    main = cohort_test(rows_for(29, 1970, 1996))
+    by40 = cohort_test(rows_for(39, 1970, 1986))
+    res = "tukee" if main["r"] < 0 and main["p"] < 0.05 else "kumoaa" if main["r"] >= 0 else "ei-ratkea"
+    return {"id": "esikoisika", "design": "annos", "result": res, "date": str(date.today()),
+            "summary": (f"Syntyneet {main['cohorts'][0]}–{main['cohorts'][1]}: tulovaiheen työttömyys → esikoiset 30 ikävuoteen mennessä "
+                        f"r = {r2(main['r'])} (p = {main['p']:.3f}, {main['n']} ikäluokkaa); 5 %-yks. huonompi tulovaihe → "
+                        f"{main['per5'] * 100:+.1f} esikoista 100 naista kohden"),
+            "detail": {**main, "by40": by40}}
+
+
 def h1_regional():
     ids_t, tf = px("synt/12du.px", [("alue_23_20260101", "*"), ("contentscode", ["tfr"]), ("timeperiod_y", "*")])
     ids_w, pop = px("tyokay/115w.px", [("alue_28_20250101", "*"), ("timeperiod_y", "*"), ("paaasial_toimin_3_20180101", ["11+12", "12"]), ("ikaryhma_10_20180101", ["25-29", "30-34"]),
@@ -917,7 +983,7 @@ def main():
     # Suomalainen lukuasu teksteihin: desimaalipilkku ja miinusmerkki.
     fi = lambda t: re.sub(r"(?<![\w])-(?=\d)", "−", re.sub(r"(?<=\d)\.(?=\d)", ",", t))
     for h in out["hypotheses"].values():
-        for t in h["tests"] + [h[k] for k in ("expectations", "temporary", "firstborn") if k in h]:
+        for t in h["tests"] + [h[k] for k in ("expectations", "temporary", "firstborn", "firstbornCohorts") if k in h]:
             t["summary"] = fi(t["summary"])
         for p in h["predictions"]:
             p["basis"] = fi(p["basis"])
@@ -936,6 +1002,10 @@ def main():
     print("maaraaikaisuus", tm["result"], tm["summary"]); print("  osittais", tm["detail"]["partial"], "maittain", tm["detail"]["countries"])
     fb = out["hypotheses"]["h1"]["firstborn"]
     print("esikoiset", fb["result"], fb["summary"], "tarkistus", fb["detail"]["check"]); print("  maittain", fb["detail"]["countries"])
+    fc = out["hypotheses"]["h1"]["firstbornCohorts"]
+    print("esikoisika", fc["result"], fc["summary"]); print("  by40", {k: fc["detail"]["by40"][k] for k in ("r", "p", "n", "per5")})
+    print("  rows", [(r["born"], r["exposure"], round(r["outcome"], 3)) for r in fc["detail"]["rows"]])
+    print("  rows40", [(r["born"], round(r["outcome"], 3)) for r in fc["detail"]["by40"]["rows"]])
     print("malli", out["hypotheses"]["h1"]["model"])
     print("toisto maittain", json.dumps(out["hypotheses"]["h1"]["tests"][0]["detail"]["countries"]))
     print("miehet maittain", json.dumps(out["hypotheses"]["h1"]["tests"][2]["detail"]["menCountries"]))

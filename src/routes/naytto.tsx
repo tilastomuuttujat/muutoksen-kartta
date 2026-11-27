@@ -226,6 +226,8 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h4" && t.id === "palvelut-vs-rahat" && <ServicesVsCash detail={t.detail as SvC} />}
       {h.id === "h5" && t.id === "pysyvyys" && <PersistenceDots detail={t.detail as Persist} />}
       {h.id === "h5" && t.id === "ikaluokat" && <CohortChart detail={t.detail as Cohorts} />}
+      {t.id === "esikoisika" && <CohortChart detail={t.detail as Cohorts} outcomeLabel="Esikoisia naista kohden 30 ikävuoteen mennessä (20–29-v.)" scale={100} unit="/100" zero={false}
+        note={`Jos huono tulovaihe lykkäisi perheen perustamista, alemman käyrän pitäisi painua laman ikäluokkien ja finanssikriisin ikäluokkien kohdalla trendin alle. Testissä molemmista poistettiin ikäluokkien suora trendi. Esikoiset 40 ikävuoteen mennessä: r = ${nf((t.detail as { by40: { r: number } }).by40.r)}.`} />}
       {(t.id === "hinnat" || t.id === "korot" || t.id === "tulot" || t.id === "luotto") && <HousingDots h={h.id} id={t.id} detail={t.detail as Housing} />}
     </li>
   );
@@ -361,14 +363,16 @@ function PersistenceDots({ detail }: { detail: Persist }) {
 
 type Cohorts = { r: number; p: number; n: number; per5: number; rows: { born: number; exposure: number; outcome: number }[]; women: { r: number }; men: { r: number } };
 
-function CohortChart({ detail }: { detail: Cohorts }) {
+function CohortChart({ detail, outcomeLabel = "Työllisyys 33–37-vuotiaana miinus 30–44-vuotiaat samoina vuosina, %-yks.", scale = 1, unit = "", zero = true, note }: {
+  detail: Cohorts; outcomeLabel?: string; scale?: number; unit?: string; zero?: boolean; note?: string;
+}) {
   const rows = detail.rows;
   const W = 620, L = 46, R = 600, H1 = 120, H2 = 120;
   const b0 = rows[0]!.born, b1 = rows.at(-1)!.born;
   const x = (b: number) => L + ((b - b0) / (b1 - b0)) * (R - L);
-  const ex = rows.map((r) => r.exposure), ou = rows.map((r) => r.outcome);
+  const ex = rows.map((r) => r.exposure), ou = rows.map((r) => r.outcome * scale);
   const y1 = (v: number) => 12 + (1 - (v - 0) / (Math.max(...ex) + 1)) * (H1 - 28);
-  const omin = Math.min(...ou, -1.5), omax = Math.max(...ou, 0.6);
+  const omin = zero ? Math.min(...ou, -1.5) : Math.min(...ou) - 1, omax = zero ? Math.max(...ou, 0.6) : Math.max(...ou) + 1;
   const y2 = (v: number) => H1 + 12 + (1 - (v - omin) / (omax - omin)) * (H2 - 34);
   const lama = rows.filter((r) => r.born >= 1969 && r.born <= 1975);
   return (
@@ -379,15 +383,17 @@ function CohortChart({ detail }: { detail: Cohorts }) {
         <text x={x(1972)} y={H1 + H2 - 26} textAnchor="middle" className="fill-primary text-[10px]">laman ikäluokat</text>
         <text x={L} y={10} className="fill-muted-foreground text-[10px]">Työttömyys (25–54 v), kun ikäluokka oli 21–24-vuotias, %</text>
         {rows.map((r) => <rect key={r.born} x={x(r.born) - 5} y={y1(r.exposure)} width={10} height={y1(0) - y1(r.exposure)} fill="var(--muted-foreground)" fillOpacity={0.55} />)}
-        <text x={L} y={H1 + 8} className="fill-muted-foreground text-[10px]">Työllisyys 33–37-vuotiaana miinus 30–44-vuotiaat samoina vuosina, %-yks.</text>
-        <line x1={L} x2={R} y1={y2(0)} y2={y2(0)} stroke="var(--foreground)" strokeOpacity={0.4} />
-        <text x={L - 6} y={y2(0) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">0</text>
-        <path d={rows.map((r, i) => `${i ? "L" : "M"}${x(r.born).toFixed(1)},${y2(r.outcome).toFixed(1)}`).join(" ")} fill="none" stroke="var(--primary)" strokeWidth={2.2} />
-        {lama.map((r) => <circle key={r.born} cx={x(r.born)} cy={y2(r.outcome)} r={3} fill="var(--primary)" />)}
-        {[b0, 1970, 1975, 1980, b1].map((t) => <text key={t} x={x(t)} y={H1 + H2 - 6} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
+        <text x={L} y={H1 + 8} className="fill-muted-foreground text-[10px]">{outcomeLabel}</text>
+        {zero && <line x1={L} x2={R} y1={y2(0)} y2={y2(0)} stroke="var(--foreground)" strokeOpacity={0.4} />}
+        {(zero ? [0] : [Math.round(Math.min(...ou)), Math.round(Math.max(...ou))]).map((t) => (
+          <text key={t} x={L - 6} y={y2(t) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">{t}{unit}</text>
+        ))}
+        <path d={rows.map((r, i) => `${i ? "L" : "M"}${x(r.born).toFixed(1)},${y2(r.outcome * scale).toFixed(1)}`).join(" ")} fill="none" stroke="var(--primary)" strokeWidth={2.2} />
+        {lama.map((r) => <circle key={r.born} cx={x(r.born)} cy={y2(r.outcome * scale)} r={3} fill="var(--primary)" />)}
+        {[...new Set([b0, 1970, 1975, 1980, 1985, 1990, b1])].filter((t) => t >= b0 && t <= b1).map((t) => <text key={t} x={x(t)} y={H1 + H2 - 6} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
       </svg>
       <p className="text-xs text-muted-foreground">
-        Syntymävuosi vaaka-akselilla. Jos huono tulovaihe jättäisi pysyvän jäljen, alemman käyrän pitäisi painua alas laman ikäluokkien kohdalla. Testissä molemmista poistettiin ikäluokkien suora trendi. Naiset r = {nf(detail.women.r)}, miehet r = {nf(detail.men.r)}.
+        Syntymävuosi vaaka-akselilla. {note ?? `Jos huono tulovaihe jättäisi pysyvän jäljen, alemman käyrän pitäisi painua alas laman ikäluokkien kohdalla. Testissä molemmista poistettiin ikäluokkien suora trendi. Naiset r = ${nf(detail.women.r)}, miehet r = ${nf(detail.men.r)}.`}
       </p>
     </div>
   );

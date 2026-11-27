@@ -61,6 +61,7 @@ type H1Data = {
   expectations: Test;
   temporary: Test;
   firstborn: Test;
+  firstbornCohorts: Test;
   predictions: Prediction[];
   model: { a: number; b: number; sd: number; n: number };
   fiTfrLast: [number, number];
@@ -145,11 +146,11 @@ export const HYPOTHESES: Hypothesis[] = [
     registered: "2026-11-27",
     preregistered: "Kirjattu H1:n, H1b:n ja H1c:n testien jälkeen ja ennen esikoistestin laskentaa.",
     map: { edge: "Globaali finanssikriisi → Historiallisen matalan syntyvyyden aika", confidence: "heikko" },
-    tests: [h1.firstborn],
+    tests: [h1.firstborn, h1.firstbornCohorts],
     predictions: [],
     reading:
-      "Esikoisten syntyvyys seurasi työttömyyttä selvästi, myöhempien lasten heikommin, kuten lykkääntyminen ennustaa. Ero esikoisten ja myöhempien lasten välillä ei kuitenkaan ole itsessään merkitsevä, ja maittain kuva vaihtelee: Suomessa ja Ruotsissa molemmat reagoivat, Norjassa ja Tanskassa yhteys on heikko. Hypoteesi on ehdokas, ei vielä tuettu.",
-    next: "Vahvempi asetelma: annos–vaste ikäryhmittäin. Jos lykkääntyminen pitää, 25–29-vuotiaiden esikoisten pitäisi reagoida enemmän kuin yli 35-vuotiaiden, joilla lykkäämisen varaa on vähemmän. Lisäksi ennuste: esikoisten osuuden pitäisi laskea vuoteen 2026, koska työttömyys nousi 2024.",
+      "Esikoisten syntyvyys seurasi koko maan työttömyyttä selvästi, myöhempien lasten heikommin, kuten lykkääntyminen ennustaa. Ikäluokkatestissä huonona aikana työmarkkinoille tulleilla oli 30 ikävuoteen mennessä trendiin nähden vähemmän esikoisia (r = −0,88), mutta yhteys ei erottunut sattumasta, koska molemmat käyrät muuttuvat hitaasti. Raakaluvuissa laman ikäluokilla ei näy notkahdusta: ikäluokkien pitkä lasku on paljon suurempi kuin mahdollinen laman vaikutus. Hypoteesi on ehdokas, ei vielä tuettu.",
+    next: "Lyhyiden, äkillisten muutosten testi: alueittainen tai vuosittainen vertailu, jossa hidas ikäluokkatrendi ei sotke. Toinen vaihtoehto on toistaa ikäluokkatesti Ruotsin aineistolla, jossa 1990-luvun lama osui eri ikäluokkiin.",
   },
   {
     id: "h1e",

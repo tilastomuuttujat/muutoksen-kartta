@@ -162,6 +162,22 @@ describe("pilot results", () => {
     expect(Math.min(...lama)).toBeGreaterThan(12.5);
     expect(Math.max(...lama)).toBeLessThan(18);
   });
+  it("H1d cohort test numbers quoted in the register", () => {
+    const c = NAYTTO.hypotheses.h1.firstbornCohorts;
+    expect(c.result).toBe("ei-ratkea");
+    const d = c.detail as { r: number; p: number; n: number; per5: number; cohorts: number[]; by40: { r: number; p: number; n: number }; rows: { born: number; outcome: number }[] };
+    expect(d.r).toBeCloseTo(-0.88, 2);
+    expect(d.p).toBeCloseTo(0.11, 2);
+    expect(d.n).toBe(27);
+    expect(d.cohorts).toEqual([1970, 1996]);
+    expect(d.per5 * 100).toBeCloseTo(-4.5, 0);
+    expect(d.by40.r).toBeCloseTo(-0.6, 2);
+    expect(d.by40.p).toBeCloseTo(0.06, 2);
+    const o = Object.fromEntries(d.rows.map((r) => [r.born, r.outcome]));
+    for (const b of [1970, 1971, 1972, 1973, 1974, 1975]) expect(o[b]!).toBeGreaterThanOrEqual(0.465);
+    for (const b of [1980, 1985]) expect(o[b]!).toBeLessThan(0.465);
+    expect(o[1996]!).toBeCloseTo(0.3, 2);
+  });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
       expect(p.lo).toBeLessThan(p.point);

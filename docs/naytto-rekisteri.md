@@ -404,3 +404,21 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 - **Lisätieto, ei vaikuta tulokseen:** esikoiset 20–39-vuotiaana (syntyneet 1970–1986). Jos kyse on
   pelkästä lykkäämisestä, ero tasoittuu 40 ikävuoteen mennessä. Jos ei tasoitu, osa esikoisista jää
   kokonaan syntymättä.
+
+## H1d / T7: tulos
+
+- **Laskettu:** 27.11.2026.
+- **Tulos:** ei ratkea.
+  - Trendikorjattu r = −0,88 (ennustettu suunta), mutta permutaatio-p = 0,11 (27 ikäluokkaa, syntyneet
+    1970–1996). 5 %-yks. huonompi tulovaihe → −4,5 esikoista 100 naista kohden.
+- **Miksi vahva korrelaatio ei riitä:**
+  - Sekä altistus että esikoisosuus muuttuvat ikäluokasta toiseen hitaasti.
+  - Altistus on korkea alussa (lama) ja lopussa (finanssikriisi), ja esikoisosuus laskee kiihtyen.
+  - Trendin poiston jälkeen kahden tällaisen käyrän muodot osuvat yhteen usein myös sattumalta.
+    Kehämäinen permutaatio ottaa tämän huomioon.
+- **Raakaluvut:**
+  - Laman ikäluokista (syntyneet 1970–1975) 47–50 % oli saanut esikoisen 30 ikävuoteen mennessä.
+    Se on enemmän kuin 1980-luvulla syntyneillä (39–46 %).
+  - Ikäluokkien pitkä lasku (syntyneet 1996: 30 %) peittää mahdollisen tulovaiheen vaikutuksen.
+- **Lisätieto, esikoiset 40 ikävuoteen mennessä:** r = −0,60 (p = 0,06, 17 ikäluokkaa).
+- **Tila:** H1d pysyy ehdokkaana. Täsmällisyys tukee, annos–vaste ei ratkea.
