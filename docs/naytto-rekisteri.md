@@ -714,3 +714,15 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Toisin kuin H11:ssä, näissä testeissä alueiden pitkät kehityssuunnat eivät selitä tuloksia eivätkä
     peitä vaikutuksia.
   - H7:ssä trendimallin suunta on ennustettu, mutta ei merkitsevä. Kumoava tulos jää voimaan.
+
+## H12. Taantuma → vähemmän liikennekuolemia
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Uusi teema.
+- **Väite:** kun työttömyys nousee, liikennekuolemat vähenevät, koska työmatkoja ja muuta ajoa on
+  vähemmän.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Ajoitus Suomessa | Työttömyysaste (Turso: työvoimatutkimuksen historiallinen sarja) → maaliikennetapaturmien ikävakioitu kuolleisuus (StatFin 11ay, koodi 42), 1972–2018. Muutos %-yks. ja log-muutos, rajaus, AR(1), viive 0–1 v, Šidák. | Tukee: r < 0 ja p < 0,05. Kumoaa: r ≥ 0. Muuten: ei ratkea |
+| T2 Toisto Pohjoismaissa | Ruotsi, Norja ja Tanska 2000–2024: työttömyys 15–74 (Eurostat lfsa_urgan) → tieliikennekuolemat miljoonaa asukasta kohden (Eurostat tran_sf_roadus). Menetelmä kuten T1, maat yhdessä. | Kuten T1 |
+| T3 Annos–vaste | 18 maakuntaa 1988–2024. Liikennekuolemat (StatFin 13u5, koodi 42, hyvinvointialueet yhdistettyinä maakunniksi kuten H7:ssä), log((kuolleet + 1) / väestö · 100 000). Työttömyysaste (115w) samana vuonna. Kiinteät alue- ja vuosivaikutukset, permutaatio 2 000 kertaa, vakiotarkistukset. | Tukee: kerroin < 0 ja p < 0,05. Kumoaa: kerroin ≥ 0. Muuten: ei ratkea |
