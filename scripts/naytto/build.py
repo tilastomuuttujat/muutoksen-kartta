@@ -1685,6 +1685,62 @@ def h22():
     return {"tests": [t1, t2], "predictions": []}
 
 
+def pension_age(c):
+    """Alin vanhuuseläkeikä vuosina syntymävuoden mukaan (vuoden 2017 uudistus)."""
+    if c <= 1954:
+        return 63.0
+    if c <= 1961:
+        return 63.0 + 0.25 * (c - 1954)
+    if c <= 1964:
+        return 65.0
+    return 65.0 + {1965: 2, 1966: 3, 1967: 4}.get(c, 4) / 12
+
+
+def fe_ols(rows, key):
+    """y ~ x + ikä + vuosi (kiinteät vaikutukset), HC1-keskivirhe. rows: (ikä, vuosi, x, y)."""
+    ages, years = sorted({r[0] for r in rows}), sorted({r[1] for r in rows})
+    X = np.array([[r[2]] + [1.0] + [float(r[0] == a) for a in ages[1:]] + [float(r[1] == t) for t in years[1:]] for r in rows])
+    Y = np.array([r[3] for r in rows])
+    XtXi = np.linalg.pinv(X.T @ X)
+    beta = XtXi @ X.T @ Y
+    e = Y - X @ beta
+    n, k = X.shape
+    V = XtXi @ (X.T * e ** 2) @ X @ XtXi * n / (n - k)
+    se = math.sqrt(V[0, 0])
+    p = math.erfc(abs(beta[0] / se) / math.sqrt(2))  # normaaliapproksimaatio (vapausasteita ~100)
+    return {"b": round(float(beta[0]), 3), "se": round(se, 3), "p": round(p, 6), "n": n}
+
+
+def h23():
+    """H23 (docs/naytto-rekisteri.md): eläkeiän nosto 2017 → 63–65-vuotiaiden työllisyys (annos, kiinteät vaikutukset)."""
+    ages = [f"{a:03d}" for a in range(60, 68)]
+    ids, d = px("tyokay/115c.px", [("paaasial_toimin_3_20180101", ["SSS", "11", "24+29"]), ("sukupuoli_9_20180101", ["SSS"]),
+                                    ("ikaryhma_10_20180101", ages), ("timeperiod_y", [str(y) for y in range(2005, 2025)])])
+    ia, ii, iy = ids.index("paaasial_toimin_3_20180101"), ids.index("ikaryhma_10_20180101"), ids.index("timeperiod_y")
+    T = {}
+    for k, v in d.items():
+        T[(k[ia], int(k[ii]), int(k[iy]))] = v
+    clamp = lambda v: min(max(v, 0.0), 1.0)
+    dose = lambda a, t: clamp(pension_age(t - a) - a) - clamp(63 - a)
+    share = lambda code, a, t: T[(code, a, t)] / T[("SSS", a, t)] * 100
+    rows = lambda code, lead, y0, y1: [(a, t, dose(a, t + lead), share(code, a, t)) for a in range(60, 68) for t in range(y0, y1 + 1)]
+    emp = fe_ols(rows("11", 0, 2010, 2024), "emp")
+    pen = fe_ols(rows("24+29", 0, 2010, 2024), "pen")
+    pre = fe_ols(rows("11", 3, 2010, 2017), "pre")
+    pre_bad = pre["b"] > 0 and pre["p"] < 0.05
+    r1 = "kumoaa" if emp["b"] <= 0 else "tukee" if emp["p"] < 0.05 and not pre_bad else "ei-ratkea"
+    r2_ = "kumoaa" if pen["b"] >= 0 else "tukee" if pen["p"] < 0.05 else "ei-ratkea"
+    grid = {a: [(t, round(share("11", a, t), 1)) for t in range(2005, 2025)] for a in range(60, 68)}
+    doses = {a: [(t, round(dose(a, t), 2)) for t in range(2010, 2025)] for a in range(60, 68)}
+    t1 = {"id": "tyolliset", "design": "annos", "result": r1, "date": str(date.today()),
+          "summary": f"Työllisten osuus: täysi annos (koko ikäryhmä ei vielä eläkeiässä) b = {emp['b']:+.1f} %-yks. (p {'< 0.0001' if emp['p'] < 0.0001 else '= ' + format(emp['p'], '.4f')}, {emp['n']} ikä–vuosi-solua); esitrenditarkistus b = {pre['b']:+.1f} (p = {pre['p']:.3f})",
+          "detail": {**emp, "pre": pre, "employment": grid, "dose": doses}}
+    t2 = {"id": "elakelaiset", "design": "tasmallisyys", "result": r2_, "date": str(date.today()),
+          "summary": f"Eläkeläisten osuus: täysi annos b = {pen['b']:+.1f} %-yks. (p {'< 0.0001' if pen['p'] < 0.0001 else '= ' + format(pen['p'], '.4f')}, {pen['n']} solua)",
+          "detail": pen}
+    return {"tests": [t1, t2], "predictions": []}
+
+
 def h11():
     """H11 (docs/naytto-rekisteri.md): ulkomaan kansalaisten osuus → Suomen kansalaisten työllisyys ja työttömyys."""
     regions = ["MK01", "MK02", "MK04", "MK05", "MK06", "MK07", "MK08", "MK09", "MK10", "MK11", "MK12", "MK13", "MK14", "MK15", "MK16", "MK17", "MK18", "MK19"]
@@ -1861,6 +1917,7 @@ def main():
     out["hypotheses"]["h20"] = h20()
     out["hypotheses"]["h21"] = h21()
     out["hypotheses"]["h22"] = h22()
+    out["hypotheses"]["h23"] = h23()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.

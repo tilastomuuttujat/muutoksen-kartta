@@ -1182,3 +1182,29 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Samaan uudistukseen kuuluivat osittainen varhennettu vanhuuseläke (61-vuotiaasta) ja
     työttömyysturvan lisäpäivien ikärajan nosto. Ne vaikuttavat myös 61–64-vuotiaisiin.
   - Annos kohdistuu kuitenkin vain eläkeiän nousun mukaisiin solmuihin.
+
+## H23: tulos
+
+- **Laskettu:** 27.11.2026.
+- **Laskentatapa:** p-arvo on laskettu normaaliapproksimaatiolla, koska scipy ei ollut käytössä.
+  Vapausasteita oli noin 100, joten ero t-jakaumaan on merkityksetön.
+- **T1 Annos: tukee.** Täysi annos eli se, että koko ikäryhmä ei vielä ole eläkeiässä, nosti
+  työllisten osuutta 19,3 prosenttiyksikköä (p < 0,0001, 120 ikä–vuosi-solua).
+  - Esitrenditarkistus läpäistiin: b = −1,9 (p = 0,07), eli suunta oli väärä eikä merkitsevä.
+- **T2 Täsmällisyys: tukee.** Eläkeläisten osuus pieneni 32,2 prosenttiyksikköä täyttä annosta kohden
+  (p < 0,0001).
+- **Tila:** tuettu. Vahva annosasetelma ja täsmällisyystesti tukevat.
+- **Kuvaus:**
+  - 63-vuotiaiden työllisyysaste nousi vuoden 2017 32,3 prosentista vuoden 2024 61,4 prosenttiin.
+  - 64-vuotiaiden työllisyys nousi jo 2017–2022 (21,1 → 31,8 %), vaikka heidän annoksensa oli nolla.
+    Tämä viittaa siihen, että 63-vuotiaina työssä pysyneet jatkoivat osin myös 64-vuotiaina.
+  - Kun eläkeiän nousu ehti 64-vuotiaiden ikään, nousu kiihtyi: 47,8 % vuonna 2024.
+  - Tämä jatkuminen ei kuulu annokseen, joten malli aliarvioi vaikutusta pikemmin kuin yliarvioi
+    sitä.
+  - 60–62-vuotiaiden työllisyys nousi samaan aikaan noin 10 prosenttiyksikköä.
+  - Ikä- ja vuosivaikutukset poistavat tämän yleisen nousun mallista.
+- **Rajaus:**
+  - Malli olettaa, että eläkeiän vaikutus on sama kaikille annoksille.
+  - Osa 63-vuotiaista on työttömiä tai muuten työvoiman ulkopuolella. Eläkeläisten osuuden lasku
+    (32 prosenttiyksikköä) on suurempi kuin työllisten osuuden nousu (19 prosenttiyksikköä), joten
+    osa siirtyi muuhun tilaan kuin työhön, esimerkiksi työttömäksi.

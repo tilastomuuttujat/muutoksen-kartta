@@ -76,7 +76,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h16: { tests: Test[]; predictions: Prediction[] }; h17: { tests: Test[]; predictions: Prediction[] }; h18: { tests: Test[]; predictions: Prediction[] }; h19: { tests: Test[]; predictions: Prediction[] }; h20: { tests: Test[]; predictions: Prediction[] }; h21: { tests: Test[]; predictions: Prediction[] }; h22: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h16: { tests: Test[]; predictions: Prediction[] }; h17: { tests: Test[]; predictions: Prediction[] }; h18: { tests: Test[]; predictions: Prediction[] }; h19: { tests: Test[]; predictions: Prediction[] }; h20: { tests: Test[]; predictions: Prediction[] }; h21: { tests: Test[]; predictions: Prediction[] }; h22: { tests: Test[]; predictions: Prediction[] }; h23: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -450,6 +450,19 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Ruoan suhteellinen hinta laski Suomessa 1995 lähes 10 %, kun Tanskassa ja Norjassa lasku oli noin 1,5 %. Ero oli suurempi kuin yhtenäkään muuna vuonna 1981–2021, eikä se palautunut: viidessä vuodessa ero kasvoi 12 prosenttiin. Molemmat testit ovat samaa asetelmaa, joten tila on ehdokas. Ruotsi liittyi samaan aikaan, mutta sen ruoka halpeni vasta 1996 ja vähemmän; se oli purkanut maatalouden sääntelyä jo 1990–1991 (ei testattu).",
     next: "Täsmällisyys: laskun pitäisi näkyä maataloustuotteissa (vilja, liha, maito) mutta ei tuontiruoassa (hedelmät, kahvi). Tarvitaan hyödykeryhmittäiset hinnat ennen vuotta 1995.",
+  },
+  {
+    id: "h23",
+    title: "Eläkeiän nosto piti 63–64-vuotiaat työssä",
+    claim: "Vuoden 2017 eläkeuudistus nosti 63–65-vuotiaiden työllisyyttä juuri niissä ikä- ja vuosiryhmissä, joita alimman vanhuuseläkeiän nousu (3 kk syntymävuotta kohden, 63 v → 65 v) koski.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. Uusi teema.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h23.tests,
+    predictions: [],
+    reading:
+      "63-vuotiaiden työllisyys nousi 32 prosentista (2017) 61 prosenttiin (2024) sitä mukaa kuin alin eläkeikä nousi, ja 64-vuotiaiden nousu kiihtyi 2023, kun nousu ehti heidän ikäänsä (jo aiemmin 63-vuotiaina työssä pysyneet jatkoivat osin myös 64-vuotiaina). Ikä- ja vuosivaikutusten jälkeen täysi annos nosti työllisyyttä 19 ja laski eläkeläisten osuutta 32 prosenttiyksikköä. Ero tarkoittaa, että osa eläkkeeltä pois jääneistä ei ollut töissä vaan esimerkiksi työttömänä.",
+    next: "Annos ennustaa jatkoa: vuonna 2025 64-vuotiaiden annos on 0,75 ja 65-vuotiaiden 0,25. Ennusteen voisi lukita ennen kuin vuoden 2025 tiedot julkaistaan.",
   },
   {
     id: "h2",

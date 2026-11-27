@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Kaksikymmentäkahdeksan hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Kaksikymmentäyhdeksän hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Kahdeksan väitettä kumoutui, kolme on tuettu, kuusi on ehdokkaita ja yksitoista näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Kahdeksan väitettä kumoutui, neljä on tuettu, kuusi on ehdokkaita ja yksitoista näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -251,6 +251,9 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h22" && t.id === "vuosi" && <LinesChart from={1985} to={2010} event={1995} eventLabel="EU 1/1995" min={80}
         lines={Object.entries((t.detail as unknown as { index: Record<string, [number, number][]> }).index).map(([c, s]) => ({ label: { FI: "Suomi", SE: "Ruotsi", NO: "Norja", DK: "Tanska" }[c] ?? c, s, main: c === "FI" }))}
         caption="Ruoan hinta suhteessa kaikkiin kulutusmenoihin, 1994 = 100 (Eurostat nama_10_co3_p3, käypien ja kiinteiden hintojen suhde). Ruotsin tiedot alkavat 1993." />}
+      {h.id === "h23" && t.id === "tyolliset" && <LinesChart from={2005} to={2024} event={2018} eventLabel="eläkeikä nousee" 
+        lines={Object.entries((t.detail as unknown as { employment: Record<string, [number, number][]> }).employment).filter(([a]) => ["61", "62", "63", "64", "65"].includes(a)).map(([a, s]) => ({ label: `${a} v`, s, main: a === "63" || a === "64" }))}
+        caption="Työllisten osuus ikäryhmästä vuoden lopussa, % (StatFin 115c). Alin eläkeikä nousi 63-vuotiaiden kohdalla 2018–2021 ja 64-vuotiaiden kohdalla 2023 alkaen." />}
       {h.id === "h14" && t.id === "katkos" && <BreakChart detail={t.detail as Break} cfg={{ trend: [1976, 1987], win: [1988, 1991], from: 1960, label: "laki voimaan 1/1988", ticks: [1960, 1976, 1988, 2000, 2025], zeroTicks: [0, 1, 2, 3], caption: "Avioerot 1 000 asukasta kohden (StatFin 121v). Katkoviiva: vuosien 1976–1987 trendi jatkettuna. Poikkeama 1988–1991 oli suurempi kuin kaikissa tavallisissa jaksoissa." }} />}
       {h.id === "h13" && t.id === "suomi" && <DecouplingChart detail={t.detail as { co2: [number, number][]; gdp: [number, number][] }} />}
       {h.id === "h12" && t.id === "toisto" && <CountryCorr h="h12" detail={t.detail as Pooled & Rc} />}
