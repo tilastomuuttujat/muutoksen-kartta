@@ -787,3 +787,20 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
     kasvusta.
   - Kirjattua tulosta ei muuteta. Oikealla mittarilla kirjattava tarkennus H13b ei olisi ennalta
     kirjattu suhteessa näihin lukuihin.
+
+## H14. Avioerolain uudistus 1988 → avioerot
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Uusi teema.
+- **Tausta:** 1.1.1988 voimaan tullut avioliittolain uudistus poisti syyllisyysperusteet. Avioeron sai
+  puolen vuoden harkinta-ajan jälkeen tai kahden vuoden erillään asumisen perusteella.
+- **Väite:** uudistus lisäsi avioeroja.
+- **Aineisto:** StatFin 121v, avioerot, solmitut avioliitot ja väkiluku vuosittain. Mittari on
+  tapahtumat 1 000 asukasta kohden (log).
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Luonnollinen koe | Avioerot: lineaarinen trendi 1976–1987, poikkeama keskimäärin 1988–1991. Lumejaksot: kaikki nelivuotiset jaksot, joiden alkuvuosi on 1960–2021 ja joilla on 12 vuoden esijakso, eikä jakso tai esijakso osu vuosiin 1988–1991. | Tukee: poikkeama > 0 ja suurempi kuin 95 %:ssa lumejaksoista. Kumoaa: poikkeama ≤ 0. Muuten: ei ratkea |
+| T2 Negatiivinen kontrolli | Solmitut avioliitot, sama laskenta | Tukee: T1 tukee ja avioliitot eivät ylitä 95 %:a. Kumoaa: avioliittojen poikkeama ≥ avioerojen poikkeama. Muuten: ei ratkea |
+
+- **Lisätieto, ei vaikuta tulokseen:** poikkeama 1992–1999 (pysyikö taso koholla vai purkautuiko
+  vain kasautunut jono).
