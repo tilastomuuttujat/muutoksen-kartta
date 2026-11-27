@@ -124,3 +124,14 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Määräaikaisuuden osittaiskorrelaatio, kun työttömyys on vakioitu.
 - **Tunnettu rajoite:** työvoimatutkimuksen menetelmämuutokset (Suomessa 2021) voivat näkyä
   yksittäisen vuoden muutoksena. Rajaus 5–95 %:iin vaimentaa niitä.
+
+## H1c / T5: tulos
+
+- **Laskettu:** 27.11.2026.
+- **Tulos:** ei ratkea.
+  - Määräaikaisuuden yhdistetty r = −0,10 (viive 2 v, p = 0,52).
+  - Naisten 25–34 työttömyys samoissa maissa ja samoina vuosina: r = −0,33 (p = 0,001).
+  - Osittaiskorrelaatio, kun työttömyys on vakioitu: r = −0,08.
+  - Maittain: Suomi −0,18, Ruotsi −0,13, Norja −0,26, Tanska +0,33. Mikään ei ole merkitsevä.
+- **Tulkinta:** määräaikaisuus ei ennusta syntyvyyttä, eikä se lisää mitään työttömyyden lisäksi.
+  Työn epävarmuus siinä muodossa kuin määräaikaisuus sitä mittaa ei selitä yhteyttä.

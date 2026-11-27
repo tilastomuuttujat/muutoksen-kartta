@@ -59,6 +59,7 @@ export function statusOf(tests: Pick<Test, "design" | "result">[], predictions: 
 type H1Data = {
   tests: Test[];
   expectations: Test;
+  temporary: Test;
   predictions: Prediction[];
   model: { a: number; b: number; sd: number; n: number };
   fiTfrLast: [number, number];
@@ -114,7 +115,20 @@ export const HYPOTHESES: Hypothesis[] = [
     predictions: h1.predictions,
     reading:
       "Odotustesti kumosi mielialaan perustuvan selityksen: kuluttajien luottamuksen nousua ei seurannut syntyvyyden nousu, vaikka nuorten naisten työttömyys samoissa maissa ja samoina vuosina ennusti syntyvyyttä selvästi. Syntyvyys näyttää seuraavan koko maan työmarkkinatilannetta, ei yleistä talousmielialaa eikä oman alueen työttömyyttä. Ennusteet vuosille 2026 ja 2027 ratkeavat, kun Tilastokeskus julkaisee syntyvyysluvut.",
-    next: "Tarkennus kannattaa kirjata uudeksi hypoteesiksi: koko maan nuorten aikuisten työmarkkinat (esim. määräaikaisuus, työllistymisen kesto) eivätkä odotukset. Sen testi olisi, ennustaako määräaikaisten osuus syntyvyyttä paremmin kuin työttömyys.",
+    next: "Tarkennus kirjattiin uudeksi hypoteesiksi H1c (työn epävarmuus).",
+  },
+  {
+    id: "h1c",
+    title: "Nuorten aikuisten työn epävarmuus → syntyvyys",
+    claim: "Syntyvyys seuraa nuorten aikuisten työn epävarmuutta koko maassa. Määräaikaisuus mittaa epävarmuutta työttömyyttä suoremmin, koska se koskee myös niitä, joilla on työ.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu H1:n ja H1b:n testien jälkeen ja ennen määräaikaisuustestin laskentaa.",
+    map: { edge: "Globaali finanssikriisi → Historiallisen matalan syntyvyyden aika", confidence: "heikko" },
+    tests: [h1.temporary],
+    predictions: [],
+    reading:
+      "Määräaikaisuus ei ennustanut syntyvyyttä missään neljästä maasta, eikä se lisännyt mitään työttömyyden lisäksi. Työttömyys ennusti samoissa maissa ja samoina vuosina selvästi. Kolmen tarkennuksen jälkeen jäljelle jää kapea havainto: syntyvyys seuraa koko maan nuorten naisten työttömyyttä kahden vuoden viiveellä, mutta ei alueen omaa työttömyyttä, ei mielialaa eikä määräaikaisuutta. Mekanismi on vielä auki.",
+    next: "Mahdollisia selityksiä, joita ei ole testattu: työttömyys kuvaa koko maan työllistymisen vaikeutta, joka siirtää perheen perustamista (esim. ensimmäisen vakituisen työn saamisen ikä), tai yhteys kulkee perhepolitiikan ja julkisen talouden kautta, jotka reagoivat työttömyyteen. Ensimmäiseen sopisi esikoisten syntyvyys, toiseen päätösten ajoitus.",
   },
   {
     id: "h3",

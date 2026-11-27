@@ -178,7 +178,9 @@ def h1(nordic, fi_tfr):
                       "actual": None})
     regional = h1_regional()
     expect = h1b_expectations(nordic, tfr, pw)
+    temporary = h1c_temporary(nordic, pw)
     return {
+        "temporary": temporary,
         "expectations": expect,
         "tests": [
             {"id": "toisto", "design": "toisto", "result": t1_result,
@@ -251,6 +253,63 @@ def h1b_expectations(nordic, tfr, pw):
             "detail": {"confidence": conf_c, "unemployment": unemp_c, "confidenceLong": conf_long, "countries": per,
                        "confidenceYears": [yrs[0], yrs[-1]],
                        "series": {c: sorted((y, round(v, 2)) for y, v in conf[c].items()) for c in cs}},
+            "date": str(date.today())}
+
+
+def eurostat_temporary():
+    """Eurostat lfsa_etpgan: määräaikaisten osuus palkansaajista (%), naiset 25–34, kaikki kansalaisuudet."""
+    url = ("https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/lfsa_etpgan?"
+           + "&".join(f"geo={c}" for c in COUNTRIES) + "&sex=F&age=Y25-34&citizen=TOTAL&unit=PC&format=JSON&lang=en")
+    with urllib.request.urlopen(url, timeout=120) as r:
+        d = json.load(r)
+    geo = {v: k for k, v in d["dimension"]["geo"]["category"]["index"].items()}
+    tim = {v: k for k, v in d["dimension"]["time"]["category"]["index"].items()}
+    nt = len(tim)
+    out = {}
+    for pos, v in d["value"].items():
+        p = int(pos)
+        out.setdefault(geo[p // nt], {})[int(tim[p % nt])] = float(v)
+    return out
+
+
+def h1c_temporary(nordic, pw):
+    """T5 (docs/naytto-rekisteri.md, kirjattu ennen laskentaa): määräaikaisuus vs. työttömyys,
+    naiset 25–34, FI SE NO DK, samat maat ja vuodet."""
+    temp = eurostat_temporary()
+    pt = {c: prewhiten(changes(temp[c], False)) for c in COUNTRIES}
+    pu = {c: prewhiten(changes(nordic["uw"][c], False)) for c in COUNTRIES}
+
+    def triples(k):
+        return [(pt[c][t - k], pu[c][t - k], pw[c][t]) for c in COUNTRIES for t in pw[c] if t - k in pt[c] and t - k in pu[c]]
+
+    def pooled(col):
+        best = None
+        for k in (1, 2):
+            ps = [(x[col], x[2]) for x in triples(k)]
+            r, n = corr(ps)
+            if r is not None and (best is None or abs(r) > abs(best[0])):
+                best = (r, n, k)
+        r, n, k = best
+        return {"r": round(r, 3), "n": n, "lag": k, "p": round(1 - (1 - p_two_sided(r, n)) ** 2, 4)}
+
+    tmp_c, une_c = pooled(0), pooled(1)
+    # osittaiskorrelaatio: määräaikaisuus ja syntyvyys, kun työttömyys on vakioitu (määräaikaisuuden viiveellä)
+    a = np.array(triples(tmp_c["lag"]))
+    res = lambda y: y - np.polyval(np.polyfit(a[:, 1], y, 1), a[:, 1])
+    pr = float(np.corrcoef(res(a[:, 0]), res(a[:, 2]))[0, 1])
+    partial = {"r": round(pr, 3), "n": len(a), "lag": tmp_c["lag"], "p": round(p_two_sided(pr, len(a) - 1), 4)}
+    per = {c: lead_corr(pt[c], pw[c]) for c in COUNTRIES}
+    if tmp_c["r"] >= 0:
+        result = "kumoaa"
+    elif tmp_c["p"] < 0.05 and abs(tmp_c["r"]) >= abs(une_c["r"]):
+        result = "tukee"
+    else:
+        result = "ei-ratkea"
+    return {"id": "maaraaikaisuus", "design": "tasmallisyys", "result": result,
+            "summary": (f"Määräaikaisuus r = {tmp_c['r']:.2f} (viive {tmp_c['lag']} v, p = {tmp_c['p']:.3f}), "
+                        f"työttömyys samoina vuosina r = {une_c['r']:.2f} (p = {une_c['p']:.3f}); Suomi, Ruotsi, Norja, Tanska"),
+            "detail": {"temporary": tmp_c, "unemployment": une_c, "partial": partial, "countries": per,
+                       "series": {c: sorted(temp[c].items()) for c in COUNTRIES}},
             "date": str(date.today())}
 
 
@@ -378,7 +437,7 @@ def main():
     # Suomalainen lukuasu teksteihin: desimaalipilkku ja miinusmerkki.
     fi = lambda t: re.sub(r"(?<![\w])-(?=\d)", "−", re.sub(r"(?<=\d)\.(?=\d)", ",", t))
     for h in out["hypotheses"].values():
-        for t in h["tests"] + ([h["expectations"]] if "expectations" in h else []):
+        for t in h["tests"] + [h[k] for k in ("expectations", "temporary") if k in h]:
             t["summary"] = fi(t["summary"])
         for p in h["predictions"]:
             p["basis"] = fi(p["basis"])
@@ -393,6 +452,8 @@ def main():
     print("odotukset", json.dumps({k: v for k, v in out["hypotheses"]["h1"]["expectations"].items() if k != "detail"}, ensure_ascii=False))
     e = out["hypotheses"]["h1"]["expectations"]["detail"]
     print("  maittain", e["countries"], "pitkä", e["confidenceLong"], e["confidenceYears"])
+    tm = out["hypotheses"]["h1"]["temporary"]
+    print("maaraaikaisuus", tm["result"], tm["summary"]); print("  osittais", tm["detail"]["partial"], "maittain", tm["detail"]["countries"])
     print("malli", out["hypotheses"]["h1"]["model"])
     print("toisto maittain", json.dumps(out["hypotheses"]["h1"]["tests"][0]["detail"]["countries"]))
     print("miehet maittain", json.dumps(out["hypotheses"]["h1"]["tests"][2]["detail"]["menCountries"]))

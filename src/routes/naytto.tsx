@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Pilotti: neljä hypoteesia. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Pilotti: viisi hypoteesia. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Kaksi väitettä kumoutui, yksi on tuettu ja yhden näyttö on ristiriitaista</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Kaksi väitettä kumoutui, yksi on tuettu, yhden näyttö on ristiriitaista ja yksi jäi ratkaisematta</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -156,6 +156,7 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       )}
       {h.id === "h3" && t.id === "annos" && <RegionStrip detail={t.detail as Regions} />}
       {t.id === "odotukset" && <ExpectationDots detail={t.detail as Expect} />}
+      {t.id === "maaraaikaisuus" && <TemporaryDots detail={t.detail as Temporary} />}
     </li>
   );
 }
@@ -198,27 +199,58 @@ function CountryDots({ detail }: { detail: Replication }) {
 }
 
 type Expect = { confidence: Rc; unemployment: Rc; confidenceLong: Rc; countries: Record<string, Rc> };
+type Temporary = { temporary: Rc; unemployment: Rc; partial: Rc; countries: Record<string, Rc> };
+type DotRow = [string, Rc, "test" | "unemp", boolean];
 
 function ExpectationDots({ detail }: { detail: Expect }) {
-  const rows: [string, Rc, "conf" | "unemp", boolean][] = [
-    ["Luottamus: Suomi", detail.countries["FI"]!, "conf", false],
-    ["Luottamus: Ruotsi", detail.countries["SE"]!, "conf", false],
-    ["Luottamus: Tanska", detail.countries["DK"]!, "conf", false],
-    ["Luottamus yhdessä", detail.confidence, "conf", true],
-    ["Työttömyys yhdessä", detail.unemployment, "unemp", true],
-  ];
-  const W = 560, L = 150, R = 540, ROW = 20;
+  return (
+    <CompareDots
+      rows={[
+        ["Luottamus: Suomi", detail.countries["FI"]!, "test", false],
+        ["Luottamus: Ruotsi", detail.countries["SE"]!, "test", false],
+        ["Luottamus: Tanska", detail.countries["DK"]!, "test", false],
+        ["Luottamus yhdessä", detail.confidence, "test", true],
+        ["Työttömyys yhdessä", detail.unemployment, "unemp", true],
+      ]}
+      side="pos"
+      band="H1b:n ennuste luottamukselle"
+      note="Jos H1b pitäisi, luottamuksen pallojen pitäisi olla nollan oikealla puolella. Norjan luottamustietoa ei ole Eurostatissa."
+    />
+  );
+}
+
+function TemporaryDots({ detail }: { detail: Temporary }) {
+  return (
+    <CompareDots
+      rows={[
+        ["Määräaikaisuus: Suomi", detail.countries["FI"]!, "test", false],
+        ["Määräaikaisuus: Ruotsi", detail.countries["SE"]!, "test", false],
+        ["Määräaikaisuus: Norja", detail.countries["NO"]!, "test", false],
+        ["Määräaikaisuus: Tanska", detail.countries["DK"]!, "test", false],
+        ["Määräaikaisuus yhdessä", detail.temporary, "test", true],
+        ["Työttömyys yhdessä", detail.unemployment, "unemp", true],
+      ]}
+      side="neg"
+      band="H1c:n ennuste määräaikaisuudelle"
+      note={`Jos H1c pitäisi, määräaikaisuuden pallojen pitäisi olla nollan vasemmalla puolella ja vähintään yhtä kaukana kuin työttömyyden. Kun työttömyys vakioidaan, määräaikaisuuden osittaiskorrelaatio on ${nf(detail.partial.r)}.`}
+    />
+  );
+}
+
+function CompareDots({ rows, side, band, note }: { rows: DotRow[]; side: "pos" | "neg"; band: string; note: string }) {
+  const W = 560, L = 160, R = 540, ROW = 20;
   const x = (r: number) => L + ((r + 1) / 1.6) * (R - L); // −1 … +0,6
+  const H = rows.length * ROW;
   return (
     <div className="mt-2 overflow-x-auto">
-      <svg viewBox={`0 0 ${W} ${rows.length * ROW + 40}`} className="h-auto w-full min-w-[440px] max-w-xl" role="img"
+      <svg viewBox={`0 0 ${W} ${H + 40}`} className="h-auto w-full min-w-[440px] max-w-xl" role="img"
         aria-label={rows.map(([n, c]) => `${n} r ${nf(c.r)}`).join(", ")}>
-        <rect x={x(0)} y={4} width={R - x(0)} height={rows.length * ROW} fill="var(--primary)" fillOpacity={0.06} />
-        <text x={R - 4} y={rows.length * ROW + 0} textAnchor="end" className="fill-primary text-[10px]">H1b:n ennuste luottamukselle</text>
-        <line x1={x(0)} x2={x(0)} y1={4} y2={rows.length * ROW + 4} stroke="var(--foreground)" strokeOpacity={0.5} />
+        <rect x={side === "pos" ? x(0) : L} y={4} width={side === "pos" ? R - x(0) : x(0) - L} height={H} fill="var(--primary)" fillOpacity={0.06} />
+        <text x={side === "pos" ? R - 4 : L + 4} y={H + 16} textAnchor={side === "pos" ? "end" : "start"} className="fill-primary text-[10px]">{band}</text>
+        <line x1={x(0)} x2={x(0)} y1={4} y2={H + 4} stroke="var(--foreground)" strokeOpacity={0.5} />
         {rows.map(([name, c, kind, pooled], i) => {
           const y = 14 + i * ROW;
-          const col = kind === "conf" ? "var(--primary)" : "var(--foreground)";
+          const col = kind === "test" ? "var(--primary)" : "var(--foreground)";
           return (
             <g key={name}>
               <text x={L - 8} y={y + 4} textAnchor="end" className={`text-[11px] ${pooled ? "fill-foreground font-semibold" : "fill-muted-foreground"}`}>{name}</text>
@@ -228,10 +260,10 @@ function ExpectationDots({ detail }: { detail: Expect }) {
             </g>
           );
         })}
-        {[-1, -0.5, 0, 0.5].map((t) => <text key={t} x={x(t)} y={rows.length * ROW + 34} textAnchor="middle" className="fill-muted-foreground text-[10px]">{nf(t, 1)}</text>)}
+        {[-1, -0.5, 0, 0.5].map((t) => <text key={t} x={x(t)} y={H + 34} textAnchor="middle" className="fill-muted-foreground text-[10px]">{nf(t, 1)}</text>)}
       </svg>
       <p className="text-xs text-muted-foreground">
-        Korrelaatio: selittäjän muutos ja syntyvyyden muutos 1–2 vuotta myöhemmin, samoissa maissa ja samoina vuosina. Jos H1b pitäisi, luottamuksen pallojen pitäisi olla nollan oikealla puolella. Täytetty pallo: p &lt; 0,05. Norjan luottamustietoa ei ole Eurostatissa.
+        Korrelaatio: selittäjän muutos ja syntyvyyden muutos 1–2 vuotta myöhemmin, samoissa maissa ja samoina vuosina. Täytetty pallo: p &lt; 0,05. {note}
       </p>
     </div>
   );

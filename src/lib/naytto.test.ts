@@ -37,6 +37,7 @@ describe("pilot results", () => {
   it("statuses", () => {
     expect(statusOfHypothesis(hypothesis("h1")!)).toBe("kumottu");
     expect(statusOfHypothesis(hypothesis("h1b")!)).toBe("ristiriita");
+    expect(statusOfHypothesis(hypothesis("h1c")!)).toBe("oletus");
     expect(statusOfHypothesis(hypothesis("h2")!)).toBe("kumottu");
     expect(statusOfHypothesis(hypothesis("h3")!)).toBe("tuettu");
   });
@@ -63,6 +64,17 @@ describe("pilot results", () => {
     expect(d.confidence.p).toBeCloseTo(0.08, 2);
     expect(d.confidence.lag).toBe(1);
     expect(d.unemployment.r).toBeCloseTo(-0.41, 2);
+  });
+  it("temporary-work test numbers quoted in the register", () => {
+    const t = NAYTTO.hypotheses.h1.temporary;
+    expect(t.result).toBe("ei-ratkea");
+    const d = t.detail as { temporary: { r: number; p: number }; unemployment: { r: number }; partial: { r: number }; countries: Record<string, { r: number; p: number }> };
+    expect(d.temporary.r).toBeCloseTo(-0.1, 2);
+    expect(d.temporary.p).toBeCloseTo(0.52, 2);
+    expect(d.unemployment.r).toBeCloseTo(-0.33, 2);
+    expect(d.partial.r).toBeCloseTo(-0.08, 2);
+    expect(d.countries["DK"]!.r).toBeCloseTo(0.33, 2);
+    for (const c of Object.values(d.countries)) expect(c.p).toBeGreaterThan(0.05);
   });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
