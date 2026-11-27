@@ -497,3 +497,18 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Vuositason aineisto (alle 30 vuotta) ei kuitenkaan riitä erottamaan vaikutusta muusta
     vaihtelusta.
 - **Tila:** ehdokas ennallaan.
+
+## H7. Työttömyys → itsemurhat
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Uusi teema.
+- **Tausta:** Suomen itsemurhakuolleisuus oli huipussaan 1990, juuri ennen lamaa, ja laski laman
+  aikana. Vaikutuksen suunta on siksi kiistanalainen.
+- **Väite:** työttömyyden nousu lisää itsemurhia.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Annos–vaste | 18 maakuntaa ilman Ahvenanmaata. Itsemurhat: StatFin 13u5, koodi 50, kaikki iät; hyvinvointialueet yhdistetään maakunniksi, Uusimaa = HVA01–04 + Helsinki. Väestö ja työttömyysaste (työttömät / työvoima, kaikki iät): StatFin 115w. Malli log(itsemurhat / 100 000)(t) ~ työttömyysaste(t − 1), kiinteät alue- ja vuosivaikutukset, 1988–2024. Permutaatio: maakuntien työttömyyssarjojen sekoitus 2 000 kertaa. | Tukee: kerroin > 0 ja p < 0,05. Kumoaa: kerroin ≤ 0. Muuten: ei ratkea |
+| T2 Ajoitus koko maassa | Itsemurhat 25–64-vuotiailla (StatFin 11by: 25–44 + 45–64, lukumäärä) ja työttömyysaste (Turso: työvoimatutkimuksen historiallinen sarja), 1960–2018. Log-muutos ja muutos %-yks., rajaus, AR(1), viive 0–1 v, Šidák. | Tukee: r > 0 ja p < 0,05. Kumoaa: r ≤ 0. Muuten: ei ratkea |
+
+- **Lisätieto, ei vaikuta tulokseen:** T1 miehille ja naisille erikseen, jos aineisto sen sallii.
+  Lisäksi itsemurhat 1980–2005 laman ajoituksen näyttämiseksi.
