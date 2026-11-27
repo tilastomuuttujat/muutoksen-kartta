@@ -340,3 +340,28 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 - **Tila:** ehdokas, koska kaksi eri asetelmaa tukee, mutta kumpikaan ei ole vahva.
 - **Seuraava vahva asetelma:** annos–vaste kohorteittain tai alueittain. Ikäluokat, jotka tulivat
   työmarkkinoille laman aikana, verrattuna muihin.
+
+## H5 / T3 Ikäluokkatesti (annos–vaste kohorteittain)
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa.
+- **Väite:** ikäluokat, jotka tulivat työmarkkinoille huonona aikana, ovat 33–37-vuotiaina muita
+  harvemmin töissä.
+- **Aineisto:** StatFin 115c (väestö pääasiallisen toiminnan, iän ja vuoden mukaan 1987–2024, molemmat
+  sukupuolet).
+- **Altistus:** 25–54-vuotiaiden työttömyysaste (työttömät / työvoima) keskimäärin niinä vuosina, kun
+  ikäluokka oli 21–24-vuotias. Altistus mittaa koko maan työmarkkinatilannetta eikä ikäluokan omaa
+  tilannetta.
+- **Seuraus:** ikäluokan työllisyysaste (työlliset / väestö) 33–37-vuotiaana keskimäärin, josta on
+  vähennetty 30–44-vuotiaiden työllisyysaste samoina vuosina. Erotus poistaa vuoden suhdanteen.
+- **Ikäluokat:** syntyneet 1966–1987, eli ne, joilla on havainto kaikista ikävuosista 21–24 ja 33–37.
+- **Menetelmä:**
+  - Molemmista poistetaan lineaarinen trendi syntymävuoden suhteen, jotta esimerkiksi koulutuksen
+    pidentyminen ei näy vaikutuksena.
+  - Tunnusluku on Pearsonin r ikäluokkien yli.
+  - p-arvo saadaan permutaatiotestillä, jossa altistusta siirretään kehämäisesti ikäluokkien yli
+    kaikilla mahdollisilla siirroilla. Siirto säilyttää altistuksen sujuvan vaihtelun.
+- **Tukee:** r < 0 ja yksisuuntainen p < 0,05. **Kumoaa:** r ≥ 0. Muuten: ei ratkea.
+- **Lisätieto, ei vaikuta tulokseen:**
+  - Tulos naisille ja miehille erikseen.
+  - Ennustettu ero ikäluokkien välillä: työllisyys 33–37-vuotiaana prosenttiyksikköinä, kun
+    altistuksen ero on 5 prosenttiyksikköä.
