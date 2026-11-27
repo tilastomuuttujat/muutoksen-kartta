@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Kolmekymmentäkolme hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Kolmekymmentäneljä hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Yhdeksän väitettä kumoutui, viisi on tuettu, seitsemän on ehdokkaita ja kaksitoista näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Yhdeksän väitettä kumoutui, viisi on tuettu, kahdeksan on ehdokkaita ja kaksitoista näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -264,6 +264,9 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
         pts={(NAYTTO.hypotheses.h24d.tests[0]!.detail as unknown as { rows: { event: number; after: number; total: number; wear: number; five: number }[] }).rows.map((r) => ({ label: String(r.event), x: t.id === "kuluminen" ? r.after : r.total, y: t.id === "kuluminen" ? r.wear : r.five }))}
         xLabel={t.id === "kuluminen" ? "reaalisen kurssin muutos t0+2 → t0+5, % (+ = vahvistui)" : "reaalisen kurssin muutos t0−1 → t0+5, % (− = heikkeni)"}
         yLabel={t.id === "kuluminen" ? "viennin osuuden muutos t0+2 → t0+5, %" : "viennin osuuden muutos t0 → t0+5, %"} />}
+      {h.id === "h24e" && t.id === "annos" && <PointScatter dots
+        pts={(t.detail as unknown as { events: { iso: string; t: number; x: number; y: number }[] }).events.map((e) => ({ label: `${e.iso} ${e.t}`, x: e.x, y: e.y }))}
+        xLabel="reaalisen kurssin muutos t0−1 → t0+5, % (− = heikkeni)" yLabel="viennin osuuden muutos t0 → t0+5, %" />}
       {h.id === "h14" && t.id === "katkos" && <BreakChart detail={t.detail as Break} cfg={{ trend: [1976, 1987], win: [1988, 1991], from: 1960, label: "laki voimaan 1/1988", ticks: [1960, 1976, 1988, 2000, 2025], zeroTicks: [0, 1, 2, 3], caption: "Avioerot 1 000 asukasta kohden (StatFin 121v). Katkoviiva: vuosien 1976–1987 trendi jatkettuna. Poikkeama 1988–1991 oli suurempi kuin kaikissa tavallisissa jaksoissa." }} />}
       {h.id === "h13" && t.id === "suomi" && <DecouplingChart detail={t.detail as { co2: [number, number][]; gdp: [number, number][] }} />}
       {h.id === "h12" && t.id === "toisto" && <CountryCorr h="h12" detail={t.detail as Pooled & Rc} />}
@@ -721,7 +724,7 @@ function MigrationChart({ detail }: { detail: { toSweden: [number, number][]; fr
   );
 }
 
-function PointScatter({ pts, xLabel, yLabel }: { pts: { label: string; x: number; y: number }[]; xLabel: string; yLabel: string }) {
+function PointScatter({ pts, xLabel, yLabel, dots = false }: { pts: { label: string; x: number; y: number }[]; xLabel: string; yLabel: string; dots?: boolean }) {
   const W = 620, H = 210, L = 50, R = 580, TOP = 18, BOT = 170;
   const nice = (v: number) => Math.ceil(Math.abs(v) / 10) * 10 * Math.sign(v);
   const x0 = Math.min(0, nice(Math.min(...pts.map((p) => p.x)) - 2)), x1 = Math.max(0, nice(Math.max(...pts.map((p) => p.x)) + 2));
@@ -739,10 +742,10 @@ function PointScatter({ pts, xLabel, yLabel }: { pts: { label: string; x: number
         {ticks(x0, x1).map((t) => <text key={t} x={x(t)} y={BOT + 16} textAnchor="middle" className="fill-muted-foreground text-[10px]">{sgn(t)}</text>)}
         <text x={(L + R) / 2} y={H - 6} textAnchor="middle" className="fill-muted-foreground text-[10px]">{xLabel}</text>
         <text x={L + 4} y={TOP - 6} className="fill-muted-foreground text-[10px]">{yLabel}</text>
-        {pts.map((p) => (
-          <g key={p.label}>
-            <circle cx={x(p.x)} cy={y(p.y)} r={5} fill="var(--primary)" />
-            <text x={x(p.x) + 8} y={y(p.y) + 4} className="fill-foreground text-[11px]">{p.label}</text>
+        {pts.map((p, i) => (
+          <g key={`${p.label}-${i}`}>
+            <circle cx={x(p.x)} cy={y(p.y)} r={dots ? 3.5 : 5} fill="var(--primary)" fillOpacity={dots ? 0.6 : 1}><title>{`${p.label}: ${p.x} %, ${p.y} %`}</title></circle>
+            {!dots && <text x={x(p.x) + 8} y={y(p.y) + 4} className="fill-foreground text-[11px]">{p.label}</text>}
           </g>
         ))}
       </svg>

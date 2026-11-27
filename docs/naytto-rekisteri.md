@@ -1498,3 +1498,28 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Valuuttakriisimerkintä perustuu kurssin heikkenemiseen suhteessa Yhdysvaltain dollariin. Siksi
     osa tapahtumista on dollarin vahvistumista eikä oman valuutan devalvaatiota. Tällaiset tapaukset
     näkyvät pieninä REER-muutoksina, joten ne kuuluvat testin vertailuryhmään.
+
+## H24e: tulos
+
+- **Laskettu:** 27.11.2026.
+- **Aineisto rajausten jälkeen:** 78 valuuttakriisiä 60 maassa, Suomi pois lukien.
+- **T1 Annos: tukee.** rho = −0,31 (permutaatio-p = 0,003).
+  - Mitä enemmän reaalista heikkenemistä jäi viiden vuoden päähän, sitä enemmän viennin BKT-osuus
+    kasvoi.
+  - Suomen viiden tapauksen järjestys (H24d) toistui siis muiden maiden aineistossa. Yhteys on
+    kuitenkin paljon heikompi kuin Suomen täydellinen järjestys.
+- **T2 Täsmällisyys ("vain jos"): ei ratkea.**
+  - Viennin osuuden mediaanimuutos oli +9,4 % niissä tapauksissa, joissa reaalinen kurssi heikkeni
+    vähintään 10 % (n = 46).
+  - Vertailuryhmässä, jossa reaalinen heikkeneminen oli alle 5 % (n = 16), mediaanimuutos oli +8,3 %
+    (p = 0,41).
+  - Vientiosuus kasvoi siis tyypillisesti myös silloin, kun reaalinen kurssi ei heikentynyt.
+- **Tila:** ehdokas. Yksi asetelma tukee.
+- **Tulkinta:**
+  - Annos–vaste-yhteys on yleinen: suurempi reaalinen heikkeneminen tarkoittaa suurempaa
+    vientiosuuden kasvua.
+  - Väitteen jyrkkä muoto ei saanut tukea: ei voida sanoa, että devalvaatio auttaisi *vain*
+    reaalisen heikkenemisen kautta.
+  - Valuuttakriisin jälkeen vientiosuus kasvoi tyypillisesti myös muista syistä, esimerkiksi koska
+    kotimainen kysyntä ja tuonti supistuivat kriisissä ja BKT laski.
+  - Suomen 1957- ja 1982-tapausten ilman reaalista heikkenemistä ei siis tarvitse olla yleinen sääntö.

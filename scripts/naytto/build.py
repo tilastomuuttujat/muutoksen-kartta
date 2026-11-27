@@ -1699,6 +1699,57 @@ def gmd_series(iso, var):
     return {int(y): float(v) for y, v in zip(d["year"], d[var])}
 
 
+def h24e():
+    """H24e (docs/naytto-rekisteri.md): valuuttakriisit muissa maissa; reaalinen vs. pelkkä nimellinen heikkeneminen → vienti/BKT."""
+    import pandas as pd
+    path = os.environ.get("GMD_DTA", os.path.join("/tmp", "GMD_2026_09.dta"))
+    if not os.path.exists(path):
+        urllib.request.urlretrieve(GMD_URL, path)
+    d = pd.read_stata(path, columns=["ISO3", "countryname", "year", "CurrencyCrisis", "REER", "exports_GDP", "infl"])
+    d = d[d["year"].between(1950, 2025)]
+    ev = []
+    for iso, g in d.groupby("ISO3"):
+        if iso == "FIN":
+            continue
+        g = g.set_index("year")
+        cc, R, X, I = g["CurrencyCrisis"].to_dict(), g["REER"].to_dict(), g["exports_GDP"].to_dict(), g["infl"].to_dict()
+        for t in range(1960, 2016):
+            if cc.get(t) == 1 and cc.get(t - 1) == 0 and all(cc.get(s_) != 1 for s_ in range(t - 5, t)):
+                win = range(t - 1, t + 6)
+                if all(pd.notna(R.get(s_)) and pd.notna(X.get(s_)) and R.get(s_) > 0 and X.get(s_) > 0 for s_ in win) and \
+                   all(pd.notna(I.get(s_)) and I.get(s_) < 25 for s_ in win):
+                    ev.append({"iso": iso, "country": str(g["countryname"].iloc[0]), "t": t,
+                               "x": math.log(R[t + 5] / R[t - 1]), "y": math.log(X[t + 5] / X[t]), "i": math.log(R[t + 1] / R[t - 1])})
+    rng = np.random.default_rng(1)
+    def rank(v):
+        o = np.argsort(v, kind="stable"); r = np.empty(len(v)); r[o] = np.arange(len(v)); return r
+    xs, ys = np.array([e["x"] for e in ev]), np.array([e["y"] for e in ev])
+    rx, ry = rank(xs), rank(ys)
+    rho = float(np.corrcoef(rx, ry)[0, 1])
+    perm = np.array([np.corrcoef(rx, rng.permutation(ry))[0, 1] for _ in range(10000)])
+    p1 = float(np.mean(perm <= rho))
+    r1 = "tukee" if rho < 0 and p1 < 0.05 else "kumoaa" if rho >= 0 else "ei-ratkea"
+    real = [e["y"] for e in ev if e["i"] <= math.log(0.90)]
+    nom = [e["y"] for e in ev if e["i"] > math.log(0.95)]
+    diff = float(np.median(real) - np.median(nom))
+    pool = np.array(real + nom); k = len(real)
+    pd_ = []
+    for _ in range(10000):
+        q = rng.permutation(pool)
+        pd_.append(np.median(q[:k]) - np.median(q[k:]))
+    p2 = float(np.mean(np.array(pd_) >= diff))
+    r2x = "tukee" if diff > 0 and p2 < 0.05 else "kumoaa" if diff <= 0 else "ei-ratkea"
+    pc = lambda v: round((math.exp(v) - 1) * 100, 1)
+    t1 = {"id": "annos", "design": "annos", "result": r1, "date": str(date.today()),
+          "summary": f"{len(ev)} valuuttakriisiä {len({e['iso'] for e in ev})} maassa (ei Suomea): jäljelle jäänyt reaalinen muutos t0−1 → t0+5 vs. viennin osuuden muutos t0 → t0+5, rho = {rho:.2f} (permutaatio-p = {p1:.4f})",
+          "detail": {"rho": round(rho, 3), "p": round(p1, 4), "n": len(ev), "countries": len({e['iso'] for e in ev}),
+                     "events": [{"iso": e["iso"], "country": e["country"], "t": e["t"], "x": pc(e["x"]), "y": pc(e["y"]), "i": pc(e["i"])} for e in ev]}}
+    t2 = {"id": "vainjos", "design": "tasmallisyys", "result": r2x, "date": str(date.today()),
+          "summary": f"Viennin osuuden muutos viidessä vuodessa: välitön reaalinen heikkeneminen t0−1 → t0+1 ≥ 10 % (n = {len(real)}) mediaani {pc(float(np.median(real))):+.1f} %, pelkkä nimellinen (alle 5 %, n = {len(nom)}) mediaani {pc(float(np.median(nom))):+.1f} %; permutaatio-p = {p2:.4f}",
+          "detail": {"realN": len(real), "nomN": len(nom), "realMedian": pc(float(np.median(real))), "nomMedian": pc(float(np.median(nom))), "p": round(p2, 4)}}
+    return {"tests": [t1, t2], "predictions": []}
+
+
 def pension_age(c):
     """Alin vanhuuseläkeikä vuosina syntymävuoden mukaan (vuoden 2017 uudistus)."""
     if c <= 1954:
@@ -2102,6 +2153,7 @@ def main():
     out["hypotheses"]["h24b"] = out["hypotheses"]["h24"].pop("kesto")
     out["hypotheses"]["h24c"] = out["hypotheses"]["h24"].pop("kierre")
     out["hypotheses"]["h24d"] = out["hypotheses"]["h24"].pop("reaali")
+    out["hypotheses"]["h24e"] = h24e()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
