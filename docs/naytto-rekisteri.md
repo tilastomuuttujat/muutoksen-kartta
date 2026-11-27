@@ -1523,3 +1523,34 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Valuuttakriisin jälkeen vientiosuus kasvoi tyypillisesti myös muista syistä, esimerkiksi koska
     kotimainen kysyntä ja tuonti supistuivat kriisissä ja BKT laski.
   - Suomen 1957- ja 1982-tapausten ilman reaalista heikkenemistä ei siis tarvitse olla yleinen sääntö.
+
+## H24f. Kriisin jälkeen vienti kasvoi, eikä vain BKT supistunut
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Jatkoa H24e:lle.
+  - H24e:ssä viennin osuus kasvoi kriisin jälkeen myös ilman reaalista heikkenemistä. Yksi selitys
+    on, että osuus kasvoi vain siksi, että BKT supistui.
+- **Väite:** valuuttakriisin jälkeinen viennin BKT-osuuden nousu johtui pääosin viennin kasvusta
+  eikä BKT:n heikosta kehityksestä.
+- **Hajotelma:**
+  - Viennin osuuden log-muutos = E − G.
+  - E = log-muutos luvussa vienti / BKT-deflaattori, eli viennin arvo kotimaisina hyödykkeinä.
+  - G = reaalisen BKT:n log-muutos (rGDP).
+  - Jakso on t0 → t0 + 5.
+- **Aineisto:** Global Macro Database 2026_09 (exports, deflator, rGDP, CurrencyCrisis, infl).
+  - Tapahtumat ovat samat kuin H24e:ssä: 78 kriisiä, ei Suomea.
+- **Normaali taso:**
+  - Kullekin maalle lasketaan saman maan tavallisten viiden vuoden jaksojen E:n ja G:n mediaanit.
+  - Tavallisen jakson alkuvuosi s on 1960–2015, jaksolla s − 1 … s + 5 ei ole kriisimerkintää,
+    kaikki sarjat ovat saatavilla, ja inflaatio on alle 25 %.
+  - Tapahtuma otetaan mukaan, jos maalla on vähintään 5 tavallista jaksoa.
+  - Poikkeamat ovat E_dev = E − maan normaali E ja G_dev = G − maan normaali G.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Luonnollinen koe | E_dev tapahtumien yli: kasvoiko vienti tavallista enemmän? Merkkitesti, yksisuuntainen | Tukee: mediaani > 0 ja p < 0,05. Kumoaa: mediaani ≤ 0. Muuten: ei ratkea |
+| T2 Täsmällisyys | E_dev + G_dev tapahtumien yli: ylittikö viennin lisäkasvu BKT:n vajeen? Merkkitesti | Tukee: mediaani > 0 ja p < 0,05. Kumoaa: mediaani ≤ 0, eli BKT:n vaje oli vähintään yhtä suuri. Muuten: ei ratkea |
+
+- **Rajaus:**
+  - BKT-deflaattorilla deflatoitu vienti sisältää myös vientihintojen nousun suhteessa kotimaisiin
+    hintoihin, mikä on devalvaation välitön hintavaikutus. Se ei siis ole puhdas määrämittari.
+  - Tulosta luetaan muodossa: kasvoiko viennin arvo kotimaisina hyödykkeinä tavallista enemmän.
