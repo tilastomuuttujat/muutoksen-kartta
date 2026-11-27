@@ -76,7 +76,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h16: { tests: Test[]; predictions: Prediction[] }; h17: { tests: Test[]; predictions: Prediction[] }; h18: { tests: Test[]; predictions: Prediction[] }; h19: { tests: Test[]; predictions: Prediction[] }; h20: { tests: Test[]; predictions: Prediction[] }; h21: { tests: Test[]; predictions: Prediction[] }; h22: { tests: Test[]; predictions: Prediction[] }; h23: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h16: { tests: Test[]; predictions: Prediction[] }; h17: { tests: Test[]; predictions: Prediction[] }; h18: { tests: Test[]; predictions: Prediction[] }; h19: { tests: Test[]; predictions: Prediction[] }; h20: { tests: Test[]; predictions: Prediction[] }; h21: { tests: Test[]; predictions: Prediction[] }; h22: { tests: Test[]; predictions: Prediction[] }; h23: { tests: Test[]; predictions: Prediction[] }; h24: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -463,6 +463,19 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "63-vuotiaiden työllisyys nousi 32 prosentista (2017) 61 prosenttiin (2024) sitä mukaa kuin alin eläkeikä nousi, ja 64-vuotiaiden nousu kiihtyi 2023, kun nousu ehti heidän ikäänsä (jo aiemmin 63-vuotiaina työssä pysyneet jatkoivat osin myös 64-vuotiaina). Ikä- ja vuosivaikutusten jälkeen täysi annos nosti työllisyyttä 19 ja laski eläkeläisten osuutta 32 prosenttiyksikköä. Ero tarkoittaa, että osa eläkkeeltä pois jääneistä ei ollut töissä vaan esimerkiksi työttömänä.",
     next: "Ennuste vuodelle 2025 on lukittu: 64-vuotiaiden annos nousee 0,50:stä 0,75:een. Jos toteutunut työllisyysaste osuu väliin, hypoteesi nousee vahvasti tuetuksi. 65-vuotiaiden annos nousee nollasta vasta 2030 (syntyneet 1965).",
+  },
+  {
+    id: "h24",
+    title: "Devalvaatiot lisäsivät vientiä",
+    claim: "Markan devalvaatiot (1957, 1967, 1977–78, 1982, 1991–92) paransivat vientiteollisuuden kilpailukykyä: viennin osuus taloudesta kasvoi ja vienti suhteessa tuontiin kasvoi kahden vuoden kuluessa.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. Uusi teema.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h24.tests,
+    predictions: [],
+    reading:
+      "Jokaisen viiden devalvaation jälkeen viennin osuus BKT:sta kasvoi tavallista enemmän, keskimäärin 16 % kahdessa vuodessa, enemmän kuin yhdessäkään satunnaisessa vertailuvuosien joukossa. Myös määrät kertovat samaa: vienti kasvoi suhteessa tuontiin. Suurin vaikutus oli 1991–92, mutta tulos pysyy ilman sitäkin (jälkikäteinen tarkistus). Testi koskee kahta vuotta; se ei kerro, kuinka pitkään kilpailukykyetu säilyi palkkojen ja hintojen noustessa.",
+    next: "Kesto: säilyikö viennin osuus koholla viiden vuoden päästä, vai söikö inflaatio edun (devalvaatiokierre)? Vertailu reaalisen valuuttakurssin kanssa vaatisi kauppapainotetun kurssin ennen vuotta 1970.",
   },
   {
     id: "h2",

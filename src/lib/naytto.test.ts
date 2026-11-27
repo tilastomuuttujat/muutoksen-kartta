@@ -456,6 +456,16 @@ describe("pilot results", () => {
     expect([e1!.year, e1!.point, e1!.lo, e1!.hi, e1!.registered]).toEqual([2025, 54.1, 52.6, 55.3, "2026-11-27"]);
     expect(e1!.basis).toContain("ennuste olisi 49,3");
   });
+  it("H24 numbers quoted in the register", () => {
+    const [t1, t2, t3] = NAYTTO.hypotheses.h24.tests as { result: string; detail: Record<string, unknown> }[];
+    expect(t1!.result).toBe("tukee");
+    expect(t1!.detail).toMatchObject({ pctChange: 16.3, percentile: 1, placebo: 46, placeboMedianPct: -1, events: { "1957": 4.6, "1967": 22.6, "1977": 10, "1982": 2.1, "1991": 47.7 }, no1991: { pctChange: 9.5, percentile: 0.988 } });
+    expect(t2!.result).toBe("tukee");
+    expect(t2!.detail).toEqual({ above: 5, of: 5 });
+    expect(t3!.result).toBe("tukee");
+    expect(t3!.detail).toMatchObject({ pctChange: 11.5, percentile: 1, placebo: 34, events: { "1977": 3.9, "1982": 5.8, "1991": 26.2 }, no1991: { pctChange: 4.8, percentile: 0.972 } });
+    expect(statusOfHypothesis(hypothesis("h24")!)).toBe("tuettu");
+  });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
       expect(p.lo).toBeLessThan(p.point);

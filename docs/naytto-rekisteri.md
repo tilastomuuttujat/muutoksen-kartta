@@ -1268,3 +1268,35 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
     mittaa määriä.
   - Vuoden 1991 ikkunaan osuvat myös Neuvostoliiton kaupan romahdus ja lama.
   - Vuoden 1977 ikkunaan osuu öljykriisin jälkeinen elpyminen.
+
+## H24: tulos
+
+- **Laskettu:** 27.11.2026.
+- **Aineistotarkennus:** BKT käyvin hinnoin vuosilta 1948–1959 on taulukossa eri sarjakoodilla
+  (ntp-CP1860, milj. mk) kuin vienti (ntp-CP1948, milj. mk).
+  - Yksikkö on sama, joten osuus lasketaan niiden suhteena.
+  - Vuodesta 1960 alkaen kummallakin on sama sarjakoodi.
+- **T1 Luonnollinen koe: tukee.** Viennin BKT-osuus kasvoi kahdessa vuodessa devalvaatiosta
+  keskimäärin 16,3 %. Tämä on suurempi kuin yhdessäkään 20 000 lumejoukosta (46 lumeikkunaa).
+
+  | Tapahtuma | Viennin BKT-osuuden muutos |
+  |---|---|
+  | 1957 | +5 % |
+  | 1967 | +23 % |
+  | 1977 | +10 % |
+  | 1982 | +2 % |
+  | 1991 | +48 % |
+
+- **T2 Toisto: tukee.** Kaikki 5 devalvaatiota ylittivät lumeikkunoiden mediaanin (−1,0 %).
+- **T3 Täsmällisyys: tukee.** Viennin määrä suhteessa tuonnin määrään kasvoi keskimäärin 11,5 %
+  (1977 +4 %, 1982 +6 %, 1991 +26 %). Kasvu oli suurempi kuin kaikissa lumejoukoissa (34
+  lumeikkunaa).
+- **Tila:** tuettu. Kolme asetelmaa tukee, ja niistä yksi on vahva.
+- **Jälkikäteinen herkkyystarkistus** (ei rekisteröity, ei vaikuta tilaan): ilman vuotta 1991
+  - T1:n muutos on +9,5 % (persentiili 98,8 %).
+  - T3:n muutos on +4,8 % (persentiili 97,2 %).
+  - Tulos ei siis nojaa pelkästään vuoden 1991 kriisiin ja kellutukseen.
+- **Rajaus:**
+  - Vaikutuksen kesto testattiin vain kahden vuoden ikkunassa. Myöhempi kehitys, kuten palkkojen ja
+    hintojen nousu, joka söi kilpailukykyetua, jää testin ulkopuolelle.
+  - Vuoden 1982 vaikutus oli pieni (+2 %).

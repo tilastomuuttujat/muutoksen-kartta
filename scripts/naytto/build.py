@@ -1761,6 +1761,64 @@ def h23():
     return {"tests": [t1, t2], "predictions": [pred]}
 
 
+def h24():
+    """H24 (docs/naytto-rekisteri.md): devalvaatiot 1957–1991 → viennin osuus ja nettovienti (määrät)."""
+    ids, d = px("ntp/15ai.px", [("toimiala_79_20180101", ["SSS"]), ("taloustoimi_1_20180101", ["B1GMH", "P6K", "P7R"]),
+                                 ("contentscode", ["ntp-CP1860", "ntp-CP1948", "ntp-CP1960", "ntp-CP1975", "ntp-R2015P"]), ("timeperiod_y", "*")])
+    it, ic, iy = ids.index("taloustoimi_1_20180101"), ids.index("contentscode"), ids.index("timeperiod_y")
+    V = {}
+    for k, v in d.items():
+        if v:
+            V.setdefault((k[it], k[ic]), {})[int(k[iy])] = float(v)
+    share = {}
+    for code, y0, y1 in (("ntp-CP1948", 1948, 1959), ("ntp-CP1960", 1960, 1974), ("ntp-CP1975", 1975, 2025)):
+        for y in range(y0, y1 + 1):
+            gcode = "ntp-CP1860" if code == "ntp-CP1948" else code  # BKT 1948–1959 on sarjassa CP1860 (sama yksikkö)
+            if y in V.get(("P6K", code), {}) and y in V.get(("B1GMH", gcode), {}):
+                share[y] = V[("P6K", code)][y] / V[("B1GMH", gcode)][y]
+    ex, im = V[("P6K", "ntp-R2015P")], V[("P7R", "ntp-R2015P")]
+    net = {y: math.log(ex[y]) - math.log(im[y]) for y in ex if y in im}
+    lsh = {y: math.log(v) for y, v in share.items()}
+    rng = np.random.default_rng(1)
+
+    def test(series, events, first):
+        ch = lambda t: series[t + 2] - series[t] if t in series and t + 2 in series else None
+        obs = [ch(t) for t in events]
+        plac = [c for t in range(first, 2024) if (c := ch(t)) is not None and all(t + 2 < e or t > e + 2 for e in events)]
+        m = float(np.mean(obs))
+        draws = np.array([np.mean(rng.choice(plac, len(events), replace=False)) for _ in range(20000)])
+        pct = float(np.mean(draws < m))
+        med = float(np.median(plac))
+        return {"mean": round(m, 4), "pctChange": round((math.exp(m) - 1) * 100, 1), "percentile": round(pct, 3),
+                "placebo": len(plac), "events": {str(t): round((math.exp(o) - 1) * 100, 1) for t, o in zip(events, obs)},
+                "aboveMedian": sum(1 for o in obs if o > med), "placeboMedianPct": round((math.exp(med) - 1) * 100, 1)}
+    E5, E3 = [1957, 1967, 1977, 1982, 1991], [1977, 1982, 1991]
+    a = test(lsh, E5, 1953)
+    c = test(net, E3, 1976)
+    # Jälkikäteinen herkkyystarkistus (ei rekisteröity): ilman vuotta 1991; lumeikkunat samat kuin päätestissä.
+    def without(series, events, all_events, first):
+        ch = lambda t: series[t + 2] - series[t] if t in series and t + 2 in series else None
+        plac = [cc for t in range(first, 2024) if (cc := ch(t)) is not None and all(t + 2 < e or t > e + 2 for e in all_events)]
+        m = float(np.mean([ch(t) for t in events]))
+        draws = np.array([np.mean(rng.choice(plac, len(events), replace=False)) for _ in range(20000)])
+        return {"pctChange": round((math.exp(m) - 1) * 100, 1), "percentile": round(float(np.mean(draws < m)), 3)}
+    a["no1991"] = without(lsh, E5[:-1], E5, 1953)
+    c["no1991"] = without(net, E3[:-1], E3, 1976)
+    res = lambda x: "tukee" if x["mean"] > 0 and x["percentile"] >= 0.95 else "kumoaa" if x["mean"] <= 0 else "ei-ratkea"
+    k = a["aboveMedian"]
+    r2_ = "tukee" if k == 5 else "kumoaa" if k <= 2 else "ei-ratkea"
+    ev = lambda x: ", ".join(f"{t} {v:+.0f} %" for t, v in x["events"].items())
+    t1 = {"id": "osuus", "design": "luonnollinen", "result": res(a), "date": str(date.today()),
+          "summary": f"Viennin BKT-osuus kahdessa vuodessa devalvaatiosta: keskimäärin {a['pctChange']:+.1f} % ({ev(a)}); suurempi kuin {a['percentile'] * 100:.0f} %:ssa lumejoukoista ({a['placebo']} lumeikkunaa)",
+          "detail": {**a, "share": sorted((y, round(v * 100, 2)) for y, v in share.items())}}
+    t2 = {"id": "toisto", "design": "toisto", "result": r2_, "date": str(date.today()),
+          "summary": f"{k}/5 devalvaatiota ylitti lumeikkunoiden mediaanin ({a['placeboMedianPct']:+.1f} %)", "detail": {"above": k, "of": 5}}
+    t3 = {"id": "maarat", "design": "tasmallisyys", "result": res(c), "date": str(date.today()),
+          "summary": f"Viennin määrä suhteessa tuonnin määrään kahdessa vuodessa: keskimäärin {c['pctChange']:+.1f} % ({ev(c)}); suurempi kuin {c['percentile'] * 100:.0f} %:ssa lumejoukoista ({c['placebo']} lumeikkunaa)",
+          "detail": c}
+    return {"tests": [t1, t2, t3], "predictions": []}
+
+
 def h11():
     """H11 (docs/naytto-rekisteri.md): ulkomaan kansalaisten osuus → Suomen kansalaisten työllisyys ja työttömyys."""
     regions = ["MK01", "MK02", "MK04", "MK05", "MK06", "MK07", "MK08", "MK09", "MK10", "MK11", "MK12", "MK13", "MK14", "MK15", "MK16", "MK17", "MK18", "MK19"]
@@ -1938,6 +1996,7 @@ def main():
     out["hypotheses"]["h21"] = h21()
     out["hypotheses"]["h22"] = h22()
     out["hypotheses"]["h23"] = h23()
+    out["hypotheses"]["h24"] = h24()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
