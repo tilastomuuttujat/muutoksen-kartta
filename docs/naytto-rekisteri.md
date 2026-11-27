@@ -104,3 +104,23 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Luottamuksen yhdistetty r = −0,23 (viive 1 v, p = 0,08) eli väärä etumerkki.
   - Naisten 25–34 työttömyys samoissa maissa ja samoina vuosina: r = −0,41.
 - **Tulkinta:** syntyvyys ei näytä seuraavan yleistä talousmielialaa vaan työmarkkinatilannetta.
+
+## H1c. Nuorten aikuisten työn epävarmuus → syntyvyys (tarkennus)
+
+- **Kirjattu:** 27.11.2026, H1:n ja H1b:n testien jälkeen ja ennen alla olevan testin laskentaa.
+- **Syy:**
+  - Syntyvyys seurasi koko maan nuorten naisten työttömyyttä (toisto), mutta ei alueen omaa
+    työttömyyttä (H1, annos–vaste).
+  - Se ei myöskään seurannut yleistä talousmielialaa (H1b, odotustesti).
+- **Väite:** syntyvyys seuraa nuorten aikuisten työn epävarmuutta koko maassa. Määräaikaisuus mittaa
+  epävarmuutta työttömyyttä suoremmin, koska se koskee myös niitä, joilla on työ.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T5 Määräaikaisuus | Eurostat lfsa_etpgan: määräaikaisten osuus palkansaajista, naiset 25–34, kaikki kansalaisuudet. Suomi, Ruotsi, Norja ja Tanska 1995–. Menetelmä kuten H1:n toistotestissä (rajaus, AR(1)-suodatus, viive 1–2 v, Šidák, maat yhdessä). Verrataan naisten 25–34 työttömyyteen samoissa maissa ja samoina vuosina. | Tukee: määräaikaisuuden yhdistetty r < 0, p < 0,05 ja \|r\| ≥ työttömyyden \|r\|. Kumoaa: r ≥ 0. Muuten: ei ratkea |
+
+- **Lisätieto, ei vaikuta tulokseen:**
+  - Tulokset maittain.
+  - Määräaikaisuuden osittaiskorrelaatio, kun työttömyys on vakioitu.
+- **Tunnettu rajoite:** työvoimatutkimuksen menetelmämuutokset (Suomessa 2021) voivat näkyä
+  yksittäisen vuoden muutoksena. Rajaus 5–95 %:iin vaimentaa niitä.
