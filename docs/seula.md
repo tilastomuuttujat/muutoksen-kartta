@@ -55,3 +55,21 @@ Pari on **jyvä** vain, jos se läpäisee kaikki portaat.
 - Aikajaossa sama yhteys voi muuttua ajan myötä, jolloin aito yhteys voi jäädä vahvistumatta.
 - Seula ei tunnista kolmatta tekijää.
 - Jyvä on ehdokas, joka kirjataan rekisteriin ja testataan vahvemmilla asetelmilla.
+
+## Lisäys 27.11.2026 (ensimmäisen ajon jälkeen): varoitusmerkinnät
+
+Seulan säännöt ja jyvät pysyvät ennallaan. Jyville lisätään merkinnät, jotka kertovat tunnetuista
+syistä, joiden vuoksi yhteys voi olla aito mutta epäkiinnostava. Merkinnät perustuvat sarjojen
+nimiin ja yksiköihin:
+
+- **Nimellinen pari:** molemmat sarjat ovat rahamääräisiä käyvin hinnoin (esim. "käyvin hinnoin",
+  "milj. €", "nimellis-", palkkasumma). Yhteinen hintataso voi selittää yhteyden.
+- **BKT-suhde:** toinen sarjoista on suhde BKT:hen. Nimittäjä vaihtelee suhdanteen mukana, jolloin
+  sarja liikkuu suhdanteen eikä osoittajan takia.
+- **Sama tilinpito:** molemmat ovat kansantalouden tilinpidon eriä (koodit B1G, P3, P5, P6, P7, D1,
+  D5, D6, E1, E2, S1 …). Ne ovat saman kirjanpidon osia.
+- **Lukumäärä:** seuraus on henkilöiden lukumäärä ja syy väestöön tai syntyneisiin liittyvä. Määrä
+  seuraa pohjaväestöä.
+
+Ilman merkintää olevat jyvät näytetään ensin. Merkityt eivät ole hylättyjä, ja ne näytetään
+erikseen.
