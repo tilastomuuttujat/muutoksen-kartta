@@ -1381,3 +1381,27 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
     mittari on karkea.
   - Viidellä havainnolla testi on hyvin heikko. Tulos voi korkeintaan nostaa hypoteesin
     ehdokkaaksi.
+
+## H24c: tulos
+
+- **Laskettu:** 27.11.2026.
+
+  | Tapahtuma | Hinnat t0 → t0 + 3 | Palkat t0 → t0 + 3 | Kuluminen t0 + 2 → t0 + 5 |
+  |---|---|---|---|
+  | 1957 | +14 % | +16 % | −5 % |
+  | 1967 | +14 % | +29 % | +6 % |
+  | 1977 | +29 % | +33 % | −3 % |
+  | 1982 | +23 % | +31 % | −15 % |
+  | 1991 | +6 % | +4 % | +16 % |
+
+- **T1 Inflaatio: ei ratkea.** rho = −0,70 (tarkka p = 0,12, n = 5). Suunta oli ennustettu, mutta
+  rajaa −0,9 ei saavutettu.
+- **T2 Palkat: ei ratkea.** rho = −0,50 (p = 0,23).
+- **Tila:** oletus.
+- **Tulkinta:**
+  - Ääripäät sopivat kierreselitykseen:
+    - Vuonna 1991 hinnat (+6 %) ja palkat (+4 %) nousivat vähiten, ja etu kasvoi eniten.
+    - Vuonna 1982 hinnat ja palkat nousivat nopeasti, ja etu kului eniten.
+  - Vuosi 1967 ei sovi palkkaselitykseen: palkat nousivat 29 %, mutta etu säilyi.
+  - Viisi tapausta ei riitä erottamaan kierrettä muista syistä, kuten idänkaupasta tai
+    maailmankaupan suhdanteista.

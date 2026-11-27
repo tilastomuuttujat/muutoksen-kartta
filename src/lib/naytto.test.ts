@@ -475,6 +475,17 @@ describe("pilot results", () => {
     expect(statusOfHypothesis(hypothesis("h24b")!)).toBe("ehdokas");
     expect(statusOfHypothesis(hypothesis("h24")!)).toBe("tuettu");
   });
+  it("H24c numbers quoted in the register", () => {
+    const [t1, t2] = NAYTTO.hypotheses.h24c.tests as { result: string; detail: { rho: number; p: number; rows: { event: number; exposurePct: number; wearPct: number }[] } }[];
+    expect(t1!.result).toBe("ei-ratkea");
+    expect([t1!.detail.rho, t1!.detail.p]).toEqual([-0.7, 0.117]);
+    expect(t1!.detail.rows.map((r) => Math.round(r.exposurePct))).toEqual([14, 14, 29, 23, 6]);
+    expect(t1!.detail.rows.map((r) => Math.round(r.wearPct))).toEqual([-5, 6, -3, -15, 16]);
+    expect(t2!.result).toBe("ei-ratkea");
+    expect([t2!.detail.rho, t2!.detail.p]).toEqual([-0.5, 0.225]);
+    expect(t2!.detail.rows.map((r) => Math.round(r.exposurePct))).toEqual([16, 29, 33, 31, 4]);
+    expect(statusOfHypothesis(hypothesis("h24c")!)).toBe("oletus");
+  });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
       expect(p.lo).toBeLessThan(p.point);

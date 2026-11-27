@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Kolmekymmentäyksi hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Kolmekymmentäkaksi hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Kahdeksan väitettä kumoutui, viisi on tuettu, seitsemän on ehdokkaita ja yksitoista näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Kahdeksan väitettä kumoutui, viisi on tuettu, seitsemän on ehdokkaita ja kaksitoista näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -259,6 +259,7 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
         caption="Tavaroiden ja palvelujen viennin osuus BKT:sta käyvin hinnoin, % (StatFin 15ai). Katkoviivat: devalvaatiovuodet." />}
       {h.id === "h24b" && t.id === "kesto" && <DevalBars two={(NAYTTO.hypotheses.h24.tests[0]!.detail as unknown as { events: Record<string, number> }).events}
         five={(t.detail as unknown as { events: Record<string, number> }).events} />}
+      {h.id === "h24c" && <WearScatter rows={(t.detail as unknown as { rows: { event: number; exposurePct: number; wearPct: number }[] }).rows} xLabel={t.id === "inflaatio" ? "hintojen nousu t0 → t0+3, %" : "palkkojen nousu t0 → t0+3, %"} />}
       {h.id === "h14" && t.id === "katkos" && <BreakChart detail={t.detail as Break} cfg={{ trend: [1976, 1987], win: [1988, 1991], from: 1960, label: "laki voimaan 1/1988", ticks: [1960, 1976, 1988, 2000, 2025], zeroTicks: [0, 1, 2, 3], caption: "Avioerot 1 000 asukasta kohden (StatFin 121v). Katkoviiva: vuosien 1976–1987 trendi jatkettuna. Poikkeama 1988–1991 oli suurempi kuin kaikissa tavallisissa jaksoissa." }} />}
       {h.id === "h13" && t.id === "suomi" && <DecouplingChart detail={t.detail as { co2: [number, number][]; gdp: [number, number][] }} />}
       {h.id === "h12" && t.id === "toisto" && <CountryCorr h="h12" detail={t.detail as Pooled & Rc} />}
@@ -712,6 +713,30 @@ function MigrationChart({ detail }: { detail: { toSweden: [number, number][]; fr
         {[1945, 1960, 1970, 1980, 1992].map((t) => <text key={t} x={x(t)} y={H - 12} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
       </svg>
       <p className="text-xs text-muted-foreground">Muuttaneet henkilöt vuodessa (Korkiasaari 1993) ja Suomen työttömyysaste (katkoviiva, oma asteikko).</p>
+    </div>
+  );
+}
+
+function WearScatter({ rows, xLabel }: { rows: { event: number; exposurePct: number; wearPct: number }[]; xLabel: string }) {
+  const W = 620, H = 210, L = 50, R = 580, TOP = 14, BOT = 170;
+  const x = (v: number) => L + (v / 40) * (R - L);
+  const y = (v: number) => BOT - ((v + 20) / 40) * (BOT - TOP);
+  const sgn = (v: number) => (v > 0 ? `+${v}` : v < 0 ? `−${-v}` : `${v}`);
+  return (
+    <div className="mt-2 overflow-x-auto">
+      <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[460px] max-w-2xl" role="img" aria-label={`${xLabel} ja viennin osuuden kuluminen: ${rows.map((r) => `${r.event}: ${r.exposurePct} %, ${r.wearPct} %`).join("; ")}`}>
+        <line x1={L} x2={R} y1={y(0)} y2={y(0)} stroke="var(--foreground)" strokeOpacity={0.4} />
+        {[-20, -10, 0, 10, 20].map((t) => <text key={t} x={L - 6} y={y(t) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">{sgn(t)}</text>)}
+        {[0, 10, 20, 30, 40].map((t) => <text key={t} x={x(t)} y={BOT + 16} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
+        <text x={(L + R) / 2} y={H - 6} textAnchor="middle" className="fill-muted-foreground text-[10px]">{xLabel}</text>
+        <text x={L + 4} y={TOP + 2} className="fill-muted-foreground text-[10px]">viennin osuuden muutos t0+2 → t0+5, %</text>
+        {rows.map((r) => (
+          <g key={r.event}>
+            <circle cx={x(r.exposurePct)} cy={y(r.wearPct)} r={5} fill="var(--primary)" />
+            <text x={x(r.exposurePct) + 8} y={y(r.wearPct) + 4} className="fill-foreground text-[11px]">{r.event}</text>
+          </g>
+        ))}
+      </svg>
     </div>
   );
 }

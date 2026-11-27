@@ -1838,7 +1838,44 @@ def h24():
     b2 = {"id": "kuluminen", "design": "tasmallisyys", "result": rl, "date": str(date.today()),
           "summary": f"Muutos vuodesta t0+2 vuoteen t0+5: keskimäärin {kl['pctChange']:+.1f} % ({evs(kl)}); suurempi kuin {kl['percentile'] * 100:.0f} %:ssa lumejoukoista ({kl['placebo']} lumeikkunaa, mediaani {kl['placeboMedianPct']:+.1f} %)",
           "detail": kl}
-    return {"tests": [t1, t2, t3], "predictions": [], "kesto": {"tests": [b1, b2], "predictions": []}}
+    # H24c (rekisteri 27.11.2026): inflaatio ja palkat t0 → t0+3 vs. kuluminen t0+2 → t0+5 (Spearman, tarkka p).
+    ids_c, d_c = px("khi/11xp.px", [("timeperiod_y", "*"), ("contentscode", ["khi-pisteluku"])])
+    cpi = {int(k[ids_c.index("timeperiod_y")]): v for k, v in d_c.items() if v}
+    wage = {}
+    for line in open(os.path.join(D, "values.ndjson")):
+        k_, y_, g_, v_, kind_ = json.loads(line)
+        if k_ == "fi.historical20261026.jst.wage" and v_ is not None:
+            wage[int(y_)] = float(v_)
+    wear = [lsh[t + 5] - lsh[t + 2] for t in E5]
+    import itertools
+    def ranks(v):
+        o = sorted(range(len(v)), key=lambda i: v[i]); r = [0] * len(v)
+        for pos, i in enumerate(o):
+            r[i] = pos
+        return r
+    def spearman(xv, yv):
+        rx, ry = ranks(xv), ranks(yv)
+        return float(np.corrcoef(rx, ry)[0, 1])
+    def rank_test(expo):
+        rho = spearman(expo, wear)
+        perms = [spearman(expo, [wear[i] for i in pp]) for pp in itertools.permutations(range(len(wear)))]
+        p_ = sum(1 for r_ in perms if r_ <= rho + 1e-12) / len(perms)
+        res = "tukee" if rho <= -0.9 + 1e-9 else "kumoaa" if rho >= 0 else "ei-ratkea"
+        return res, {"rho": round(rho, 2), "p": round(p_, 3), "n": len(E5),
+                     "rows": [{"event": t, "exposurePct": round((math.exp(e) - 1) * 100, 1), "wearPct": round((math.exp(w) - 1) * 100, 1)} for t, e, w in zip(E5, expo, wear)]}
+    infl = [math.log(cpi[t + 3] / cpi[t]) for t in E5]
+    wg = [math.log(wage[t + 3] / wage[t]) for t in E5]
+    rc1, dc1 = rank_test(infl)
+    rc2, dc2 = rank_test(wg)
+    rowtxt = lambda dd: ", ".join(f"{r_['event']} {r_['exposurePct']:.0f} %" for r_ in dd["rows"])
+    c1 = {"id": "inflaatio", "design": "annos", "result": rc1, "date": str(date.today()),
+          "summary": f"Hintojen nousu kolmessa vuodessa devalvaatiosta ({rowtxt(dc1)}) vs. viennin osuuden kuluminen: rho = {dc1['rho']:.2f} (tarkka p = {dc1['p']:.3f}, n = 5)",
+          "detail": dc1}
+    c2 = {"id": "palkat", "design": "annos", "result": rc2, "date": str(date.today()),
+          "summary": f"Palkkojen nousu kolmessa vuodessa devalvaatiosta ({rowtxt(dc2)}) vs. viennin osuuden kuluminen: rho = {dc2['rho']:.2f} (tarkka p = {dc2['p']:.3f}, n = 5)",
+          "detail": dc2}
+    return {"tests": [t1, t2, t3], "predictions": [], "kesto": {"tests": [b1, b2], "predictions": []},
+            "kierre": {"tests": [c1, c2], "predictions": []}}
 
 
 def h11():
@@ -2020,6 +2057,7 @@ def main():
     out["hypotheses"]["h23"] = h23()
     out["hypotheses"]["h24"] = h24()
     out["hypotheses"]["h24b"] = out["hypotheses"]["h24"].pop("kesto")
+    out["hypotheses"]["h24c"] = out["hypotheses"]["h24"].pop("kierre")
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
