@@ -65,3 +65,26 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 - **Tuettu:** vähintään kaksi eri asetelmaa tukee, niistä yksi vahva, eikä mikään kumoa.
 - **Ehdokas:** vähintään yksi testi tukee, eikä mikään kumoa.
 - **Oletus:** ei testejä tai pelkkiä "ei ratkea" -tuloksia.
+
+## H1b / T4 Odotustesti: tarkka määrittely
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Tarkentaa H1b:n testin T4.
+- **Aineisto:**
+  - Eurostat ei_bsco_m, kuluttajien luottamusindikaattori (BS-CSMCI), kausitasoitettu saldoluku,
+    vuoden kuukausien keskiarvo.
+  - Maat Suomi, Ruotsi ja Tanska. Norjan tieto ei ole Eurostatissa, eikä OECD:n rajapinta ole
+    tavoitettavissa.
+  - Syntyvyys ja työttömyys kuten H1:ssä.
+- **Menetelmä:** sama kuin H1:n toistotestissä.
+  - Vuosimuutokset rajataan 5–95 %:iin, ja sarjan oma jatkuvuus poistetaan AR(1)-suodatuksella.
+  - Viive 1–2 vuotta, Šidákin korjaus.
+  - Kolme maata yhdistetään.
+- **Reilu vertailu:** luottamusta ja naisten 25–34 työttömyyttä verrataan samoissa maissa ja samoina
+  vuosina (vuodet, joilta molemmat ovat saatavilla, 1995–).
+- **Ennuste, jos H1b pitää:** luottamuksen nousua seuraa syntyvyyden nousu (r > 0). Yhteys on
+  vähintään yhtä vahva kuin työttömyyden.
+- **Tukee:** luottamuksen yhdistetty r > 0, p < 0,05 ja |r| ≥ työttömyyden |r|.
+- **Kumoaa:** luottamuksen yhdistetty r ≤ 0.
+- **Muuten:** ei ratkea.
+- **Lisätieto, ei vaikuta tulokseen:** sama laskenta koko luottamussarjan ajalta (1985–) näytetään
+  erikseen.
