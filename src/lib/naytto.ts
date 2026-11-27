@@ -459,10 +459,10 @@ export const HYPOTHESES: Hypothesis[] = [
     preregistered: "Kirjattu ennen laskentaa. Uusi teema.",
     map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
     tests: NAYTTO.hypotheses.h23.tests,
-    predictions: [],
+    predictions: NAYTTO.hypotheses.h23.predictions,
     reading:
       "63-vuotiaiden työllisyys nousi 32 prosentista (2017) 61 prosenttiin (2024) sitä mukaa kuin alin eläkeikä nousi, ja 64-vuotiaiden nousu kiihtyi 2023, kun nousu ehti heidän ikäänsä (jo aiemmin 63-vuotiaina työssä pysyneet jatkoivat osin myös 64-vuotiaina). Ikä- ja vuosivaikutusten jälkeen täysi annos nosti työllisyyttä 19 ja laski eläkeläisten osuutta 32 prosenttiyksikköä. Ero tarkoittaa, että osa eläkkeeltä pois jääneistä ei ollut töissä vaan esimerkiksi työttömänä.",
-    next: "Annos ennustaa jatkoa: vuonna 2025 64-vuotiaiden annos on 0,75 ja 65-vuotiaiden 0,25. Ennusteen voisi lukita ennen kuin vuoden 2025 tiedot julkaistaan.",
+    next: "Ennuste vuodelle 2025 on lukittu: 64-vuotiaiden annos nousee 0,50:stä 0,75:een. Jos toteutunut työllisyysaste osuu väliin, hypoteesi nousee vahvasti tuetuksi. 65-vuotiaiden annos nousee nollasta vasta 2030 (syntyneet 1965).",
   },
   {
     id: "h2",

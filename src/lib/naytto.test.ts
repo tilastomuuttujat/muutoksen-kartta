@@ -452,6 +452,9 @@ describe("pilot results", () => {
     expect(t2!.result).toBe("tukee");
     expect(t2!.detail.b).toBeCloseTo(-32.2, 1);
     expect(statusOfHypothesis(hypothesis("h23")!)).toBe("tuettu");
+    const [e1] = NAYTTO.hypotheses.h23.predictions;
+    expect([e1!.year, e1!.point, e1!.lo, e1!.hi, e1!.registered]).toEqual([2025, 54.1, 52.6, 55.3, "2026-11-27"]);
+    expect(e1!.basis).toContain("ennuste olisi 49,3");
   });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {

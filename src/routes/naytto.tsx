@@ -131,7 +131,7 @@ function HypothesisCard({ h }: { h: Hypothesis }) {
         {h.tests.map((t) => <TestRow key={t.id} h={h} t={t} />)}
       </ol>
 
-      {h.predictions.length > 0 && <Predictions list={h.predictions} />}
+      {h.predictions.length > 0 && (h.id === "h23" ? <EmploymentPrediction p={h.predictions[0]!} /> : <Predictions list={h.predictions} />)}
       {h.id === "h1g" && <MoneyStory />}
 
       <p className="mt-4 text-sm">{h.reading}</p>
@@ -836,6 +836,40 @@ function RegionStrip({ detail }: { detail: Regions }) {
         <text x={R} y={72} textAnchor="end" className="fill-muted-foreground text-[10px]">pienempi lasku →</text>
       </svg>
       <p className="text-xs text-muted-foreground">Verenkiertoelinten kuolleisuuden suhde muihin tauteihin, muutos 1969–71 → 1977–86 (logaritminen), 23 hyvinvointialuetta. Pohjois-Savo oli Pohjois-Karjala-projektin vertailualue.</p>
+    </div>
+  );
+}
+
+function EmploymentPrediction({ p }: { p: Prediction }) {
+  const obs = (NAYTTO.hypotheses.h23.tests[0]!.detail as unknown as { employment: Record<string, [number, number][]> }).employment["64"]!.filter(([yy]) => yy >= 2010);
+  const last = obs.at(-1)!;
+  const noEffect = Number(/b = 0\) ennuste olisi ([\d,]+)/.exec(p.basis)?.[1]?.replace(",", "."));
+  const W = 620, H = 200, L = 46, R = 470, TOP = 12, BOT = 168;
+  const x = (yy: number) => L + ((yy - 2010) / (p.year - 2010)) * (R - L);
+  const lo = 15, hi = 60;
+  const y = (v: number) => BOT - ((v - lo) / (hi - lo)) * (BOT - TOP);
+  const state = predictionState(p);
+  return (
+    <div className="mt-4 rounded-lg border p-3">
+      <h3 className="text-sm font-semibold">Päivätty ennuste · {state === "odottaa" ? "odottaa vuoden 2025 tietoa" : state === "osui" ? "osui" : "meni ohi"}</h3>
+      <p className="text-xs text-muted-foreground">64-vuotiaiden työllisyysaste {p.year}: {nf(p.point, 1)} % (80 %:n väli {nf(p.lo, 1)}–{nf(p.hi, 1)}). Kirjattu {p.registered.split("-").reverse().map(Number).join(".")}. {p.basis}</p>
+      <div className="mt-2 overflow-x-auto">
+        <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[460px] max-w-2xl" role="img"
+          aria-label={`64-vuotiaiden työllisyysaste 2010–${last[0]} ja ennuste ${p.year}: ${nf(p.point, 1)} % (${nf(p.lo, 1)}–${nf(p.hi, 1)})`}>
+          {[20, 30, 40, 50, 60].map((t) => <text key={t} x={L - 6} y={y(t) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">{t}</text>)}
+          <path d={obs.map(([a, v], i) => `${i ? "L" : "M"}${x(a)},${y(v)}`).join(" ")} fill="none" stroke="var(--foreground)" strokeOpacity={0.7} strokeWidth={2} />
+          <path d={`M${x(last[0])},${y(last[1])} L${x(p.year)},${y(p.hi)} L${x(p.year)},${y(p.lo)} Z`} fill="var(--primary)" fillOpacity={0.15} />
+          <line x1={x(p.year)} x2={x(p.year)} y1={y(p.lo)} y2={y(p.hi)} stroke="var(--primary)" strokeWidth={2} />
+          <circle cx={x(p.year)} cy={y(p.point)} r={4} fill="var(--primary)" />
+          <text x={x(p.year) + 8} y={y(p.point) + 4} className="fill-primary text-[11px] font-semibold">{nf(p.point, 1)}</text>
+          {Number.isFinite(noEffect) && <>
+            <circle cx={x(p.year)} cy={y(noEffect)} r={3.5} fill="none" stroke="var(--muted-foreground)" strokeWidth={1.5} />
+            <text x={x(p.year) + 8} y={y(noEffect) + 4} className="fill-muted-foreground text-[10px]">ilman vaikutusta {nf(noEffect, 1)}</text>
+          </>}
+          {p.actual != null && <circle cx={x(p.year)} cy={y(p.actual)} r={5} fill="var(--foreground)" />}
+          {[2010, 2015, 2020, p.year].map((t) => <text key={t} x={x(t)} y={H - 12} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
+        </svg>
+      </div>
     </div>
   );
 }

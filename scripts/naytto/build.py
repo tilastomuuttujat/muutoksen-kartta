@@ -1738,7 +1738,27 @@ def h23():
     t2 = {"id": "elakelaiset", "design": "tasmallisyys", "result": r2_, "date": str(date.today()),
           "summary": f"Eläkeläisten osuus: täysi annos b = {pen['b']:+.1f} %-yks. (p {'< 0.0001' if pen['p'] < 0.0001 else '= ' + format(pen['p'], '.4f')}, {pen['n']} solua)",
           "detail": pen}
-    return {"tests": [t1, t2], "predictions": []}
+    # E1 (rekisteri 27.11.2026): 64-vuotiaiden työllisyysaste 2025, lukitaan; toteutunut täytetään kun 115c sisältää 2025.
+    E = {a: dict(v) for a, v in grid.items()}
+    ctrl = lambda t: float(np.mean([E[a][t] - E[a][t - 1] for a in (60, 61, 62)]))
+    def one_step(a, t, yrs):
+        return E[a][t - 1] + emp["b"] * (dose(a, t) - dose(a, t - 1)) + float(np.mean([ctrl(s) for s in yrs]))
+    errs = [E[a][t] - one_step(a, t, range(max(2006, t - 10), t)) for a in range(60, 68) for t in range(2011, 2025)]
+    q10, q90 = (float(v) for v in np.quantile(errs, [0.1, 0.9]))
+    pt = one_step(64, 2025, range(2015, 2025)) if 2024 in E[64] else None
+    actual = None
+    try:
+        ids2, d2 = px("tyokay/115c.px", [("paaasial_toimin_3_20180101", ["SSS", "11"]), ("sukupuoli_9_20180101", ["SSS"]),
+                                         ("ikaryhma_10_20180101", ["064"]), ("timeperiod_y", ["2025"])])
+        v2 = {k[ids2.index("paaasial_toimin_3_20180101")]: v for k, v in d2.items()}
+        actual = round(v2["11"] / v2["SSS"] * 100, 1)
+    except Exception:
+        pass
+    pred = {"id": "h23-tyollisyys64-2025", "target": "64-vuotiaiden työllisyysaste, %", "year": 2025,
+            "point": round(pt, 1), "lo": round(pt + q10, 1), "hi": round(pt + q90, 1), "registered": "2026-11-27",
+            "basis": f"Vuoden 2024 arvo {E[64][2024]:.1f} + b {emp['b']:.1f} × annoksen nousu 0.25 + yhteinen trendi; 80 %:n väli {len(errs)} takautuvan ennusteen virheistä. Ilman vaikutusta (b = 0) ennuste olisi {pt - emp['b'] * 0.25:.1f}.",
+            "actual": actual}
+    return {"tests": [t1, t2], "predictions": [pred]}
 
 
 def h11():
@@ -1930,6 +1950,9 @@ def main():
                 q = dict(prev.get(p["id"], p))
                 if q.get("actual") is None and q["year"] in fi_tfr and "tfr" in q["id"]:
                     q["actual"] = fi_tfr[q["year"]]
+                # Lukittu väli pysyy; vain toteutunut arvo otetaan uudesta laskennasta.
+                if q.get("actual") is None and p.get("actual") is not None:
+                    q["actual"] = p["actual"]
                 kept.append(q)
             kept += [q for pid, q in prev.items() if pid not in {p["id"] for p in h["predictions"]}]
             h["predictions"] = kept

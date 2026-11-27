@@ -1208,3 +1208,29 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Osa 63-vuotiaista on työttömiä tai muuten työvoiman ulkopuolella. Eläkeläisten osuuden lasku
     (32 prosenttiyksikköä) on suurempi kuin työllisten osuuden nousu (19 prosenttiyksikköä), joten
     osa siirtyi muuhun tilaan kuin työhön, esimerkiksi työttömäksi.
+
+## H23: ennuste vuodelle 2025
+
+- **Kirjattu:** 27.11.2026. Vuoden 2025 työssäkäyntitietoja ei ole julkaistu: StatFin 115c päättyy
+  vuoteen 2024, ja tieto päivitettiin 1.7.2026.
+- **Korjaus edelliseen merkintään:** H23:n seuraava askel -kohdassa sivulla luki, että
+  65-vuotiaiden annos vuonna 2025 on 0,25.
+  - Oikea arvo on 0. Vuonna 2025 65 vuotta täyttävät ovat syntyneet 1960, ja heidän alin eläkeikänsä
+    on 64 v 6 kk.
+  - 65-vuotiaiden annos nousee nollasta vasta vuonna 2030 (syntyneet 1965).
+- **Kohde:** 64-vuotiaiden työllisten osuus 31.12.2025 (StatFin 115c). Annos nousee 0,50:stä
+  0,75:een, koska vuonna 1961 syntyneiden alin eläkeikä on 64 v 9 kk.
+- **Menetelmä:**
+  - Ennuste = vuoden 2024 arvo + b · (annoksen muutos) + yhteinen trendi.
+  - b on H23 T1:n kerroin (19,3).
+  - Yhteinen trendi on 60–62-vuotiaiden työllisyysasteen keskimääräinen vuosimuutos 2015–2024
+    (+1,46 %-yks.).
+  - 80 %:n väli saadaan samalla menetelmällä laskettujen yhden vuoden ennusteiden virheiden 10. ja 90.
+    persentiilistä: iät 60–67, vuodet 2011–2024, 112 ennustetta, yhteisenä trendinä edellisten
+    enintään 10 vuoden keskiarvo.
+  - Menetelmä käyttää koko aineistosta estimoitua b:tä myös takautuvissa ennusteissa. Tämä on pieni
+    vuoto, joka tekee välistä hieman liian kapean.
+- **E1:** 64-vuotiaiden työllisyysaste 2025 = 54,1 % (80 %:n väli 52,6–55,3).
+  - Jos uudistuksella ei olisi vaikutusta (b = 0), ennuste olisi 49,3 %, mikä on välin ulkopuolella.
+- **Osuma:** toteutunut arvo on välillä. Toteutunut arvo täytetään vasta, kun virallinen luku on
+  julkaistu, eikä väliä siirretä.
