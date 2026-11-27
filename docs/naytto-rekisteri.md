@@ -972,3 +972,31 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Todennäköinen syy, jota ei ole testattu: Suomen ja Ruotsin suhdanteet kulkevat yhdessä, joten
     kun Suomen työttömyys nousee, Ruotsin veto heikkenee samaan aikaan.
   - Oikea mittari olisi maiden välinen ero, eli Ruotsin ja Suomen työmarkkinatilanteen erotus.
+
+## H19. Nopeusrajoitukset käänsivät liikennekuolemat
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Uusi teema.
+- **Väite:** liikennekuolemat kääntyivät laskuun vuonna 1973, kun yleinen nopeusrajoitus vakinaistettiin.
+  Seuraavina vuosina tulivat lisäksi turvavyöpakko (1975) ja muut toimet. Pelkkä liikenteen
+  väheneminen öljykriisissä 1973–1974 ei selitä käännettä.
+- **Mekanismi:** nopeuden lasku vähentää kuolemia selvästi enemmän kuin loukkaantumisia, koska
+  kuolemanriski kasvaa nopeuden noin neljännessä potenssissa ja loukkaantumisriski noin toisessa
+  (Nilssonin potenssimalli). Liikenteen väheneminen pienentäisi kuolemia ja loukkaantumisia samassa
+  suhteessa.
+- **Aineisto:** tieliikenteessä kuolleet ja loukkaantuneet (StatFin 11bh, 1931–).
+- **Menetelmä:**
+  - Kuten H14: poikkeama log-lineaarisesta trendistä 12 vuoden esijaksolla (1961–1972), keskiarvona
+    jaksolta 1973–1976.
+  - Lumejaksot ovat kaikki muut 4 vuoden jaksot vuodesta 1960 alkaen, jotka eivät osu vuosiin
+    1961–1976.
+  - Persentiili tarkoittaa niiden lumejaksojen osuutta, joiden poikkeama oli tätä pienempi.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Katkos | Kuolleet 1973–1976 vs. trendi | Tukee: poikkeama < 0 ja alempi kuin 95 %:ssa lumejaksoista. Kumoaa: poikkeama ≥ 0. Muuten: ei ratkea |
+| T2 Täsmällisyys | Kuolleisuus loukkaantuneisiin suhteutettuna (kuolleet / loukkaantuneet) 1973–1976 vs. trendi | Tukee: poikkeama < 0 ja alempi kuin 95 %:ssa lumejaksoista. Kumoaa: poikkeama ≥ 0. Muuten: ei ratkea |
+
+- **Rajaus:** testit eivät erottele nopeusrajoitusta ja turvavyötä toisistaan.
+  - Molemmat vähentävät vammojen vakavuutta.
+  - Tuettu tulos tarkoittaa, että vakavuutta vähentävät toimet selittävät käänteen paremmin kuin
+    liikenteen määrä.
