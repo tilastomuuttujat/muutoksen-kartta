@@ -1300,3 +1300,29 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Vaikutuksen kesto testattiin vain kahden vuoden ikkunassa. Myöhempi kehitys, kuten palkkojen ja
     hintojen nousu, joka söi kilpailukykyetua, jää testin ulkopuolelle.
   - Vuoden 1982 vaikutus oli pieni (+2 %).
+
+## H24b. Devalvaatioiden vientietu säilyi viisi vuotta
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Jatkoa H24:lle.
+  - H24 kattoi vain kaksi vuotta. Tämä on eri väite, eikä sen tulos muuta H24:n tilaa.
+- **Väite:** devalvaation jälkeen viennin BKT-osuus pysyi koholla vielä viiden vuoden päästä.
+  Kotimaiset palkat ja hinnat eivät siis syöneet etua kolmessa vuodessa (devalvaatiokierre).
+- **Aineisto ja tapahtumat:** samat kuin H24:ssä.
+  - Viennin osuus BKT:sta käyvin hinnoin, StatFin 15ai, 1948–.
+  - Tapahtumat 1957, 1967, 1977, 1982 ja 1991.
+  - Vuoden 1977 viiden vuoden ikkuna päättyy vuoteen 1982, jolloin tehtiin seuraava devalvaatio
+    (lokakuussa).
+- **Lumeikkunat:**
+  - H24:n tapa (ei päällekkäisyyttä tapahtumaikkunoiden kanssa) jättäisi viiden vuoden ikkunoille
+    lumeiksi vain vuoden 1997 jälkeiset jaksot. Siksi lumeikkunoiksi hyväksytään kaikki ikkunat
+    [t, t + k], joiden sisällä (alku mukaan lukien) ei ole devalvaatiovuotta. Alkuvuosi on
+    1953–2020.
+  - Devalvaation jälkeen alkavat ikkunat ovat siis mukana. Jos etu kului niissä, lumejakauma
+    madaltuu ja T1:stä tulee helpompi läpäistä. T2 mittaa kulumista suoraan.
+- **Testisuure:** tapahtumien keskiarvo verrattuna 20 000 samankokoisen satunnaisen lumejoukon
+  keskiarvoon (siemenluku 1).
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Kesto | Viennin BKT-osuuden log-muutos t0 → t0 + 5, viiden tapahtuman keskiarvo, lumeikkunat k = 5 | Tukee: > 0 ja suurempi kuin 95 %:ssa lumejoukoista. Kumoaa: ≤ 0. Muuten: ei ratkea |
+| T2 Kuluminen | Log-muutos t0 + 2 → t0 + 5, viiden tapahtuman keskiarvo, lumeikkunat k = 3 | Tukee: ≥ 0, eli etu ei kulunut. Kumoaa: < 0 ja pienempi kuin 95 %:ssa lumejoukoista, eli etu kului poikkeuksellisen nopeasti. Muuten: ei ratkea, eli etu kului jonkin verran mutta tavanomaisen vaihtelun rajoissa |
