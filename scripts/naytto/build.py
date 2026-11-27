@@ -1649,6 +1649,42 @@ def h21():
     return {"tests": out, "predictions": []}
 
 
+def h22():
+    """H22 (docs/naytto-rekisteri.md): EU-jäsenyys 1995 → ruoan suhteellinen hinta (vs. Tanska, Norja)."""
+    _, d = eurostat_multi("nama_10_co3_p3", "geo=FI&geo=SE&geo=NO&geo=DK&coicop=CP011&coicop=TOTAL&unit=CP_MNAC&unit=CLV15_MNAC")
+    rel = {}
+    for c in ("FI", "SE", "NO", "DK"):
+        g = lambda co, u: d[(u, co, c)]
+        defl = lambda co: {y: g(co, "CP_MNAC")[y] / g(co, "CLV15_MNAC")[y] for y in g(co, "CP_MNAC") if y in g(co, "CLV15_MNAC")}
+        f, t = defl("CP011"), defl("TOTAL")
+        rel[c] = {y: math.log(f[y] / t[y]) for y in f if y in t}
+
+    def gap(y0, y1):
+        if not all(y0 in rel[c] and y1 in rel[c] for c in ("FI", "DK", "NO")):
+            return None
+        ch = {c: rel[c][y1] - rel[c][y0] for c in ("FI", "DK", "NO")}
+        return ch["FI"] - (ch["DK"] + ch["NO"]) / 2
+
+    def test(k):
+        obs = gap(1994, 1994 + k)
+        plac = [v for v in (gap(y, y + k) for y in range(1975, 2030) if not (y < 1995 <= y + k)) if v is not None]
+        below = sum(1 for v in plac if v > obs)
+        res = "tukee" if obs < 0 and below / len(plac) >= 0.95 else "kumoaa" if obs >= 0 else "ei-ratkea"
+        return res, {"gap": round(obs, 4), "pct": round((math.exp(obs) - 1) * 100, 1), "below": below, "placebo": len(plac),
+                     "percentile": round(below / len(plac), 3), "placeboMin": round(min(plac), 4)}
+    r1, a = test(1)
+    r2_, b = test(5)
+    one = {c: round((math.exp(rel[c][1995] - rel[c][1994]) - 1) * 100, 1) for c in rel}
+    idx = {c: sorted((y, round(math.exp(rel[c][y] - rel[c][1994]) * 100, 1)) for y in rel[c]) for c in rel}
+    t1 = {"id": "vuosi", "design": "luonnollinen", "result": r1, "date": str(date.today()),
+          "summary": f"Ruoan suhteellinen hinta 1994→1995: Suomi {one['FI']:+.1f} %, Tanska {one['DK']:+.1f} %, Norja {one['NO']:+.1f} % (Ruotsi {one['SE']:+.1f} %); Suomen ero {a['pct']:+.1f} %, pienempi kuin {a['below']}:ssä {a['placebo']} lumevuodesta",
+          "detail": {**a, "countries": one, "index": idx}}
+    t2 = {"id": "pysyvyys", "design": "luonnollinen", "result": r2_, "date": str(date.today()),
+          "summary": f"Sama ero viidessä vuodessa 1994→1999: {b['pct']:+.1f} %, pienempi kuin {b['below']}:ssä {b['placebo']} viiden vuoden lumejaksosta",
+          "detail": b}
+    return {"tests": [t1, t2], "predictions": []}
+
+
 def h11():
     """H11 (docs/naytto-rekisteri.md): ulkomaan kansalaisten osuus → Suomen kansalaisten työllisyys ja työttömyys."""
     regions = ["MK01", "MK02", "MK04", "MK05", "MK06", "MK07", "MK08", "MK09", "MK10", "MK11", "MK12", "MK13", "MK14", "MK15", "MK16", "MK17", "MK18", "MK19"]
@@ -1824,6 +1860,7 @@ def main():
     out["hypotheses"]["h19"] = h19()
     out["hypotheses"]["h20"] = h20()
     out["hypotheses"]["h21"] = h21()
+    out["hypotheses"]["h22"] = h22()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.

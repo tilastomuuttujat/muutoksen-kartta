@@ -1121,3 +1121,30 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 
 - **Rajaus:** vuoden 1994 liikevaihtoverosta arvonlisäveroon siirtyminen osuu edeltävään vuoteen.
   Ruoan verokanta pysyi tiettävästi ennallaan, mutta tätä ei ole tarkistettu aineistosta.
+
+## H22: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Luonnollinen koe: tukee.** Ruoan suhteellinen hinta muuttui 1994→1995 seuraavasti:
+
+  | Maa | Muutos |
+  |---|---|
+  | Suomi | −9,6 % |
+  | Tanska | −1,3 % |
+  | Norja | −1,5 % |
+  | Ruotsi | −1,7 % |
+
+  - Suomen ero vertailumaihin oli −8,3 %.
+  - Ero oli suurempi kuin yhdessäkään 40 lumevuodesta. Suurin lumevuoden lasku oli −3,4 %.
+- **T2 Pysyvyys: tukee.** Ero 1994→1999 oli −12,2 %, eli lasku ei palautunut vaan syveni.
+  - Ero oli suurempi kuin yhdessäkään 32 viiden vuoden lumejaksosta. Suurin lumejakson lasku oli
+    −8,0 %.
+- **Tila:** ehdokas. Molemmat tukevat testit ovat samaa asetelmaa (luonnollinen koe), ja tuettu-tila
+  vaatii kaksi eri asetelmaa.
+- **Huomio:** Ruotsi liittyi EU:hun samaan aikaan, mutta sen ruoan suhteellinen hinta laski vasta
+  1996 ja vähemmän (noin −10 % vuoteen 1997).
+  - Tämä sopii siihen, että Ruotsi oli purkanut maatalouden sääntelyä jo vuosina 1990–1991.
+  - Selitystä ei ole testattu.
+- **Seuraava testi:** täsmällisyys.
+  - Lasku pitäisi näkyä maataloustuotteissa, kuten viljassa, lihassa ja maitotaloustuotteissa.
+  - Tuontiruoassa, kuten hedelmissä, kahvissa ja teessä, sitä ei pitäisi näkyä.
