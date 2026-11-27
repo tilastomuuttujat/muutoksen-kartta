@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Kaksitoista hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Kolmetoista hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Neljä väitettä kumoutui, yksi on tuettu, kolme on ehdokkaita ja neljän näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Viisi väitettä kumoutui, yksi on tuettu, kolme on ehdokkaita ja neljän näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -225,6 +225,7 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h4" && t.id === "toisto-maat" && <SimpleDots rows={toDots(t.detail as Pooled, "Palvelut")} side="neg" band="H4:n ennuste: vasemmalla" note="Työttömyyden muutos ja julkisten palvelujen (D63) reaalikasvu 1–2 vuotta myöhemmin. Yhdistetty Ruotsi ja Tanska; Suomi näytetään vertailuksi." />}
       {h.id === "h4" && t.id === "palvelut-vs-rahat" && <ServicesVsCash detail={t.detail as SvC} />}
       {h.id === "h5" && t.id === "pysyvyys" && <PersistenceDots detail={t.detail as Persist} />}
+      {h.id === "h7" && t.id === "ajoitus" && <SuicideChart detail={t.detail as Suicide} />}
       {h.id === "h6" && t.id === "katkos" && <BreakChart detail={t.detail as Break} />}
       {h.id === "h6" && t.id === "hinta" && <PriceChart price={(t.detail as { realPrice: [number, number][] }).realPrice} mort={(h.tests[0]!.detail as Break).series} />}
       {h.id === "h5" && t.id === "ikaluokat" && <CohortChart detail={t.detail as Cohorts} />}
@@ -466,6 +467,41 @@ function PriceChart({ price, mort }: { price: [number, number][]; mort: [number,
         {[X0, 2004, 2008, 2012, 2018, X1].map((t) => <text key={t} x={x(t)} y={H - 12} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
       </svg>
       <p className="text-xs text-muted-foreground">Alkoholijuomien reaalihinta (kuluttajahintaindeksi 02.1 / kokonaisindeksi, StatFin 15b5) ja alkoholikuolleisuus, molemmat 2003 = 100. Hinta laski 2004 ja nousi veronkorotusten myötä 2008–2014.</p>
+    </div>
+  );
+}
+
+type Suicide = { series: [number, number][]; unemployment: [number, number][]; men: Rc; women: Rc };
+
+function SuicideChart({ detail }: { detail: Suicide }) {
+  const S = detail.series.filter(([y]) => y <= 2018), U = detail.unemployment;
+  const W = 620, H = 200, L = 44, R = 560, TOP = 14, BOT = 168;
+  const X0 = 1975, X1 = 2018;
+  const x = (y: number) => L + ((y - X0) / (X1 - X0)) * (R - L);
+  const sMax = Math.max(...S.map((p) => p[1])) * 1.05, uMax = Math.max(...U.map((p) => p[1])) * 1.05;
+  const ys = (v: number) => BOT - (v / sMax) * (BOT - TOP), yu = (v: number) => BOT - (v / uMax) * (BOT - TOP);
+  const line = (s: [number, number][], f: (v: number) => number) => s.map(([a, v], i) => `${i ? "L" : "M"}${x(a).toFixed(1)},${f(v).toFixed(1)}`).join(" ");
+  return (
+    <div className="mt-2 overflow-x-auto">
+      <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[460px] max-w-2xl" role="img" aria-label="Itsemurhat 25–64-vuotiailla ja työttömyysaste 1975–2018">
+        <rect x={x(1991)} y={TOP} width={x(1994) - x(1991)} height={BOT - TOP} fill="var(--primary)" fillOpacity={0.07} />
+        <text x={x(1991) + 3} y={BOT - 4} className="fill-primary text-[10px]">lama</text>
+        <path d={line(U, yu)} fill="none" stroke="var(--foreground)" strokeOpacity={0.6} strokeWidth={1.6} strokeDasharray="5 3" />
+        <path d={line(S, ys)} fill="none" stroke="var(--primary)" strokeWidth={2.2} />
+        {(() => {
+          const a = ys(S.at(-1)![1]), b = yu(U.at(-1)![1]);
+          const g = Math.abs(a - b) < 13 ? (13 - Math.abs(a - b)) / 2 : 0, d = a <= b ? -1 : 1;
+          return (
+            <>
+              <text x={R + 4} y={a + 4 + d * g} className="fill-primary text-[11px] font-semibold">itsemurhat</text>
+              <text x={R + 4} y={b + 4 - d * g} className="fill-foreground text-[11px]">työttömyys</text>
+            </>
+          );
+        })()}
+        {[0, 500, 1000].map((t) => <text key={t} x={L - 6} y={ys(t) + 4} textAnchor="end" className="fill-primary text-[10px]">{t}</text>)}
+        {[1975, 1985, 1990, 1995, 2005, 2018].map((t) => <text key={t} x={x(t)} y={H - 12} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
+      </svg>
+      <p className="text-xs text-muted-foreground">Itsemurhat 25–64-vuotiailla, lukumäärä (StatFin 11by, punainen asteikko) ja työttömyysaste (työvoimatutkimuksen historiallinen sarja, katkoviiva, oma asteikko). Miehet r = {nf(detail.men.r)}, naiset r = {nf(detail.women.r)}.</p>
     </div>
   );
 }

@@ -76,7 +76,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -242,6 +242,19 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Alkoholikuolleisuus nousi vuodesta 2003 vuoteen 2007 noin kolmanneksella, kun alkoholin reaalihinta laski noin 15 %, ja kääntyi laskuun, kun hinta nousi veronkorotusten myötä vuosina 2008–2014. Järjestys sopii väitteeseen, ja myynnin ja kuolleisuuden yhteys vuositasolla tukee mekanismia. Kirjatut katkos- ja annostestit jäivät kuitenkin rajan alle: kuolleisuus nousi jo ennen alennusta, ja vuositason aineisto (alle 30 vuotta) on liian lyhyt erottamaan vaikutusta muusta vaihtelusta. Miehillä katkos oli selvempi kuin naisilla; henkirikoksissa sitä ei näy.",
     next: "Vahvempi asetelma vaatii tarkemman aineiston: kuukausittainen kuolleisuus (StatFin 11bf, 1969–) veronmuutosten ympärillä tai alue-erot Viron tuonnin mukaan (Etelä-Suomi vs. muut). Kuukausiaineisto erottaisi maaliskuun 2004 katkoksen vuoden sisäisestä vaihtelusta.",
+  },
+  {
+    id: "h7",
+    title: "Työttömyys → itsemurhat",
+    claim: "Työttömyyden nousu lisää itsemurhia.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. Uusi teema, ei seulasta.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h7.tests,
+    predictions: [],
+    reading:
+      "Maakunnissa, joissa työttömyys oli muita korkeampi, itsemurhia ei ollut seuraavana vuonna enempää, ja koko maan tasollakin yhteys on heikko. Työikäisten itsemurhat alkoivat nousta jo 1980-luvun lopulla ennen lamaa, olivat korkeimmillaan 1990–1993 ja kääntyivät pitkään laskuun 1990-luvun puolivälissä, vaikka työttömyys oli yhä korkea. Itsemurhakuolleisuuden pitkä lasku sopii paremmin muihin selityksiin, kuten mielenterveyspalvelujen ja -lääkityksen muutoksiin ja itsemurhien ehkäisyprojektiin (1986–1996), joita tämä testi ei mittaa.",
+    next: "Testaamattomat selitykset kirjattavaksi: masennuslääkkeiden käytön kasvu (Turso: Pohjoismaiden N06A-sarja 2000–) ja alkoholi (H6:n aineisto) itsemurhien selittäjinä samalla asetelmalla.",
   },
   {
     id: "h2",

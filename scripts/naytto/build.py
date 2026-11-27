@@ -959,6 +959,85 @@ def h6():
     return {"tests": [t1, t2, t3, t4, t5], "predictions": [], "extra": extra}
 
 
+HVA_TO_MK = {"HVA01": "MK01", "HVA02": "MK01", "HVA03": "MK01", "HVA04": "MK01", "HVA90": "MK01", "HVA05": "MK02",
+             "HVA06": "MK04", "HVA07": "MK05", "HVA08": "MK06", "HVA09": "MK07", "HVA10": "MK08", "HVA11": "MK09",
+             "HVA12": "MK10", "HVA13": "MK11", "HVA14": "MK12", "HVA15": "MK13", "HVA16": "MK14", "HVA17": "MK15",
+             "HVA18": "MK16", "HVA19": "MK17", "HVA20": "MK18", "HVA21": "MK19"}
+
+
+def h7():
+    """H7 (docs/naytto-rekisteri.md): työttömyys → itsemurhat. Annos–vaste maakunnittain ja koko maan ajoitus."""
+    ids, d = px("ksyyt/13u5.px", [("alue_23_20260101", list(HVA_TO_MK)), ("kuolinsyyt_1_20210101", ["50"]), ("contentscode", ["ksyylkm"]), ("timeperiod_y", "*")])
+    ia, iy = ids.index("alue_23_20260101"), ids.index("timeperiod_y")
+    deaths = {}
+    for k, v in d.items():
+        mk = HVA_TO_MK[k[ia]]
+        deaths.setdefault(mk, {}).setdefault(int(k[iy]), 0)
+        deaths[mk][int(k[iy])] += v or 0
+    ids_w, pop = px("tyokay/115w.px", [("alue_28_20250101", sorted(set(HVA_TO_MK.values()))), ("timeperiod_y", "*"),
+                                      ("paaasial_toimin_3_20180101", ["SSS", "11+12", "12"]), ("ikaryhma_10_20180101", ["SSS"]), ("sukupuoli_9_20180101", ["SSS"])])
+    ra, ry, rt = ids_w.index("alue_28_20250101"), ids_w.index("timeperiod_y"), ids_w.index("paaasial_toimin_3_20180101")
+    P = {}
+    for k, v in pop.items():
+        P.setdefault(k[ra], {}).setdefault(int(k[ry]), {})[k[rt]] = v
+    regions = sorted(r for r in P if r in deaths)
+    une = {r: {y: 100 * x["12"] / x["11+12"] for y, x in P[r].items()} for r in regions}
+    rate = {r: {y: math.log(deaths[r][y] / P[r][y]["SSS"] * 1e5) for y in P[r] if deaths[r].get(y)} for r in regions}
+    years = [t for t in range(1988, 2025) if all(t in rate[r] and t - 1 in une[r] for r in regions)]
+
+    def fe(U):
+        rows = [(r, t, rate[r][t], U[r][t - 1]) for r in regions for t in years]
+        a = np.array([[x[2], x[3]] for x in rows])
+        ri = [regions.index(x[0]) for x in rows]; ti = [years.index(x[1]) for x in rows]
+        for col in (0, 1):
+            v = a[:, col].copy()
+            for _ in range(20):
+                for idx, n in ((ri, len(regions)), (ti, len(years))):
+                    s_ = np.bincount(idx, v, n) / np.maximum(np.bincount(idx, None, n), 1)
+                    v = v - s_[idx]
+            a[:, col] = v
+        return float((a[:, 0] @ a[:, 1]) / (a[:, 1] @ a[:, 1])), len(rows)
+
+    b, n = fe(une)
+    rng = random.Random(5); R = 2000; ge = 0
+    for _ in range(R):
+        perm = regions[:]; rng.shuffle(perm)
+        if fe({r: une[p_] for r, p_ in zip(regions, perm)})[0] >= b:
+            ge += 1
+    p = (ge + 1) / (R + 1)
+    pct = (math.exp(b) - 1) * 100
+    r1 = "tukee" if b > 0 and p < 0.05 else "kumoaa" if b <= 0 else "ei-ratkea"
+    t1 = {"id": "annos", "design": "annos", "result": r1, "date": str(date.today()),
+          "summary": f"1 %-yks. suurempi työttömyys kuin muualla → itsemurhat {pct:+.1f} % seuraavana vuonna (p = {p:.3f}, {len(regions)} maakuntaa, {years[0]}–{years[-1]})",
+          "detail": {"b": round(b, 5), "pctPerPoint": round(pct, 2), "p": round(p, 4), "n": n, "regions": len(regions), "years": [years[0], years[-1]]}}
+
+    # T2 koko maa
+    ids2, s2 = px("ksyyt/11by.px", [("ikaryhma_10_20180101", ["25-44", "45-64"]), ("timeperiod_y", "*"), ("sukupuoli_9_20180101", ["SSS", "1", "2"])])
+    a2, y2, sx2 = ids2.index("ikaryhma_10_20180101"), ids2.index("timeperiod_y"), ids2.index("sukupuoli_9_20180101")
+    sui = {}
+    for k, v in s2.items():
+        sui.setdefault(k[sx2], {}).setdefault(int(k[y2]), 0)
+        sui[k[sx2]][int(k[y2])] += v or 0
+    U = {}
+    for line in open(os.path.join(D, "values.ndjson")):
+        k, y, g_, v, kind = json.loads(line)
+        if k == "fi.histlabour.lfs2019.unemployment_rate" and v is not None and kind in ("observed", "estimate"):
+            U[int(y)] = float(v)
+    pu = prewhiten(changes({y: v for y, v in U.items() if 1959 <= y <= 2018}, False))
+    out = {}
+    for sx in ("SSS", "1", "2"):
+        ps_ = prewhiten(changes({y: v for y, v in sui[sx].items() if 1959 <= y <= 2018}, True))
+        out[sx] = lead_corr(pu, ps_, lags=(0, 1))
+    lc = out["SSS"]
+    r2_ = "tukee" if lc["r"] > 0 and lc["p"] < 0.05 else "kumoaa" if lc["r"] <= 0 else "ei-ratkea"
+    t2 = {"id": "ajoitus", "design": "ajoitus", "result": r2_, "date": str(date.today()),
+          "summary": f"Koko maa 1960–2018: työttömyyden muutos → itsemurhien (25–64 v) muutos r = {r2(lc['r'])} (viive {lc['lag']} v, p = {lc['p']:.3f}, n = {lc['n']})",
+          "detail": {**lc, "men": out["1"], "women": out["2"],
+                     "series": sorted((y, v) for y, v in sui["SSS"].items() if 1975 <= y <= 2025),
+                     "unemployment": sorted((y, v) for y, v in U.items() if 1975 <= y <= 2018)}}
+    return {"tests": [t1, t2], "predictions": []}
+
+
 def h1_regional():
     ids_t, tf = px("synt/12du.px", [("alue_23_20260101", "*"), ("contentscode", ["tfr"]), ("timeperiod_y", "*")])
     ids_w, pop = px("tyokay/115w.px", [("alue_28_20250101", "*"), ("timeperiod_y", "*"), ("paaasial_toimin_3_20180101", ["11+12", "12"]), ("ikaryhma_10_20180101", ["25-29", "30-34"]),
@@ -1064,7 +1143,7 @@ def h2():
 def main():
     _, t = px("synt/12dt.px", [("contentscode", ["tfr"]), ("timeperiod_y", "*")])
     fi_tfr = {int(k[0]): v for k, v in t.items()}
-    out = {"built": str(date.today()), "hypotheses": {"h1": h1(turso_nordic(), fi_tfr), "h1e": h1e(fi_tfr), "h1f": h1f(fi_tfr), "h1g": h1g(fi_tfr), "h2": h2(), "h3": h3(), "h4": h4(), "h5": h5(), "h6": h6()}}
+    out = {"built": str(date.today()), "hypotheses": {"h1": h1(turso_nordic(), fi_tfr), "h1e": h1e(fi_tfr), "h1f": h1f(fi_tfr), "h1g": h1g(fi_tfr), "h2": h2(), "h3": h3(), "h4": h4(), "h5": h5(), "h6": h6(), "h7": h7()}}
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
@@ -1111,6 +1190,8 @@ def main():
     d4 = e6["tests"][3]["detail"]; print("  ilman 2004", d4["without2004"], "myynti", d4["sales"]); print("  reaalihinta", d4["realPrice"])
     d5 = e6["tests"][4]["detail"]; print("  hinta", d5["priceChange"]); print("  kuolleisuus t+1", d5["nextMortChange"])
     print("  extra", e6["extra"])
+    for t in out["hypotheses"]["h7"]["tests"]: print("h7", t["id"], t["result"], "|", t["summary"])
+    d7 = out["hypotheses"]["h7"]["tests"][1]["detail"]; print("  miehet", d7["men"], "naiset", d7["women"]); print("  sarja", [x for x in d7["series"] if x[0] <= 2005])
     print("malli", out["hypotheses"]["h1"]["model"])
     print("toisto maittain", json.dumps(out["hypotheses"]["h1"]["tests"][0]["detail"]["countries"]))
     print("miehet maittain", json.dumps(out["hypotheses"]["h1"]["tests"][2]["detail"]["menCountries"]))

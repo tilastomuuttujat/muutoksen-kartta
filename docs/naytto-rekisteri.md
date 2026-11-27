@@ -512,3 +512,19 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 
 - **Lisätieto, ei vaikuta tulokseen:** T1 miehille ja naisille erikseen, jos aineisto sen sallii.
   Lisäksi itsemurhat 1980–2005 laman ajoituksen näyttämiseksi.
+
+## H7: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Annos–vaste: kumoaa.** 1 %-yks. muita suurempi työttömyys → itsemurhat −0,3 % seuraavana
+  vuonna (p = 0,63, 18 maakuntaa, 1988–2024).
+- **T2 Ajoitus koko maassa: ei ratkea.**
+  - r = +0,12 (viive 1 v, p = 0,60, n = 57).
+  - Miehet +0,17, naiset +0,26 (p = 0,09).
+- **Korjaus taustatietoon:** 25–64-vuotiaiden itsemurhat eivät laskeneet laman aikana. Lukumäärä
+  oli korkeimmillaan 1990–1993 (huippu 1992: 1 138) ja kääntyi laskuun vasta 1994–1996. Merkinnän
+  tausta koski koko väestön kuolleisuuslukua, ja se oli epätarkka.
+- **Tila:** kumottu, koska vahva asetelma kumoaa.
+- **Tulkinta:** maakuntien väliset työttömyyserot eivät ennusta itsemurhien eroja. Koko maan
+  tasollakin yhteys on heikko. Itsemurhien nousu 1980-luvun lopulla alkoi ennen lamaa, ja niiden
+  pitkä lasku 1990-luvun puolivälistä alkaen tapahtui työttömyyden ollessa yhä korkea.
