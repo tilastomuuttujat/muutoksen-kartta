@@ -663,6 +663,85 @@ def h1g(fi_tfr):
     return {"tests": [t1, t2, t3], "predictions": [], "describe": describe}
 
 
+def seula_grain(design, pred):
+    sd = json.load(open(os.path.join(ROOT, "src", "data", "seula.json")))["designs"][design]
+    return next(r for r in sd["rows"] if r["status"] == "jyva" and pred(sd["meta"][r["x"]]["t"], sd["meta"][r["y"]]["t"], r))
+
+
+def pooled_lead(pred, target, cs, lags=(1, 2)):
+    best = None
+    for k in lags:
+        ps = [(pred[c][t - k], target[c][t]) for c in cs for t in target[c] if t - k in pred[c]]
+        r, n = corr(ps)
+        if r is not None and (best is None or abs(r) > abs(best[0])):
+            best = (r, n, k)
+    r, n, k = best
+    return {"r": round(r, 3), "n": n, "lag": k, "p": round(1 - (1 - p_two_sided(r, n)) ** len(lags), 4)}
+
+
+def h4():
+    """H4 (docs/naytto-rekisteri.md): työttömyys → julkisten palvelujen (D63) reaalikasvu; D62 vertailuna."""
+    g = seula_grain("aika", lambda x, y, r: x.startswith("Työttömyysaste") and "D63R" in y)
+    t1 = {"id": "toisto-aika", "design": "toisto", "result": "tukee", "date": "2026-11-27",
+          "summary": f"Seula, aikajako: löytö ≤ 2000 r = {r2(g['rD'])}, vahvistus 2001–2025 r = {r2(g['rC'])} (viive {g['lag']} v, p = {g['pC']:.3f})",
+          "detail": g}
+    cs = ["FI", "SE", "DK"]
+    geos = "&".join(f"geo={c}" for c in cs)
+    une = eurostat_annual("lfsa_urgan", f"{geos}&age=Y15-74&sex=T&citizen=TOTAL&unit=PC")
+    _, tr = eurostat_multi("nasa_10_nf_tr", f"{geos}&sector=S13&direct=PAID&na_item=D63&na_item=D62&unit=CP_MNAC")
+    defl = eurostat_annual("nama_10_gdp", f"{geos}&na_item=B1GQ&unit=PD15_NAC")
+    item = lambda it: {k[-1]: v for k, v in tr.items() if it in k}
+    real = lambda d: {c: {y: v / defl[c][y] for y, v in d[c].items() if y in defl.get(c, {})} for c in cs}
+    d63, d62 = real(item("D63")), real(item("D62"))
+    pu = {c: prewhiten(changes(une[c], False)) for c in cs}
+    p63 = {c: prewhiten(changes({y: v for y, v in d63[c].items() if y >= 1995}, True)) for c in cs}
+    p62 = {c: prewhiten(changes({y: v for y, v in d62[c].items() if y >= 1995}, True)) for c in cs}
+    rep = pooled_lead(pu, p63, ["SE", "DK"])
+    per = {c: lead_corr(pu[c], p63[c]) for c in cs}
+    t2 = {"id": "toisto-maat", "design": "toisto", "result": "tukee" if rep["r"] < 0 and rep["p"] < 0.05 else "kumoaa" if rep["r"] >= 0 else "ei-ratkea",
+          "date": str(date.today()),
+          "summary": f"Ruotsi ja Tanska: työttömyys → julkisten palvelujen reaalikasvu r = {r2(rep['r'])} (viive {rep['lag']} v, p = {rep['p']:.3f}, n = {rep['n']})",
+          "detail": {"predictor": rep, "countries": per}}
+    a63, a62 = pooled_lead(pu, p63, cs), pooled_lead(pu, p62, cs)
+    res3 = "kumoaa" if a62["r"] <= a63["r"] else "tukee" if a63["r"] < 0 else "ei-ratkea"
+    t3 = {"id": "palvelut-vs-rahat", "design": "tasmallisyys", "result": res3, "date": str(date.today()),
+          "summary": f"Suomi, Ruotsi ja Tanska: palvelut (D63) r = {r2(a63['r'])}, rahaetuudet (D62) r = {r2(a62['r'])}",
+          "detail": {"d63": a63, "d62": a62, "d62Countries": {c: lead_corr(pu[c], p62[c]) for c in cs}}}
+    return {"tests": [t1, t2, t3], "predictions": []}
+
+
+def h5():
+    """H5: työttömyyden pitkittyminen. Pysyvyys: ΔU(t) vs. pitkäaikaistyöttömien osuuden muutos t → t+3."""
+    g = seula_grain("maa", lambda x, y, r: r["x"] == "nordics.unemployment_rate_25_34_women_1990_2024" and r["y"] == "safe_corridor.long_term_unemployment_share_30_34")
+    t1 = {"id": "toisto", "design": "toisto", "result": "tukee", "date": "2026-11-27",
+          "summary": f"Seula, maajako: löytö Suomessa r = {r2(g['rD'])}, vahvistus Ruotsissa, Norjassa ja Tanskassa r = {r2(g['rC'])} (viive {g['lag']} v, p = {g['pC']:.4f})",
+          "detail": g}
+    U = {c: {} for c in COUNTRIES}; LT = {c: {} for c in COUNTRIES}
+    for line in open(os.path.join(D, "values.ndjson")):
+        k, y, g_, v, kind = json.loads(line)
+        if g_ in COUNTRIES and v is not None and kind in ("observed", "estimate"):
+            if k == "nordics.unemployment_rate_25_34_women_1990_2024":
+                U[g_][int(y)] = float(v)
+            elif k == "safe_corridor.long_term_unemployment_share_30_34":
+                LT[g_][int(y)] = float(v)
+    pairs_, per = [], {}
+    for c in COUNTRIES:
+        cp = [(U[c][t] - U[c][t - 1], LT[c][t + 3] - LT[c][t]) for t in U[c] if t - 1 in U[c] and t in LT[c] and t + 3 in LT[c]]
+        pairs_ += cp
+        r_, n_ = corr(cp)
+        per[c] = {"r": round(r_, 3), "n": n_} if r_ is not None else None
+    r, n = corr(pairs_)
+    neff = max(4, n // 3)
+    p = float(p_two_sided(r, neff + 3 - 3)) if r is not None else 1.0
+    # yksisuuntainen (ennustettu suunta r > 0)
+    p1s = p / 2 if r > 0 else 1 - p / 2
+    res = "tukee" if r > 0 and p1s < 0.05 else "kumoaa" if r <= 0 else "ei-ratkea"
+    t2 = {"id": "pysyvyys", "design": "tasmallisyys", "result": res, "date": str(date.today()),
+          "summary": f"Työttömyyden nousu vuonna t → pitkäaikaistyöttömien osuus 30–34 kolmen vuoden päästä: r = {r2(r)} (n = {n}, efektiivinen {neff}, p = {p1s:.3f}); neljä maata",
+          "detail": {"r": round(r, 3), "n": n, "neff": neff, "p": round(p1s, 4), "countries": per}}
+    return {"tests": [t1, t2], "predictions": []}
+
+
 def h1_regional():
     ids_t, tf = px("synt/12du.px", [("alue_23_20260101", "*"), ("contentscode", ["tfr"]), ("timeperiod_y", "*")])
     ids_w, pop = px("tyokay/115w.px", [("alue_28_20250101", "*"), ("timeperiod_y", "*"), ("paaasial_toimin_3_20180101", ["11+12", "12"]), ("ikaryhma_10_20180101", ["25-29", "30-34"]),
@@ -768,7 +847,7 @@ def h2():
 def main():
     _, t = px("synt/12dt.px", [("contentscode", ["tfr"]), ("timeperiod_y", "*")])
     fi_tfr = {int(k[0]): v for k, v in t.items()}
-    out = {"built": str(date.today()), "hypotheses": {"h1": h1(turso_nordic(), fi_tfr), "h1e": h1e(fi_tfr), "h1f": h1f(fi_tfr), "h1g": h1g(fi_tfr), "h2": h2(), "h3": h3()}}
+    out = {"built": str(date.today()), "hypotheses": {"h1": h1(turso_nordic(), fi_tfr), "h1e": h1e(fi_tfr), "h1f": h1f(fi_tfr), "h1g": h1g(fi_tfr), "h2": h2(), "h3": h3(), "h4": h4(), "h5": h5()}}
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.

@@ -75,7 +75,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -202,6 +202,32 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Suomi erkani verrokeistaan juuri 1972 jälkeen, ja Pohjois-Karjalassa verenkiertoelinten kuolleisuuden osuus laski toiseksi eniten 23 alueesta. Projektin vertailualue Pohjois-Savo oli neljäs, mikä sopii siihen, että kansanterveystyö levisi nopeasti muuallekin. Koko maan kuolinsyytesti jäi rajan alle.",
     next: "Kartan aineistoon voisi lisätä yhteyden Kansanterveyslaki → elinajanodotteen nousu (ehdotus Lovableen).",
+  },
+  {
+    id: "h4",
+    title: "Työttömyys → julkisten palvelujen kasvu hidastuu",
+    claim: "Kun työttömyys nousee, julkisten palvelujen (terveys, koulutus, hoiva) reaalikasvu hidastuu 1–2 vuoden päästä, kun taas rahaetuudet kasvavat automaattisesti.",
+    registered: "2026-11-27",
+    preregistered: "Seulan jyvä (aikajako). Toisto muissa maissa ja täsmällisyystesti kirjattiin ennen laskentaa.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h4.tests,
+    predictions: [],
+    reading:
+      "Suomessa julkisten palvelujen kasvu on hidastunut työttömyyden noustessa, ja yhteys kesti seulan aikajaon. Ruotsissa ja Tanskassa sama yhteys on heikko. Lisäksi rahaetuuksien kasvu hidastui vähintään yhtä paljon kuin palvelujen, joten kyse näyttää olevan julkisten menojen yleisestä sopeuttamisesta, ei palveluihin kohdistuvasta leikkauksesta.",
+    next: "Suomen erityispiirteen testi: kuntien palvelumenot ja valtionosuudet. Jos sopeutus kulki valtionosuuksien kautta, kuntien palvelujen kasvun pitäisi hidastua eniten niissä kunnissa, joiden tuloista valtionosuudet ovat suurin osa (annos–vaste).",
+  },
+  {
+    id: "h5",
+    title: "Nuorten aikuisten työttömyys pitkittyy",
+    claim: "Työttömyysaalto jättää jäljen: 30–34-vuotiaiden pitkäaikaistyöttömien osuus nousee ja on vielä kolmen vuoden päästä koholla.",
+    registered: "2026-11-27",
+    preregistered: "Seulan jyvä (maajako). Pysyvyystesti kirjattiin ennen laskentaa.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h5.tests,
+    predictions: [],
+    reading:
+      "Työttömyyden nousua seuraa pitkäaikaistyöttömyyden kasvu, joka ei purkaudu vuodessa: osuus on kolmen vuoden päästä yhä koholla. Suunta on sama kaikissa neljässä Pohjoismaassa. Tämä sopii ajatukseen, että työttömyysaalto jättää osalle nuorista aikuisista pysyvämmän jäljen.",
+    next: "Vahva asetelma: annos–vaste ikäluokittain. Laman aikana työmarkkinoille tulleiden ikäluokkien työllisyyden pitäisi olla vielä vuosia myöhemmin muita heikompi (aineisto: StatFin 115c, ikävuosittain 1987–).",
   },
   {
     id: "h2",

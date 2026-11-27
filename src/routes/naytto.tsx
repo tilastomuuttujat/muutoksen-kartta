@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Pilotti: yhdeksän hypoteesia, joista yksi tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Yksitoista hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Kolme väitettä kumoutui, yksi on tuettu, kaksi on ehdokkaita ja kolmen näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Kolme väitettä kumoutui, yksi on tuettu, kolme on ehdokkaita ja neljän näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -222,6 +222,9 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {t.id === "odotukset" && <ExpectationDots detail={t.detail as Expect} />}
       {t.id === "maaraaikaisuus" && <TemporaryDots detail={t.detail as Temporary} />}
       {t.id === "esikoiset" && <FirstbornDots detail={t.detail as Firstborn} />}
+      {h.id === "h4" && t.id === "toisto-maat" && <SimpleDots rows={toDots(t.detail as Pooled, "Palvelut")} side="neg" band="H4:n ennuste: vasemmalla" note="Työttömyyden muutos ja julkisten palvelujen (D63) reaalikasvu 1–2 vuotta myöhemmin. Yhdistetty Ruotsi ja Tanska; Suomi näytetään vertailuksi." />}
+      {h.id === "h4" && t.id === "palvelut-vs-rahat" && <ServicesVsCash detail={t.detail as SvC} />}
+      {h.id === "h5" && t.id === "pysyvyys" && <PersistenceDots detail={t.detail as Persist} />}
       {(t.id === "hinnat" || t.id === "korot" || t.id === "tulot" || t.id === "luotto") && <HousingDots h={h.id} id={t.id} detail={t.detail as Housing} />}
     </li>
   );
@@ -316,6 +319,45 @@ function HousingDots({ h, id, detail }: { h: string; id: string; detail: Housing
   );
 }
 
+type Pooled = { predictor: Rc; countries: Record<string, Rc> };
+const toDots = (d: Pooled, label: string): DotRow[] => [
+  ...Object.entries(d.countries).map(([c, r]) => [`${label}: ${CNAME[c]}`, r, "test", false] as DotRow),
+  ["Ruotsi + Tanska", d.predictor, "test", true],
+];
+
+function SimpleDots({ rows, side, band, note }: { rows: DotRow[]; side: "pos" | "neg"; band: string; note: string }) {
+  return <CompareDots rows={rows} side={side} band={band} note={note} lead="Korrelaatio:" />;
+}
+
+type SvC = { d63: Rc; d62: Rc; d62Countries: Record<string, Rc> };
+function ServicesVsCash({ detail }: { detail: SvC }) {
+  return (
+    <CompareDots
+      rows={[
+        ["Palvelut (D63) yhdessä", detail.d63, "test", true],
+        ["Rahaetuudet (D62) yhdessä", detail.d62, "unemp", true],
+        ...Object.entries(detail.d62Countries).map(([c, r]) => [`Rahaetuudet: ${CNAME[c]}`, r, "unemp", false] as DotRow),
+      ]}
+      side="neg"
+      band="H4:n ennuste: palvelut vasemmalla, rahaetuudet oikealla"
+      lead="Korrelaatio:"
+      note="Työttömyyden muutos ja menojen reaalikasvu 1–2 vuotta myöhemmin, Suomi, Ruotsi ja Tanska. Jos H4 pitäisi, rahaetuuksien pallojen pitäisi olla palvelujen oikealla puolella."
+    />
+  );
+}
+
+type Persist = { r: number; n: number; neff: number; p: number; countries: Record<string, { r: number; n: number } | null> };
+function PersistenceDots({ detail }: { detail: Persist }) {
+  const rows: DotRow[] = [
+    ...Object.entries(detail.countries).filter(([, v]) => v).map(([c, v]) => [CNAME[c]!, { r: v!.r, n: v!.n, lag: 3, p: 1 }, "test", false] as DotRow),
+    ["Neljä maata yhdessä", { r: detail.r, n: detail.n, lag: 3, p: detail.p }, "test", true],
+  ];
+  return (
+    <CompareDots rows={rows} side="pos" band="H5:n ennuste: oikealla" lead="Korrelaatio:"
+      note={`Työttömyyden muutos vuonna t ja pitkäaikaistyöttömien osuuden muutos vuodesta t vuoteen t + 3. Maittaisille ei laskettu p-arvoa, koska havaintoja on vähän (Norja ${detail.countries["NO"]?.n ?? 0}). Yhdistetyn p-arvo efektiivisellä otoskoolla ${detail.neff}.`} />
+  );
+}
+
 type DotRow = [string, Rc, "test" | "unemp", boolean];
 
 function ExpectationDots({ detail }: { detail: Expect }) {
@@ -353,7 +395,7 @@ function TemporaryDots({ detail }: { detail: Temporary }) {
   );
 }
 
-function CompareDots({ rows, side, band, note }: { rows: DotRow[]; side: "pos" | "neg"; band: string; note: string }) {
+function CompareDots({ rows, side, band, note, lead = "Korrelaatio: selittäjän muutos ja syntyvyyden muutos 1–2 vuotta myöhemmin, samoissa maissa ja samoina vuosina." }: { rows: DotRow[]; side: "pos" | "neg"; band: string; note: string; lead?: string }) {
   const W = 560, L = 160, R = 540, ROW = 20;
   const x = (r: number) => L + ((r + 1) / 1.6) * (R - L); // −1 … +0,6
   const H = rows.length * ROW;
@@ -379,7 +421,7 @@ function CompareDots({ rows, side, band, note }: { rows: DotRow[]; side: "pos" |
         {[-1, -0.5, 0, 0.5].map((t) => <text key={t} x={x(t)} y={H + 34} textAnchor="middle" className="fill-muted-foreground text-[10px]">{nf(t, 1)}</text>)}
       </svg>
       <p className="text-xs text-muted-foreground">
-        Korrelaatio: selittäjän muutos ja syntyvyyden muutos 1–2 vuotta myöhemmin, samoissa maissa ja samoina vuosina. Täytetty pallo: p &lt; 0,05. {note}
+        {lead} Täytetty pallo: p &lt; 0,05. {note}
       </p>
     </div>
   );

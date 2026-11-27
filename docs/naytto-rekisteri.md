@@ -315,3 +315,28 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 |---|---|---|
 | T1 Toisto maissa (seula) | ks. yllä | Tehty: tukee |
 | T2 Pysyvyys | Suomi, Ruotsi, Norja ja Tanska (Turso, 1995–). Naisten 25–34 työttömyyden muutos vuonna t ja pitkäaikaistyöttömien osuuden (30–34) muutos vuodesta t vuoteen t + 3. Korrelaatio maat yhdessä. p lasketaan efektiivisellä otoskoolla n / 3, koska kolmen vuoden jaksot menevät päällekkäin. | Tukee: r > 0 ja p < 0,05. Kumoaa: r ≤ 0 |
+
+## H4: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T2 Toisto maissa: ei ratkea.**
+  - Ruotsi ja Tanska yhdessä r = −0,14 (viive 2 v, p = 0,53).
+  - Maittain (vahvin viive): Ruotsi −0,10, Tanska −0,34. Suomi samalla Eurostat-aineistolla −0,20.
+- **T3 Täsmällisyys: kumoaa.**
+  - Rahaetuudet (D62) r = −0,25, palvelut (D63) r = −0,16.
+  - Rahaetuuksien kasvu ei kiihtynyt vaan hidastui 1–2 vuotta työttömyyden nousun jälkeen, jopa
+    enemmän kuin palvelujen.
+- **Tila:** ristiriitainen. Seulan aikajako tukee, täsmällisyys kumoaa (heikko asetelma) ja toisto
+  muissa maissa jää ratkaisematta.
+- **Tulkinta:** työttömyyden nousua seuraa julkisten menojen kasvun yleinen hidastuminen, ei
+  palveluihin kohdistuva leikkaus. Suomen löydös ei toistu Ruotsissa ja Tanskassa.
+
+## H5: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T2 Pysyvyys: tukee.**
+  - r = +0,39 (n = 71, efektiivinen 23, yksisuuntainen p = 0,03).
+  - Maittain: Suomi +0,31, Ruotsi +0,45, Norja +0,50, Tanska +0,46, eli sama suunta kaikissa.
+- **Tila:** ehdokas, koska kaksi eri asetelmaa tukee, mutta kumpikaan ei ole vahva.
+- **Seuraava vahva asetelma:** annos–vaste kohorteittain tai alueittain. Ikäluokat, jotka tulivat
+  työmarkkinoille laman aikana, verrattuna muihin.

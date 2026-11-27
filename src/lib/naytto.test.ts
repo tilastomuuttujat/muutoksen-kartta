@@ -42,6 +42,8 @@ describe("pilot results", () => {
     expect(statusOfHypothesis(hypothesis("h1e")!)).toBe("ehdokas");
     expect(statusOfHypothesis(hypothesis("h1f")!)).toBe("oletus");
     expect(statusOfHypothesis(hypothesis("h1g")!)).toBe("kumottu");
+    expect(statusOfHypothesis(hypothesis("h4")!)).toBe("ristiriita");
+    expect(statusOfHypothesis(hypothesis("h5")!)).toBe("ehdokas");
     expect(statusOfHypothesis(hypothesis("h2")!)).toBe("kumottu");
     expect(statusOfHypothesis(hypothesis("h3")!)).toBe("tuettu");
   });
@@ -130,6 +132,20 @@ describe("pilot results", () => {
     expect(r["FI"]!.regained).toBe(2016);
     expect(Object.fromEntries(g.describe.moneyGrowth)[2009]).toBeCloseTo(0.5, 1);
     expect(Object.fromEntries(g.describe.moneyGrowth)[2015]).toBeCloseTo(10, 1);
+  });
+  it("H4 and H5 numbers quoted in the register", () => {
+    const [, rep, svc] = NAYTTO.hypotheses.h4.tests as { result: string; detail: Record<string, { r: number; p: number }> }[];
+    expect(rep!.result).toBe("ei-ratkea");
+    expect(rep!.detail["predictor"]!.r).toBeCloseTo(-0.14, 2);
+    expect(svc!.result).toBe("kumoaa");
+    expect(svc!.detail["d63"]!.r).toBeCloseTo(-0.155, 3);
+    expect(svc!.detail["d62"]!.r).toBeCloseTo(-0.25, 2);
+    const pers = NAYTTO.hypotheses.h5.tests[1]!;
+    expect(pers.result).toBe("tukee");
+    const d = pers.detail as { r: number; p: number; neff: number; countries: Record<string, { r: number }> };
+    expect(d.r).toBeCloseTo(0.39, 2);
+    expect(d.p).toBeLessThan(0.05);
+    for (const c of Object.values(d.countries)) expect(c.r).toBeGreaterThan(0);
   });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {
