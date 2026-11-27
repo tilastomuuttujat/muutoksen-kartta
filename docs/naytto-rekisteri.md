@@ -941,3 +941,21 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Tasoihin verrattuna äitiyskuolleisuus oli 1946–1951 keskimäärin 179 / 100 000, kun se 1927–1938
     oli 340. Lasku on −47 %, edelleen suuri.
   - Kirjattua tulosta ei muuteta.
+
+## H18. Muutto Ruotsiin seurasi työmarkkinoita
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Uusi teema.
+- **Väite:** suuren Ruotsiin muuton vaihtelua 1960–1992 selittivät Suomen työttömyys (työntö) ja
+  Ruotsin talouskasvu (veto). Paluumuutto Suomeen reagoi päinvastoin.
+- **Aineisto:**
+  - Suomesta Ruotsiin ja Ruotsista Suomeen muuttaneet (Turso: Korkiasaari 1993, taulu 3, 1945–1992).
+  - Suomen työttömyysaste (Turso: työvoimatutkimuksen historiallinen sarja, 1959–).
+  - Ruotsin BKT asukasta kohden (Gapminder fasttrack, kuten Mitä jos? -näkymässä).
+- **Menetelmä:** vuosimuutokset (log tai %-yks.), rajaus 5–95 %, AR(1)-suodatus, viive 0–1 v,
+  Šidák, 1961–1992.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Työntö | Suomen työttömyyden muutos → muutto Ruotsiin | Tukee: r > 0 ja p < 0,05. Kumoaa: r ≤ 0. Muuten: ei ratkea |
+| T2 Veto | Ruotsin BKT:n kasvu asukasta kohden → muutto Ruotsiin | Tukee: r > 0 ja p < 0,05. Kumoaa: r ≤ 0. Muuten: ei ratkea |
+| T3 Täsmällisyys | Suomen työttömyyden muutos → paluumuutto Ruotsista | Tukee: r < 0 ja p < 0,05. Kumoaa: r ≥ 0. Muuten: ei ratkea |
