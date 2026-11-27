@@ -1055,3 +1055,27 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Pahoinpitelyt jatkoivat kasvuaan 1970-luvulla, joten testi osoittaa vain hypyn vuonna 1969, ei
     koko myöhempää kasvua.
   - Testit eivät myöskään erottele keskiolutta ja maaseudun uusia alkoholiliikkeitä toisistaan.
+
+## H21. Vankiluvun lasku lisäsi rikollisuutta
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Uusi teema.
+- **Väite:** kun vankiluku laski 1970-luvulta 1990-luvulle kriminaalipolitiikan muutosten myötä,
+  rikollisuus kasvoi, koska vankilassa olevat eivät voi tehdä rikoksia (eristysvaikutus).
+  - Väite ennustaa, että vankiluvun muutosta seuraa vastakkaissuuntainen muutos rikoksissa.
+- **Aineisto:**
+  - Vankeja keskimäärin päivässä (Turso: HCS, 1886–2022).
+  - Poliisin tietoon tulleet ryöstöt ja pahoinpitelyt (Turso: HCS, 1927–2022).
+  - Väkiluku (StatFin 121v).
+  - Kaikki sarjat 100 000 asukasta kohden.
+- **Menetelmä:** log-vuosimuutokset, rajaus 5–95 %, AR(1)-suodatus, viive 1–2 v, Šidák, 1950–2019.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Ajoitus | Vankiluvun muutos → ryöstöjen muutos | Tukee: r < 0 ja p < 0,05. Kumoaa: r ≥ 0. Muuten: ei ratkea |
+| T2 Ajoitus | Vankiluvun muutos → pahoinpitelyjen muutos | Sama sääntö |
+
+- **Rajaus:**
+  - Rikokset voivat vaikuttaa myös vankilukuun, eli kausaalisuus voi kulkea toiseen suuntaan. Siksi
+    testissä käytetään viivettä 1–2 vuotta eikä samaa vuotta.
+  - Testi on heikko asetelma, joten tulos voi korkeintaan nostaa hypoteesin ehdokkaaksi tai pitää
+    sen oletuksena.
