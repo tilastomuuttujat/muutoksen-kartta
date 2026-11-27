@@ -1405,3 +1405,28 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Vuosi 1967 ei sovi palkkaselitykseen: palkat nousivat 29 %, mutta etu säilyi.
   - Viisi tapausta ei riitä erottamaan kierrettä muista syistä, kuten idänkaupasta tai
     maailmankaupan suhdanteista.
+
+## H24d. Reaalinen valuuttakurssi ratkaisi vientiedun keston
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Jatkoa H24c:lle.
+  - H24c:n mittari oli kotimainen inflaatio ilman vertailua kauppakumppaneihin. Tämä testi käyttää
+    reaalista efektiivistä valuuttakurssia.
+- **Väite:** devalvaation vientietu säilyi niin kauan kuin reaalinen valuuttakurssi pysyi
+  heikentyneenä. Kun Suomen hinnat kurottivat kauppakumppaneiden hintojen edelle, eli reaalinen
+  kurssi vahvistui, etu kului.
+- **Aineisto:** Global Macro Database, julkaisu 2026_09 (Müller ym.).
+  - Lähde: gmd-releases.s3.ap-southeast-2.amazonaws.com, distribute/GMD_2026_09.dta.
+  - Suomen REER: reaalinen efektiivinen valuuttakurssi, jossa nousu tarkoittaa vahvistumista.
+  - Viennin osuus BKT:sta on edelleen StatFin 15ai -sarjasta, kuten H24:ssä.
+  - GMD ketjuttaa useita lähteitä, eikä tämän testin yhteydessä ole tarkistettu, miten REER on
+    muodostettu ennen vuotta 1960.
+- **Tapahtumat:** 1957, 1967, 1977, 1982, 1991. Spearmanin tarkka yksisuuntainen p, kuten H24c:ssä.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Annos | REER:n log-muutos t0 + 2 → t0 + 5 (reaalinen vahvistuminen) vs. viennin osuuden kuluminen t0 + 2 → t0 + 5 | Tukee: rho ≤ −0,9. Kumoaa: rho ≥ 0. Muuten: ei ratkea |
+| T2 Annos | REER:n log-muutos t0 − 1 → t0 + 5 (jäljelle jäänyt reaalinen heikkeneminen) vs. viennin osuuden muutos t0 → t0 + 5 | Tukee: rho ≤ −0,9. Kumoaa: rho ≥ 0. Muuten: ei ratkea |
+| T3 Ajoitus | Kaikki vuodet 1951–2020: REER:n log-vuosimuutos → viennin osuuden log-vuosimuutos, viive 1–2 v. Rajaus 5–95 %, AR(1)-suodatus, Šidák | Tukee: r < 0 ja p < 0,05. Kumoaa: r ≥ 0. Muuten: ei ratkea |
+
+- **Kuvaileva tarkistus** (ei testi): REER:n muutos t0 − 1 → t0 + 1 kertoo, heikkenikö reaalinen
+  kurssi ylipäätään kussakin devalvaatiossa.
