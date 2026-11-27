@@ -382,3 +382,25 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - Laman ikäluokat olivat kuitenkin kymmenen vuoden päästä työllisyydeltään muiden tasolla.
   - Työllisyydessä mitattuna jälki haalistui, eikä se jäänyt pysyväksi.
   - Muita seurauksia (tulot, terveys, perheen perustaminen) tämä testi ei mittaa.
+
+## H1d / T7 Esikoisikä ikäluokittain (annos–vaste)
+
+- **Kirjattu:** 27.11.2026, ennen laskentaa. Tämä on H1d:n vahva asetelma.
+- **Väite:** ikäluokat, jotka tulivat työmarkkinoille huonona aikana, saavat esikoisensa myöhemmin.
+  30 ikävuoteen mennessä niistä harvempi on saanut esikoisen.
+- **Aineisto:**
+  - Esikoiset äidin iän mukaan: StatFin 12dm, 1990–2025.
+  - Naiset ikävuosittain: StatFin 115c, 1987–2024. Keskiväkiluku on edellisen ja kuluvan vuoden
+    lopun keskiarvo, ja vuodelle 2025 käytetään vuoden 2024 loppua.
+- **Seuraus:** esikoisten kumulatiivinen hedelmällisyys 20–29-vuotiaana, eli esikoisten määrä naista
+  kohden 30 ikävuoteen mennessä. Alle 20-vuotiaiden synnytykset puuttuvat, koska aineisto alkaa 1990,
+  mutta niiden osuus on pieni.
+- **Altistus:** sama kuin H5:n ikäluokkatestissä, eli 25–54-vuotiaiden työttömyysaste (115c) niinä
+  vuosina, kun ikäluokka oli 21–24-vuotias.
+- **Ikäluokat:** syntyneet 1970–1996.
+- **Menetelmä:** sama kuin H5:n ikäluokkatestissä (lineaarinen trendi pois, Pearson r, kehämäinen
+  permutaatio).
+- **Tukee:** r < 0 ja yksisuuntainen p < 0,05. **Kumoaa:** r ≥ 0. Muuten: ei ratkea.
+- **Lisätieto, ei vaikuta tulokseen:** esikoiset 20–39-vuotiaana (syntyneet 1970–1986). Jos kyse on
+  pelkästä lykkäämisestä, ero tasoittuu 40 ikävuoteen mennessä. Jos ei tasoitu, osa esikoisista jää
+  kokonaan syntymättä.
