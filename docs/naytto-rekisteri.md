@@ -200,3 +200,20 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
     kolmas kansallinen tekijä.
   - Muuttoliike voi myös hämärtää alue-eroja: ihmiset muuttavat töiden perässä ennen lasten
     saamista.
+
+## H1f. Asuntomarkkinat → syntyvyys
+
+- **Kirjattu:** 27.11.2026, ennen alla olevien testien laskentaa.
+- **Syy:** H1 ja H1e osoittivat, että syntyvyys liikkuu koko maan työmarkkinoiden kanssa mutta ei
+  alueiden välillä. Asuntomarkkinat ovat yksi koko maan tasolla vaikuttava reitti.
+- **Väite:** perheasunnon hinta ratkaisee. Kun asuntojen reaalihinnat tai korot nousevat, syntyvyys
+  laskee noin 1–2 vuoden päästä. Yhteys on vähintään yhtä vahva kuin työllisyyden.
+
+| Testi | Asetelma | Tukee / kumoaa |
+|---|---|---|
+| T1 Asuntojen hinnat | Eurostat prc_hpi_a (kaikki asunnot, 2015 = 100) deflatoituna kuluttajahinnoilla (prc_hicp_aind, CP00). Suomi, Ruotsi, Norja ja Tanska 2005–. Log-muutokset, rajaus, AR(1), viive 1–2 v, Šidák, maat yhdessä. Vertailu työllisyysasteeseen 30–34 (Turso) samoissa maissa ja samoina vuosina. | Tukee: r < 0, p < 0,05 ja \|r\| ≥ työllisyyden \|r\|. Kumoaa: r ≥ 0. Muuten: ei ratkea |
+| T2 Korot | Eurostat irt_lt_mcby_a (pitkä korko). Suomi, Ruotsi ja Tanska 1990–, Norjan tieto puuttuu. Korkojen muutokset prosenttiyksikköinä, muuten kuten T1. Vertailu työllisyyteen samoissa maissa ja samoina vuosina. | Tukee: r < 0, p < 0,05 ja \|r\| ≥ työllisyyden \|r\|. Kumoaa: r ≥ 0. Muuten: ei ratkea |
+
+- **Tunnettu ongelma:** asuntojen hinnat nousevat yleensä hyvinä aikoina. Positiivinen yhteys
+  syntyvyyteen olisi siksi suhdanteen merkki, ei hintojen kustannusvaikutus. Se kumoaa väitteen, mutta
+  sitä ei tulkita todisteeksi vauraudesta.
