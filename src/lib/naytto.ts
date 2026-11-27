@@ -76,7 +76,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h15: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -346,6 +346,19 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Avioeroja oli 1988–1991 noin 39 % enemmän kuin aiempi kehitys ennusti, ja poikkeama oli suurempi kuin missään tavallisessa jaksossa 1960-luvulta alkaen. Solmittujen avioliittojen määrä pysyi ennallaan, joten muutos koski juuri eroja. Taso ei palannut: vielä 1990-luvun lopulla avioeroja oli noin puolet enemmän kuin vanha trendi ennusti. Uudistus ei siis vain purkanut kasautuneita eroja, vaan muutti avioerojen tason pysyvästi.",
     next: "Kartan aineistoon voisi lisätä yhteyden avioliittolain uudistuksesta (1988) avioerojen tasoon (ehdotus Lovableen). Jatkotesti: näkyykö muutos eniten pitkissä avioliitoissa, joissa syyllisyysperusteet olivat aiemmin suurin este?",
+  },
+  {
+    id: "h15",
+    title: "Euron käyttöönotto 2002 → hinnat",
+    claim: "Euron käyttöönotto käteisenä tammikuussa 2002 nosti hintoja Suomessa, koska hintoja pyöristettiin ylöspäin. Vaikutus näkyy eniten pienissä ostoksissa, kuten ravintoloissa ja kahviloissa.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. Uusi teema.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h15.tests,
+    predictions: [],
+    reading:
+      "Euron käyttöönotto ei näy Suomen vuosi-inflaatiossa, kun sitä verrataan Ruotsiin, Tanskaan ja Norjaan, joissa euroa ei otettu käyttöön: ero vuonna 2002 oli +0,3 prosenttiyksikköä, mikä on tavallista vuosivaihtelua. Ravintoloiden ja kahviloiden hinnat, joissa pyöristyksen pitäisi näkyä selvimmin, nousivat Suomessa vähemmän kuin vertailumaissa. Testi mittaa tilastoitua hintatasoa, ei koettua inflaatiota; kokemus kalliimmasta arjesta voi johtua näkyvistä pienistä hinnoista, joita indeksi painottaa vähän.",
+    next: "Tarkempi testi: kuukausi-indeksi (tammikuu 2002) ja yksittäiset pienet ostokset, kuten kahvikuppi ja parturi, joiden hinnoissa pyöristys näkyisi suoraan.",
   },
   {
     id: "h2",

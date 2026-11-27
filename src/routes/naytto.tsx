@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Kaksikymmentä hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Kaksikymmentäyksi hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Seitsemän väitettä kumoutui, kaksi on tuettu, viisi on ehdokkaita ja kuuden näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Seitsemän väitettä kumoutui, kaksi on tuettu, viisi on ehdokkaita ja seitsemän näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -227,6 +227,7 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h5" && t.id === "pysyvyys" && <PersistenceDots detail={t.detail as Persist} />}
       {h.id === "h11" && t.id === "annos" && <ChecksTable detail={t.detail as { b: number; p: number; checks: Record<string, { b: number; p: number }> }} />}
       {h.id === "h10" && t.id === "katkos" && <NeetChart a18={(t.detail as { series: [number, number][] }).series} a21={(h.tests[1]!.detail as { series: [number, number][] }).series} />}
+      {h.id === "h15" && <EuroBars detail={t.detail as { diff: [number, number][] }} what={t.id === "ravintolat" ? "Ravintoloiden ja kahviloiden hintojen" : "Kuluttajahintojen"} />}
       {h.id === "h14" && t.id === "katkos" && <BreakChart detail={t.detail as Break} cfg={{ trend: [1976, 1987], win: [1988, 1991], from: 1960, label: "laki voimaan 1/1988", ticks: [1960, 1976, 1988, 2000, 2025], zeroTicks: [0, 1, 2, 3], caption: "Avioerot 1 000 asukasta kohden (StatFin 121v). Katkoviiva: vuosien 1976–1987 trendi jatkettuna. Poikkeama 1988–1991 oli suurempi kuin kaikissa tavallisissa jaksoissa." }} />}
       {h.id === "h13" && t.id === "suomi" && <DecouplingChart detail={t.detail as { co2: [number, number][]; gdp: [number, number][] }} />}
       {h.id === "h12" && t.id === "toisto" && <CountryCorr h="h12" detail={t.detail as Pooled & Rc} />}
@@ -604,6 +605,30 @@ function DecouplingChart({ detail }: { detail: { co2: [number, number][]; gdp: [
         {[1970, 1980, 1990, 2005, 2022].map((t) => <text key={t} x={x(t)} y={H - 12} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
       </svg>
       <p className="text-xs text-muted-foreground">Suomi: BKT (Maddison) ja alueperusteiset hiilidioksidipäästöt (OWID), 2005 = 100. Vuosivaihtelut kulkevat yhdessä, mutta pitkä suunta erkanee 2000-luvun puolivälistä.</p>
+    </div>
+  );
+}
+
+function EuroBars({ detail, what }: { detail: { diff: [number, number][] }; what: string }) {
+  const D = detail.diff.filter(([y]) => y <= 2019);
+  const W = 620, H = 170, L = 40, R = 600, TOP = 10, BOT = 140;
+  const x0 = D[0]![0], x1 = D.at(-1)![0];
+  const bw = (R - L) / (x1 - x0 + 1);
+  const x = (y: number) => L + (y - x0) * bw;
+  const m = Math.max(...D.map((p) => Math.abs(p[1])), 1) * 1.1;
+  const y = (v: number) => (TOP + BOT) / 2 - (v / m) * ((BOT - TOP) / 2);
+  return (
+    <div className="mt-2 overflow-x-auto">
+      <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[460px] max-w-2xl" role="img" aria-label="Suomen inflaatio miinus Ruotsin, Tanskan ja Norjan keskiarvo vuosittain 1997–2019">
+        <line x1={L} x2={R} y1={y(0)} y2={y(0)} stroke="var(--foreground)" strokeOpacity={0.4} />
+        {D.map(([yr, v]) => (
+          <rect key={yr} x={x(yr) + 2} y={Math.min(y(v), y(0))} width={bw - 4} height={Math.abs(y(v) - y(0))}
+            fill={yr === 2002 ? "var(--primary)" : "var(--muted-foreground)"} fillOpacity={yr === 2002 ? 1 : yr === 2001 || yr === 2003 ? 0.6 : 0.35} />
+        ))}
+        {[-1, 0, 1].map((t) => <text key={t} x={L - 6} y={y(t) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">{t > 0 ? "+" : ""}{t}</text>)}
+        {[1997, 2002, 2010, 2019].map((t) => <text key={t} x={x(t) + bw / 2} y={H - 12} textAnchor="middle" className={`text-[10px] ${t === 2002 ? "fill-primary font-semibold" : "fill-muted-foreground"}`}>{t}</text>)}
+      </svg>
+      <p className="text-xs text-muted-foreground">{what} vuosimuutos Suomessa miinus Ruotsin, Tanskan ja Norjan keskiarvo, %-yks. (Eurostat, yhdenmukaistettu kuluttajahintaindeksi). Punainen: 2002, euron käyttöönotto.</p>
     </div>
   );
 }

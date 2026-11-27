@@ -836,3 +836,21 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 | T2 Täsmällisyys | CP111 ravintolat ja kahvilat, vuosi 2002 | Kuten T1 |
 
 - **Lisätieto:** samat erot vuosina 2001 ja 2003.
+
+## H15: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Kokonaisindeksi: ei ratkea.**
+  - Suomi 2,0 %, vertailumaat keskimäärin 1,7 % (Ruotsi 1,9, Tanska 2,4, Norja 0,8).
+  - Ero +0,3 %-yks., suurempi kuin 14:ssä 20 lumevuodesta (suurin lumevuosien ero +2,0).
+  - Ero oli 2001 +0,2 ja 2003 −0,8 %-yks.
+- **T2 Ravintolat ja kahvilat: kumoaa.**
+  - Suomi 3,0 %, vertailumaat keskimäärin 3,5 % (Ruotsi 4,3, Tanska 2,1, Norja 4,1).
+  - Ero −0,5 %-yks.
+- **Tila:** oletus. Tukevia testejä ei ole, ja kumoava testi on heikko asetelma.
+- **Tulkinta:**
+  - Euron käyttöönotto ei näy Suomen vuosi-inflaatiossa vertailumaihin nähden. Mahdollinen vaikutus
+    on pienempi kuin tavallinen vuosivaihtelu (noin ±1 %-yks.).
+  - Ravintoloiden ja kahviloiden hinnat, joissa pyöristyksen pitäisi näkyä selvimmin, nousivat
+    Suomessa vähemmän kuin vertailumaissa.
+  - Testi mittaa tilastoitua hintatasoa, ei koettua inflaatiota.

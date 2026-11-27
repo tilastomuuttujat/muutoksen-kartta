@@ -1409,6 +1409,35 @@ def h14():
     return {"tests": [t1, t2], "predictions": [], "extra": {"dev1992_1999pct": round((math.exp(later) - 1) * 100, 1)}}
 
 
+def h15():
+    """H15 (docs/naytto-rekisteri.md): euron käyttöönotto 2002 → hinnat (ero vertailumaihin, lumevuodet)."""
+    geos = "&".join(f"geo={c}" for c in COUNTRIES)
+    _, d = eurostat_multi("prc_hicp_aind", f"{geos}&coicop=CP00&coicop=CP111&unit=RCH_A_AVG")
+    # avaimet: (unit, coicop, geo)
+    ser = {}
+    for k, v in d.items():
+        ser.setdefault((k[-2], k[-1]), v)
+    def test(cp):
+        diff = {y: ser[(cp, "FI")][y] - np.mean([ser[(cp, c)][y] for c in ("SE", "DK", "NO")]) for y in range(1997, 2026)
+                if all(y in ser[(cp, c)] for c in COUNTRIES)}
+        plac = [diff[y] for y in range(1997, 2020) if y not in (2001, 2002, 2003)]
+        obs = diff[2002]
+        above = sum(1 for v in plac if v < obs)
+        res = "tukee" if obs > 0 and above / len(plac) >= 0.95 else "kumoaa" if obs <= 0 else "ei-ratkea"
+        return res, {"diff2002": round(obs, 2), "diff2001": round(diff[2001], 2), "diff2003": round(diff[2003], 2), "above": above, "placebo": len(plac),
+                     "placeboMax": round(max(plac), 2), "fi2002": ser[(cp, "FI")][2002],
+                     "others2002": {c: ser[(cp, c)][2002] for c in ("SE", "DK", "NO")},
+                     "diff": sorted((y, round(v, 2)) for y, v in diff.items())}
+    r1, d1 = test("CP00"); r2_, d2 = test("CP111")
+    t1 = {"id": "kokonais", "design": "luonnollinen", "result": r1, "date": str(date.today()),
+          "summary": f"Kuluttajahinnat 2002: Suomi {d1['fi2002']:.1f} %, vertailumaat keskimäärin {np.mean(list(d1['others2002'].values())):.1f} %; ero {d1['diff2002']:+.1f} %-yks., suurempi kuin {d1['above']}:ssä {d1['placebo']} lumevuodesta",
+          "detail": d1}
+    t2 = {"id": "ravintolat", "design": "tasmallisyys", "result": r2_, "date": str(date.today()),
+          "summary": f"Ravintolat ja kahvilat 2002: Suomi {d2['fi2002']:.1f} %, vertailumaat keskimäärin {np.mean(list(d2['others2002'].values())):.1f} %; ero {d2['diff2002']:+.1f} %-yks., suurempi kuin {d2['above']}:ssä {d2['placebo']} lumevuodesta",
+          "detail": d2}
+    return {"tests": [t1, t2], "predictions": []}
+
+
 def h11():
     """H11 (docs/naytto-rekisteri.md): ulkomaan kansalaisten osuus → Suomen kansalaisten työllisyys ja työttömyys."""
     regions = ["MK01", "MK02", "MK04", "MK05", "MK06", "MK07", "MK08", "MK09", "MK10", "MK11", "MK12", "MK13", "MK14", "MK15", "MK16", "MK17", "MK18", "MK19"]
@@ -1577,6 +1606,7 @@ def main():
     out["hypotheses"]["h12"] = h12()
     out["hypotheses"]["h13"] = h13()
     out["hypotheses"]["h14"] = h14()
+    out["hypotheses"]["h15"] = h15()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
@@ -1634,6 +1664,7 @@ def main():
         for t in out["hypotheses"][hk]["tests"]:
             print(hk, t["id"], t["result"], "|", t["summary"]); print("   ", t["detail"].get("countries", ""))
     d7 = out["hypotheses"]["h7"]["tests"][1]["detail"]; print("  miehet", d7["men"], "naiset", d7["women"]); print("  sarja", [x for x in d7["series"] if x[0] <= 2005])
+    for t in out["hypotheses"]["h15"]["tests"]: print("h15", t["id"], t["result"], "|", t["summary"]); print("   ", {k: v for k, v in t["detail"].items() if k != "diff"})
     for t in out["hypotheses"]["h14"]["tests"]: print("h14", t["id"], t["result"], "|", t["summary"])
     print("  h14 extra", out["hypotheses"]["h14"]["extra"], [x for x in out["hypotheses"]["h14"]["tests"][0]["detail"]["series"] if 1980 <= x[0] <= 1996])
     for t in out["hypotheses"]["h13"]["tests"]: print("h13", t["id"], t["result"], "|", t["summary"])
