@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Kolmekymmentäneljä hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Kolmekymmentäviisi hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Yhdeksän väitettä kumoutui, viisi on tuettu, kahdeksan on ehdokkaita ja kaksitoista näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Yhdeksän väitettä kumoutui, viisi on tuettu, kahdeksan on ehdokkaita ja kolmetoista näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -267,6 +267,9 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h24e" && t.id === "annos" && <PointScatter dots
         pts={(t.detail as unknown as { events: { iso: string; t: number; x: number; y: number }[] }).events.map((e) => ({ label: `${e.iso} ${e.t}`, x: e.x, y: e.y }))}
         xLabel="reaalisen kurssin muutos t0−1 → t0+5, % (− = heikkeni)" yLabel="viennin osuuden muutos t0 → t0+5, %" />}
+      {h.id === "h24f" && t.id === "hajotelma" && <PointScatter dots
+        pts={(t.detail as unknown as { events: { iso: string; t: number; e: number; g: number }[] }).events.map((e) => ({ label: `${e.iso} ${e.t}`, x: e.g, y: e.e }))}
+        xLabel="reaalinen BKT viidessä vuodessa, poikkeama maan tavallisesta, %" yLabel="viennin arvo (BKT-deflaattorilla), poikkeama maan tavallisesta, %" />}
       {h.id === "h14" && t.id === "katkos" && <BreakChart detail={t.detail as Break} cfg={{ trend: [1976, 1987], win: [1988, 1991], from: 1960, label: "laki voimaan 1/1988", ticks: [1960, 1976, 1988, 2000, 2025], zeroTicks: [0, 1, 2, 3], caption: "Avioerot 1 000 asukasta kohden (StatFin 121v). Katkoviiva: vuosien 1976–1987 trendi jatkettuna. Poikkeama 1988–1991 oli suurempi kuin kaikissa tavallisissa jaksoissa." }} />}
       {h.id === "h13" && t.id === "suomi" && <DecouplingChart detail={t.detail as { co2: [number, number][]; gdp: [number, number][] }} />}
       {h.id === "h12" && t.id === "toisto" && <CountryCorr h="h12" detail={t.detail as Pooled & Rc} />}
@@ -732,7 +735,10 @@ function PointScatter({ pts, xLabel, yLabel, dots = false }: { pts: { label: str
   const x = (v: number) => L + ((v - x0) / (x1 - x0)) * (R - L);
   const y = (v: number) => BOT - ((v - y0) / (y1 - y0)) * (BOT - TOP);
   const sgn = (v: number) => (v > 0 ? `+${v}` : v < 0 ? `−${-v}` : `${v}`);
-  const ticks = (a: number, b: number) => Array.from({ length: Math.round((b - a) / 10) + 1 }, (_, i) => a + i * 10).filter((t, _, arr) => arr.length <= 6 || t % 20 === 0);
+  const ticks = (a: number, b: number) => {
+    const step = [10, 20, 50, 100].find((st) => (b - a) / st <= 6) ?? 200;
+    return Array.from({ length: Math.floor((b - a) / 10) + 1 }, (_, i) => a + i * 10).filter((t) => t % step === 0);
+  };
   return (
     <div className="mt-2 overflow-x-auto">
       <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[460px] max-w-2xl" role="img" aria-label={`${xLabel} ja ${yLabel}: ${pts.map((p) => `${p.label}: ${p.x} %, ${p.y} %`).join("; ")}`}>

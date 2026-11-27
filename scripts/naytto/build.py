@@ -1750,6 +1750,57 @@ def h24e():
     return {"tests": [t1, t2], "predictions": []}
 
 
+def h24f():
+    """H24f (docs/naytto-rekisteri.md): kriisin jälkeinen vientiosuuden nousu = E − G; poikkeamat maan tavallisista jaksoista."""
+    import pandas as pd
+    path = os.environ.get("GMD_DTA", os.path.join("/tmp", "GMD_2026_09.dta"))
+    if not os.path.exists(path):
+        urllib.request.urlretrieve(GMD_URL, path)
+    d = pd.read_stata(path, columns=["ISO3", "year", "CurrencyCrisis", "REER", "exports_GDP", "exports", "deflator", "rGDP", "infl"])
+    d = d[d["year"].between(1950, 2025)]
+    ok = lambda v: v is not None and pd.notna(v) and v > 0
+    rows, dropped = [], 0
+    for iso, g in d.groupby("ISO3"):
+        if iso == "FIN":
+            continue
+        g = g.set_index("year")
+        cc, R, X, I = g["CurrencyCrisis"].to_dict(), g["REER"].to_dict(), g["exports_GDP"].to_dict(), g["infl"].to_dict()
+        EX, DF, RG = g["exports"].to_dict(), g["deflator"].to_dict(), g["rGDP"].to_dict()
+        lowinf = lambda win: all(pd.notna(I.get(s_)) and I.get(s_) < 25 for s_ in win)
+        EG = lambda t: (math.log(EX[t + 5] / DF[t + 5]) - math.log(EX[t] / DF[t]), math.log(RG[t + 5] / RG[t])) \
+            if all(ok(EX.get(s_)) and ok(DF.get(s_)) and ok(RG.get(s_)) for s_ in (t, t + 5)) else None
+        events = [t for t in range(1960, 2016) if cc.get(t) == 1 and cc.get(t - 1) == 0 and all(cc.get(s_) != 1 for s_ in range(t - 5, t))
+                  and all(ok(R.get(s_)) and ok(X.get(s_)) for s_ in range(t - 1, t + 6)) and lowinf(range(t - 1, t + 6))]
+        if not events:
+            continue
+        normal = [eg for s0 in range(1960, 2016) if all(cc.get(s_) == 0 for s_ in range(s0 - 1, s0 + 6)) and lowinf(range(s0 - 1, s0 + 6)) and (eg := EG(s0))]
+        for t in events:
+            eg = EG(t)
+            if eg is None or len(normal) < 5:
+                dropped += 1
+                continue
+            e_dev = eg[0] - float(np.median([q[0] for q in normal]))
+            g_dev = eg[1] - float(np.median([q[1] for q in normal]))
+            rows.append({"iso": iso, "t": t, "E": eg[0], "G": eg[1], "Edev": e_dev, "Gdev": g_dev})
+    def sign_test(vals):
+        n = len(vals); k = sum(1 for v in vals if v > 0)
+        p_ = sum(math.comb(n, j) for j in range(k, n + 1)) / 2 ** n
+        return k, n, p_
+    E_dev = [r_["Edev"] for r_ in rows]; S = [r_["Edev"] + r_["Gdev"] for r_ in rows]; G_dev = [r_["Gdev"] for r_ in rows]
+    k1, n1, p1 = sign_test(E_dev); k2, n2, p2 = sign_test(S)
+    m1, m2, mg = float(np.median(E_dev)), float(np.median(S)), float(np.median(G_dev))
+    res = lambda m, p_: "tukee" if m > 0 and p_ < 0.05 else "kumoaa" if m <= 0 else "ei-ratkea"
+    pc = lambda v: round((math.exp(v) - 1) * 100, 1)
+    t1 = {"id": "vienti", "design": "luonnollinen", "result": res(m1, p1), "date": str(date.today()),
+          "summary": f"{n1} kriisiä: viennin arvo (BKT-deflaattorilla) kasvoi viidessä vuodessa maan tavallista enemmän {k1}/{n1} tapauksessa, mediaanipoikkeama {pc(m1):+.1f} % (merkkitesti p = {p1:.4f})",
+          "detail": {"k": k1, "n": n1, "p": round(p1, 6), "medianPct": pc(m1), "dropped": dropped}}
+    t2 = {"id": "hajotelma", "design": "tasmallisyys", "result": res(m2, p2), "date": str(date.today()),
+          "summary": f"Viennin lisäkasvu ylitti BKT:n vajeen {k2}/{n2} tapauksessa, mediaani {pc(m2):+.1f} % (p = {p2:.4f}); BKT:n mediaanipoikkeama {pc(mg):+.1f} %",
+          "detail": {"k": k2, "n": n2, "p": round(p2, 6), "medianPct": pc(m2), "gdpMedianPct": pc(mg),
+                     "events": [{"iso": r_["iso"], "t": r_["t"], "e": pc(r_["Edev"]), "g": pc(r_["Gdev"])} for r_ in rows]}}
+    return {"tests": [t1, t2], "predictions": []}
+
+
 def pension_age(c):
     """Alin vanhuuseläkeikä vuosina syntymävuoden mukaan (vuoden 2017 uudistus)."""
     if c <= 1954:
@@ -2154,6 +2205,7 @@ def main():
     out["hypotheses"]["h24c"] = out["hypotheses"]["h24"].pop("kierre")
     out["hypotheses"]["h24d"] = out["hypotheses"]["h24"].pop("reaali")
     out["hypotheses"]["h24e"] = h24e()
+    out["hypotheses"]["h24f"] = h24f()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.

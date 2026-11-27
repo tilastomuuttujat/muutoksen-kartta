@@ -1554,3 +1554,24 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
   - BKT-deflaattorilla deflatoitu vienti sisältää myös vientihintojen nousun suhteessa kotimaisiin
     hintoihin, mikä on devalvaation välitön hintavaikutus. Se ei siis ole puhdas määrämittari.
   - Tulosta luetaan muodossa: kasvoiko viennin arvo kotimaisina hyödykkeinä tavallista enemmän.
+
+## H24f: tulos
+
+- **Laskettu:** 27.11.2026.
+- **Aineisto:** 74 kriisiä. H24e:n 78 tapahtumasta neljä putosi pois, koska maalla oli alle 5
+  tavallista jaksoa tai sarjat puuttuivat.
+- **T1 Vienti: ei ratkea.**
+  - Viennin arvo (BKT-deflaattorilla) kasvoi viidessä vuodessa maan tavallista enemmän 44/74
+    tapauksessa.
+  - Mediaanipoikkeama oli +6,1 % (merkkitesti p = 0,065).
+- **T2 Hajotelma: ei ratkea.**
+  - Viennin lisäkasvu ylitti BKT:n vajeen 42/74 tapauksessa, mediaani +4,1 % (p = 0,15).
+  - Reaalisen BKT:n mediaanipoikkeama oli −0,2 %, eli BKT kasvoi viidessä vuodessa lähes
+    tavalliseen tapaan.
+- **Tila:** oletus.
+- **Tulkinta:**
+  - Kilpaileva selitys ei saanut tukea: viennin osuuden nousu ei johtunut BKT:n supistumisesta,
+    koska BKT kasvoi viidessä vuodessa tyypillisesti normaalisti.
+  - Väitteen oma osa, eli viennin tavallista suurempi kasvu, oli ennustetun suuntainen mutta jäi
+    merkkitestissä niukasti merkitsevyyden alle (44/74).
+  - Kirjattu ehto ei täyttynyt, joten väite jää oletukseksi.
