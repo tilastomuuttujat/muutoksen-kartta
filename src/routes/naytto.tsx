@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Yhdeksäntoista hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Kaksikymmentä hypoteesia, joista kolme tuli seulasta. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Seitsemän väitettä kumoutui, yksi on tuettu, viisi on ehdokkaita ja kuuden näyttö on kesken</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Seitsemän väitettä kumoutui, kaksi on tuettu, viisi on ehdokkaita ja kuuden näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -227,6 +227,7 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h5" && t.id === "pysyvyys" && <PersistenceDots detail={t.detail as Persist} />}
       {h.id === "h11" && t.id === "annos" && <ChecksTable detail={t.detail as { b: number; p: number; checks: Record<string, { b: number; p: number }> }} />}
       {h.id === "h10" && t.id === "katkos" && <NeetChart a18={(t.detail as { series: [number, number][] }).series} a21={(h.tests[1]!.detail as { series: [number, number][] }).series} />}
+      {h.id === "h14" && t.id === "katkos" && <BreakChart detail={t.detail as Break} cfg={{ trend: [1976, 1987], win: [1988, 1991], from: 1960, label: "laki voimaan 1/1988", ticks: [1960, 1976, 1988, 2000, 2025], zeroTicks: [0, 1, 2, 3], caption: "Avioerot 1 000 asukasta kohden (StatFin 121v). Katkoviiva: vuosien 1976–1987 trendi jatkettuna. Poikkeama 1988–1991 oli suurempi kuin kaikissa tavallisissa jaksoissa." }} />}
       {h.id === "h13" && t.id === "suomi" && <DecouplingChart detail={t.detail as { co2: [number, number][]; gdp: [number, number][] }} />}
       {h.id === "h12" && t.id === "toisto" && <CountryCorr h="h12" detail={t.detail as Pooled & Rc} />}
       {(h.id === "h8" || h.id === "h9") && t.id === "toisto" && <CountryCorr h={h.id} detail={t.detail as Pooled & Rc} />}
@@ -409,9 +410,12 @@ function CohortChart({ detail, outcomeLabel = "Työllisyys 33–37-vuotiaana mii
 
 type Break = { dev: number; pct: number; percentile: number; placebo: number; above: number; series: [number, number][] };
 
-function BreakChart({ detail }: { detail: Break }) {
-  const pts = detail.series.filter(([y]) => y >= 1985);
-  const pre = detail.series.filter(([y]) => y >= 1992 && y <= 2003);
+type BreakCfg = { trend: [number, number]; win: [number, number]; from: number; label: string; ticks: number[]; zeroTicks: number[]; caption: string };
+const ALCOHOL_BREAK: BreakCfg = { trend: [1992, 2003], win: [2004, 2007], from: 1985, label: "veronalennus 3/2004", ticks: [1985, 1995, 2004, 2015, 2025], zeroTicks: [0, 20, 40], caption: "" };
+
+function BreakChart({ detail, cfg = ALCOHOL_BREAK }: { detail: Break; cfg?: BreakCfg }) {
+  const pts = detail.series.filter(([y]) => y >= cfg.from);
+  const pre = detail.series.filter(([y]) => y >= cfg.trend[0] && y <= cfg.trend[1]);
   const n = pre.length;
   const mx = pre.reduce((a, p) => a + p[0], 0) / n, my = pre.reduce((a, p) => a + Math.log(p[1]), 0) / n;
   const b = pre.reduce((a, p) => a + (p[0] - mx) * (Math.log(p[1]) - my), 0) / pre.reduce((a, p) => a + (p[0] - mx) ** 2, 0);
@@ -425,16 +429,16 @@ function BreakChart({ detail }: { detail: Break }) {
     <div className="mt-2 overflow-x-auto">
       <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[460px] max-w-2xl" role="img"
         aria-label={`Alkoholiperäinen kuolleisuus ${x0}–${x1}, trendi 1992–2003 jatkettuna vuoteen 2007`}>
-        <rect x={x(2004)} y={TOP} width={x(2007) - x(2004)} height={BOT - TOP} fill="var(--primary)" fillOpacity={0.08} />
-        <text x={x(2004) + 3} y={TOP + 10} className="fill-primary text-[10px]">veronalennus 3/2004</text>
-        <path d={[1992, 2007].map((yr, i) => `${i ? "L" : "M"}${x(yr)},${y(trend(yr))}`).join(" ")} fill="none" stroke="var(--muted-foreground)" strokeDasharray="5 4" strokeWidth={1.5} />
+        <rect x={x(cfg.win[0])} y={TOP} width={x(cfg.win[1]) - x(cfg.win[0])} height={BOT - TOP} fill="var(--primary)" fillOpacity={0.08} />
+        <text x={x(cfg.win[0]) + 3} y={TOP + 10} className="fill-primary text-[10px]">{cfg.label}</text>
+        <path d={[cfg.trend[0], cfg.win[1]].map((yr, i) => `${i ? "L" : "M"}${x(yr)},${y(trend(yr))}`).join(" ")} fill="none" stroke="var(--muted-foreground)" strokeDasharray="5 4" strokeWidth={1.5} />
         <path d={pts.map(([a, v], i) => `${i ? "L" : "M"}${x(a).toFixed(1)},${y(v).toFixed(1)}`).join(" ")} fill="none" stroke="var(--primary)" strokeWidth={2.2} />
-        {[0, 20, 40].filter((t) => t < hi).map((t) => <text key={t} x={L - 6} y={y(t) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">{t}</text>)}
-        {[1985, 1995, 2004, 2015, x1].map((t) => <text key={t} x={x(t)} y={H - 12} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
+        {cfg.zeroTicks.filter((t) => t < hi).map((t) => <text key={t} x={L - 6} y={y(t) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">{t}</text>)}
+        {cfg.ticks.map((t) => <text key={t} x={x(t)} y={H - 12} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
       </svg>
-      <p className="text-xs text-muted-foreground">
+      {cfg.caption ? <p className="text-xs text-muted-foreground">{cfg.caption}</p> : <p className="text-xs text-muted-foreground">
         Alkoholiperäiset taudit ja alkoholimyrkytykset, ikävakioitu kuolleisuus / 100 000 (StatFin 11ay). Katkoviiva: vuosien 1992–2003 trendi jatkettuna. Poikkeama 2004–2007 oli suurempi kuin {detail.above}:ssä {detail.placebo} tavallisesta jaksosta; kirjattu raja oli 95 %.
-      </p>
+      </p>}
     </div>
   );
 }

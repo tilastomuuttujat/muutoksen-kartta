@@ -76,7 +76,7 @@ export type Describe = {
 };
 type Data = {
   built: string;
-  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
+  hypotheses: { h1: H1Data; h1g: { tests: Test[]; predictions: Prediction[]; describe: Describe }; h1f: { tests: Test[]; predictions: Prediction[] }; h1e: { tests: Test[]; predictions: Prediction[]; model: { a: number; b: number; sd: number; n: number } }; h2: { tests: Test[]; predictions: Prediction[] }; h3: { tests: Test[]; predictions: Prediction[] }; h4: { tests: Test[]; predictions: Prediction[] }; h5: { tests: Test[]; predictions: Prediction[] }; h7: { tests: Test[]; predictions: Prediction[] }; h8: { tests: Test[]; predictions: Prediction[] }; h9: { tests: Test[]; predictions: Prediction[] }; h10: { tests: Test[]; predictions: Prediction[]; extra: Record<string, unknown> }; h11: { tests: Test[]; predictions: Prediction[] }; h12: { tests: Test[]; predictions: Prediction[] }; h13: { tests: Test[]; predictions: Prediction[] }; h14: { tests: Test[]; predictions: Prediction[]; extra: { dev1992_1999pct: number } }; h6: { tests: Test[]; predictions: Prediction[]; extra: Record<string, { dev: number; pct: number; percentile: number }> } };
 };
 export const NAYTTO = raw as unknown as Data;
 
@@ -333,6 +333,19 @@ export const HYPOTHESES: Hypothesis[] = [
     reading:
       "Tulos on kaksijakoinen. Päästöt laskivat vuodesta 2005 kaikissa neljässä Pohjoismaassa 18–46 %, vaikka talous kasvoi 14–39 %: pitkä kehityssuunta irtosi kasvusta. Vuodesta toiseen päästöt seuraavat taloutta kuitenkin edelleen, jopa tiiviimmin kuin ennen: taantumissa 2009 ja 2020 ne laskivat jyrkästi. Kirjattu mittari, vuosimuutosten jousto, mittasi suhdanneherkkyyttä eikä pitkää kehitystä, joten hypoteesi kumoutui sääntöjen mukaan, vaikka väitteen ydin näkyy aineistossa.",
     next: "Tarkennus oikealla mittarilla (H13b): päästöjen muutos nollakasvun vuonna (vakiotermi) ennen ja jälkeen 2005. Koska luvut on jo nähty, testi ei olisi ennalta kirjattu; uusi ennalta kirjattava testi olisi esimerkiksi ennuste vuoden 2025 päästöistä BKT-ennusteen perusteella.",
+  },
+  {
+    id: "h14",
+    title: "Avioerolain uudistus 1988 → avioerot",
+    claim: "Avioliittolain uudistus 1.1.1988, joka poisti syyllisyysperusteet ja salli eron puolen vuoden harkinta-ajan jälkeen, lisäsi avioeroja.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu ennen laskentaa. Uusi teema.",
+    map: { edge: "ei omaa yhteyttä kartassa", confidence: null },
+    tests: NAYTTO.hypotheses.h14.tests,
+    predictions: [],
+    reading:
+      "Avioeroja oli 1988–1991 noin 39 % enemmän kuin aiempi kehitys ennusti, ja poikkeama oli suurempi kuin missään tavallisessa jaksossa 1960-luvulta alkaen. Solmittujen avioliittojen määrä pysyi ennallaan, joten muutos koski juuri eroja. Taso ei palannut: vielä 1990-luvun lopulla avioeroja oli noin puolet enemmän kuin vanha trendi ennusti. Uudistus ei siis vain purkanut kasautuneita eroja, vaan muutti avioerojen tason pysyvästi.",
+    next: "Kartan aineistoon voisi lisätä yhteyden avioliittolain uudistuksesta (1988) avioerojen tasoon (ehdotus Lovableen). Jatkotesti: näkyykö muutos eniten pitkissä avioliitoissa, joissa syyllisyysperusteet olivat aiemmin suurin este?",
   },
   {
     id: "h2",

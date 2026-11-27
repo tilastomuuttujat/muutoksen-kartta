@@ -804,3 +804,16 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 
 - **Lisätieto, ei vaikuta tulokseen:** poikkeama 1992–1999 (pysyikö taso koholla vai purkautuiko
   vain kasautunut jono).
+
+## H14: tulos
+
+- **Laskettu:** 27.11.2026.
+- **T1 Luonnollinen koe: tukee.**
+  - Avioerot 1988–1991 +39 % vuosien 1976–1987 trendistä.
+  - Poikkeama on suurempi kuin kaikissa 43 lumejaksossa.
+  - Avioeroja 1 000 asukasta kohden: 1987: 2,05 → 1988: 2,45 → 1989: 2,89.
+- **T2 Negatiivinen kontrolli: tukee.** Solmitut avioliitot +1 % trendistä (suurempi kuin 28:ssa 43
+  lumejaksosta).
+- **Lisätieto:** 1992–1999 avioeroja oli edelleen +50 % vanhan trendin yläpuolella. Uudistus nosti
+  tasoa pysyvästi, eikä se vain purkanut kasautuneita eroja.
+- **Tila:** tuettu, koska kaksi eri asetelmaa tukee, niistä yksi vahva, eikä mikään kumoa.

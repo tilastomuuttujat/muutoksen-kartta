@@ -1366,6 +1366,49 @@ def h13():
     return {"tests": [t1, t2, t3], "predictions": []}
 
 
+def break_test(series, start, length, excl, first=1960, last=2021, pre=12):
+    """Katkos lineaarisesta log-trendistä (pre vuotta ennen) ja lumejaksot, jotka eivät osu väliin excl (esijakso mukaan)."""
+    def dev(st):
+        pp = [(y, math.log(series[y])) for y in range(st - pre, st) if y in series and series[y] > 0]
+        if len(pp) < pre - 2 or not all(y in series for y in range(st, st + length)):
+            return None
+        b = np.polyfit([q[0] for q in pp], [q[1] for q in pp], 1)
+        return float(np.mean([math.log(series[y]) - np.polyval(b, y) for y in range(st, st + length)]))
+    obs = dev(start)
+    starts = [st for st in range(first, last + 1) if st + length - 1 <= max(series) and (st + length - 1 < excl[0] or st - pre > excl[1])]
+    plac = [v for v in (dev(st) for st in starts) if v is not None]
+    above = sum(1 for v in plac if v < obs)
+    return {"dev": round(obs, 4), "pct": round((math.exp(obs) - 1) * 100, 1), "above": above, "placebo": len(plac),
+            "percentile": round(above / len(plac), 3)}
+
+
+def h14():
+    """H14 (docs/naytto-rekisteri.md): avioerolain uudistus 1988."""
+    ids, d = px("ssaaty/121v.px", [("timeperiod_y", "*"), ("contentscode", ["ssaaty-vm3136_as", "ssaaty-vm2126_as", "ssaaty-vaesto"])])
+    iy, ic = ids.index("timeperiod_y"), ids.index("contentscode")
+    T = {}
+    for k, v in d.items():
+        if v is not None:
+            T.setdefault(k[ic], {})[int(k[iy])] = v
+    pop = T["ssaaty-vaesto"]
+    rate = lambda key: {y: T[key][y] / pop[y] * 1000 for y in T[key] if y in pop and pop[y] and y >= 1900}
+    div, mar = rate("ssaaty-vm3136_as"), rate("ssaaty-vm2126_as")
+    a, m = break_test(div, 1988, 4, (1988, 1991)), break_test(mar, 1988, 4, (1988, 1991))
+    r1 = "tukee" if a["dev"] > 0 and a["percentile"] >= 0.95 else "kumoaa" if a["dev"] <= 0 else "ei-ratkea"
+    r2_ = "kumoaa" if m["dev"] >= a["dev"] else "tukee" if r1 == "tukee" and m["percentile"] < 0.95 else "ei-ratkea"
+    t1 = {"id": "katkos", "design": "luonnollinen", "result": r1, "date": str(date.today()),
+          "summary": f"Avioerot 1988–1991 {a['pct']:+.0f} % vuosien 1976–1987 trendistä; suurempi kuin {a['above']}:ssä {a['placebo']} lumejaksosta",
+          "detail": {**a, "series": sorted((y, round(v, 3)) for y, v in div.items() if y >= 1950)}}
+    t2 = {"id": "kontrolli", "design": "tasmallisyys", "result": r2_, "date": str(date.today()),
+          "summary": f"Solmitut avioliitot 1988–1991 {m['pct']:+.0f} % trendistä; suurempi kuin {m['above']}:ssä {m['placebo']} lumejaksosta",
+          "detail": {**m, "series": sorted((y, round(v, 3)) for y, v in mar.items() if y >= 1950)}}
+    # lisätieto: pysyvyys 1992–1999 saman trendin jatkeena
+    pp = [(y, math.log(div[y])) for y in range(1976, 1988)]
+    bb = np.polyfit([q[0] for q in pp], [q[1] for q in pp], 1)
+    later = float(np.mean([math.log(div[y]) - np.polyval(bb, y) for y in range(1992, 2000)]))
+    return {"tests": [t1, t2], "predictions": [], "extra": {"dev1992_1999pct": round((math.exp(later) - 1) * 100, 1)}}
+
+
 def h11():
     """H11 (docs/naytto-rekisteri.md): ulkomaan kansalaisten osuus → Suomen kansalaisten työllisyys ja työttömyys."""
     regions = ["MK01", "MK02", "MK04", "MK05", "MK06", "MK07", "MK08", "MK09", "MK10", "MK11", "MK12", "MK13", "MK14", "MK15", "MK16", "MK17", "MK18", "MK19"]
@@ -1533,6 +1576,7 @@ def main():
     out["hypotheses"]["h11"] = h11()
     out["hypotheses"]["h12"] = h12()
     out["hypotheses"]["h13"] = h13()
+    out["hypotheses"]["h14"] = h14()
     out["hypotheses"]["h1"]["fiTfrLast"] = [max(fi_tfr), fi_tfr[max(fi_tfr)]]
     # Kerran kirjattua ennustetta ei lasketa uudelleen: piste, väli ja kirjauspäivä säilyvät.
     # Toteutunut arvo täytetään vasta, kun virallinen luku on julkaistu.
@@ -1590,6 +1634,8 @@ def main():
         for t in out["hypotheses"][hk]["tests"]:
             print(hk, t["id"], t["result"], "|", t["summary"]); print("   ", t["detail"].get("countries", ""))
     d7 = out["hypotheses"]["h7"]["tests"][1]["detail"]; print("  miehet", d7["men"], "naiset", d7["women"]); print("  sarja", [x for x in d7["series"] if x[0] <= 2005])
+    for t in out["hypotheses"]["h14"]["tests"]: print("h14", t["id"], t["result"], "|", t["summary"])
+    print("  h14 extra", out["hypotheses"]["h14"]["extra"], [x for x in out["hypotheses"]["h14"]["tests"][0]["detail"]["series"] if 1980 <= x[0] <= 1996])
     for t in out["hypotheses"]["h13"]["tests"]: print("h13", t["id"], t["result"], "|", t["summary"])
     for t in out["hypotheses"]["h12"]["tests"]: print("h12", t["id"], t["result"], "|", t["summary"]); print("   ", t["detail"].get("countries", ""))
     for hk, tid in (("h1", "annos"), ("h1e", "annos"), ("h1g", "annos"), ("h7", "annos")):
