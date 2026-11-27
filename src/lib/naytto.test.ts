@@ -38,6 +38,7 @@ describe("pilot results", () => {
     expect(statusOfHypothesis(hypothesis("h1")!)).toBe("kumottu");
     expect(statusOfHypothesis(hypothesis("h1b")!)).toBe("ristiriita");
     expect(statusOfHypothesis(hypothesis("h1c")!)).toBe("oletus");
+    expect(statusOfHypothesis(hypothesis("h1d")!)).toBe("ehdokas");
     expect(statusOfHypothesis(hypothesis("h2")!)).toBe("kumottu");
     expect(statusOfHypothesis(hypothesis("h3")!)).toBe("tuettu");
   });
@@ -75,6 +76,18 @@ describe("pilot results", () => {
     expect(d.partial.r).toBeCloseTo(-0.08, 2);
     expect(d.countries["DK"]!.r).toBeCloseTo(0.33, 2);
     for (const c of Object.values(d.countries)) expect(c.p).toBeGreaterThan(0.05);
+  });
+  it("firstborn test numbers quoted in the register", () => {
+    const t = NAYTTO.hypotheses.h1.firstborn;
+    expect(t.result).toBe("tukee");
+    const d = t.detail as { first: { r: number; p: number }; later: { r: number; p: number }; check: number; countries: Record<string, { first: { r: number }; later: { r: number } }> };
+    expect(d.check).toBeGreaterThan(0.99);
+    expect(d.first.r).toBeCloseTo(-0.29, 2);
+    expect(d.first.p).toBeCloseTo(0.009, 3);
+    expect(d.later.r).toBeCloseTo(-0.17, 2);
+    expect(d.later.p).toBeCloseTo(0.2, 2);
+    expect(d.countries["FI"]!.first.r).toBeCloseTo(-0.55, 2);
+    expect(d.countries["DK"]!.first.r).toBeCloseTo(0.16, 2);
   });
   it("every prediction has an interval around its point and is registered", () => {
     for (const h of HYPOTHESES) for (const p of h.predictions) {

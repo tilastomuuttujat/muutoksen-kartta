@@ -60,6 +60,7 @@ type H1Data = {
   tests: Test[];
   expectations: Test;
   temporary: Test;
+  firstborn: Test;
   predictions: Prediction[];
   model: { a: number; b: number; sd: number; n: number };
   fiTfrLast: [number, number];
@@ -128,7 +129,20 @@ export const HYPOTHESES: Hypothesis[] = [
     predictions: [],
     reading:
       "Määräaikaisuus ei ennustanut syntyvyyttä missään neljästä maasta, eikä se lisännyt mitään työttömyyden lisäksi. Työttömyys ennusti samoissa maissa ja samoina vuosina selvästi. Kolmen tarkennuksen jälkeen jäljelle jää kapea havainto: syntyvyys seuraa koko maan nuorten naisten työttömyyttä kahden vuoden viiveellä, mutta ei alueen omaa työttömyyttä, ei mielialaa eikä määräaikaisuutta. Mekanismi on vielä auki.",
-    next: "Mahdollisia selityksiä, joita ei ole testattu: työttömyys kuvaa koko maan työllistymisen vaikeutta, joka siirtää perheen perustamista (esim. ensimmäisen vakituisen työn saamisen ikä), tai yhteys kulkee perhepolitiikan ja julkisen talouden kautta, jotka reagoivat työttömyyteen. Ensimmäiseen sopisi esikoisten syntyvyys, toiseen päätösten ajoitus.",
+    next: "Perheen perustamisen lykkääntyminen kirjattiin uudeksi hypoteesiksi H1d. Politiikkareitti (perhepolitiikka ja julkinen talous reagoivat työttömyyteen) on vielä testaamatta.",
+  },
+  {
+    id: "h1d",
+    title: "Perheen perustamisen lykkääntyminen → syntyvyys",
+    claim: "Koko maan nuorten naisten työttömyys kuvaa sitä, kuinka vaikeaa on vakiinnuttaa työura. Se siirtää perheen perustamista, joten vaikutus näkyy ennen kaikkea esikoisissa.",
+    registered: "2026-11-27",
+    preregistered: "Kirjattu H1:n, H1b:n ja H1c:n testien jälkeen ja ennen esikoistestin laskentaa.",
+    map: { edge: "Globaali finanssikriisi → Historiallisen matalan syntyvyyden aika", confidence: "heikko" },
+    tests: [h1.firstborn],
+    predictions: [],
+    reading:
+      "Esikoisten syntyvyys seurasi työttömyyttä selvästi, myöhempien lasten heikommin, kuten lykkääntyminen ennustaa. Ero esikoisten ja myöhempien lasten välillä ei kuitenkaan ole itsessään merkitsevä, ja maittain kuva vaihtelee: Suomessa ja Ruotsissa molemmat reagoivat, Norjassa ja Tanskassa yhteys on heikko. Hypoteesi on ehdokas, ei vielä tuettu.",
+    next: "Vahvempi asetelma: annos–vaste ikäryhmittäin. Jos lykkääntyminen pitää, 25–29-vuotiaiden esikoisten pitäisi reagoida enemmän kuin yli 35-vuotiaiden, joilla lykkäämisen varaa on vähemmän. Lisäksi ennuste: esikoisten osuuden pitäisi laskea vuoteen 2026, koska työttömyys nousi 2024.",
   },
   {
     id: "h3",

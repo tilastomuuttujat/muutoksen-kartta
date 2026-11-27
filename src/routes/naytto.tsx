@@ -57,7 +57,7 @@ function EvidencePage() {
           tai putoaa portailla. Ennusteet ratkeavat, kun uudet tilastot julkaistaan.
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          Pilotti: viisi hypoteesia. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
+          Pilotti: kuusi hypoteesia. Tulokset {NAYTTO.built.split("-").reverse().join(".")}. <a href={REGISTER_URL} className="underline underline-offset-4">Hypoteesirekisteri</a> (kirjattu ennen testejä, muutokset uusina merkintöinä).
         </p>
       </header>
 
@@ -91,7 +91,7 @@ function Ladder() {
   }
   return (
     <section className="rounded-xl border bg-card p-5" aria-labelledby="ladder-h">
-      <h2 id="ladder-h" className="font-display text-xl">Kaksi väitettä kumoutui, yksi on tuettu, yhden näyttö on ristiriitaista ja yksi jäi ratkaisematta</h2>
+      <h2 id="ladder-h" className="font-display text-xl">Kaksi väitettä kumoutui, yksi on tuettu, yksi nousi ehdokkaaksi ja kahden näyttö on kesken</h2>
       <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {ORDER.map((s) => (
           <div key={s} className={`rounded-lg border p-2 ${s === "kumottu" ? "sm:mr-3" : ""}`}>
@@ -157,6 +157,7 @@ function TestRow({ h, t }: { h: Hypothesis; t: Test }) {
       {h.id === "h3" && t.id === "annos" && <RegionStrip detail={t.detail as Regions} />}
       {t.id === "odotukset" && <ExpectationDots detail={t.detail as Expect} />}
       {t.id === "maaraaikaisuus" && <TemporaryDots detail={t.detail as Temporary} />}
+      {t.id === "esikoiset" && <FirstbornDots detail={t.detail as Firstborn} />}
     </li>
   );
 }
@@ -200,6 +201,27 @@ function CountryDots({ detail }: { detail: Replication }) {
 
 type Expect = { confidence: Rc; unemployment: Rc; confidenceLong: Rc; countries: Record<string, Rc> };
 type Temporary = { temporary: Rc; unemployment: Rc; partial: Rc; countries: Record<string, Rc> };
+type Firstborn = { first: Rc; later: Rc; countries: Record<string, { first: Rc; later: Rc }>; check: number };
+
+function FirstbornDots({ detail }: { detail: Firstborn }) {
+  const c = detail.countries;
+  return (
+    <CompareDots
+      rows={[
+        ["Esikoiset: Suomi", c["FI"]!.first, "test", false],
+        ["Esikoiset: Ruotsi", c["SE"]!.first, "test", false],
+        ["Esikoiset: Norja", c["NO"]!.first, "test", false],
+        ["Esikoiset: Tanska", c["DK"]!.first, "test", false],
+        ["Esikoiset yhdessä", detail.first, "test", true],
+        ["Myöhemmät yhdessä", detail.later, "unemp", true],
+      ]}
+      side="neg"
+      band="H1d:n ennuste esikoisille"
+      note={`Selittäjä on naisten 25–34 työttömyys. Jos H1d pitää, esikoisten pallojen pitäisi olla nollan vasemmalla puolella ja kauempana kuin myöhempien lasten. Esikoisten hedelmällisyys on laskettu TFR:stä ja esikoisten osuudesta syntyneistä; Suomen tarkan sarjan kanssa vuosimuutosten korrelaatio on ${nf(detail.check, 3)}.`}
+    />
+  );
+}
+
 type DotRow = [string, Rc, "test" | "unemp", boolean];
 
 function ExpectationDots({ detail }: { detail: Expect }) {

@@ -150,3 +150,20 @@ vanhaa ei muokata. Tulokset: `src/data/naytto.json` (`scripts/naytto/build.py`),
 - **Aineiston tarkistus ennen tulosta:** Suomen likiarvoa verrataan tarkkaan esikoisten
   hedelmällisyyteen (12dm ja 12c6, `statfin.synt.tfr_order_1`). Jos vuosimuutosten korrelaatio on
   alle 0,9, testi tehdään vain Suomen tarkalla sarjalla ja tulos on enintään "ei ratkea".
+
+## H1d / T6: tulos
+
+- **Laskettu:** 27.11.2026.
+- **Aineiston tarkistus:** likiarvon ja Suomen tarkan sarjan vuosimuutosten korrelaatio oli 0,996.
+  Testi tehtiin siksi neljällä maalla.
+- **Tulos:** tukee.
+  - Esikoiset: r = −0,29 (viive 2 v, p = 0,009).
+  - Myöhemmät lapset: r = −0,17 (viive 2 v, p = 0,20).
+- **Varaukset:**
+  - Esikoisten ja myöhempien lasten ero ei itsessään ole tilastollisesti merkitsevä.
+  - Maittain kuva vaihtelee:
+    - Suomi: esikoiset −0,55, myöhemmät −0,47.
+    - Ruotsi: −0,42 ja −0,40.
+    - Norja: −0,12 ja −0,26.
+    - Tanska: +0,16 ja +0,24, ja vain 19 vuotta aineistoa.
+  - Tulos on heikko asetelma (täsmällisyys), joka nostaa H1d:n enintään ehdokkaaksi.

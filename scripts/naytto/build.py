@@ -179,7 +179,9 @@ def h1(nordic, fi_tfr):
     regional = h1_regional()
     expect = h1b_expectations(nordic, tfr, pw)
     temporary = h1c_temporary(nordic, pw)
+    firstborn = h1d_firstborn(nordic, tfr)
     return {
+        "firstborn": firstborn,
         "temporary": temporary,
         "expectations": expect,
         "tests": [
@@ -313,6 +315,80 @@ def h1c_temporary(nordic, pw):
             "date": str(date.today())}
 
 
+def eurostat_birth_order():
+    """Eurostat demo_fordagec: elävänä syntyneet järjestysluvun mukaan (kaikki iät)."""
+    url = ("https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_fordagec?"
+           + "&".join(f"geo={c}" for c in COUNTRIES) + "&age=TOTAL&format=JSON&lang=en")
+    with urllib.request.urlopen(url, timeout=120) as r:
+        d = json.load(r)
+    dims = d["id"]; size = d["size"]
+    cats = [{v: k for k, v in d["dimension"][i]["category"]["index"].items()} for i in dims]
+    out = {}
+    for pos, v in d["value"].items():
+        p, idx = int(pos), []
+        for s_ in reversed(size):
+            idx.append(p % s_); p //= s_
+        idx.reverse()
+        k = {dims[j]: cats[j][idx[j]] for j in range(len(dims))}
+        out.setdefault(k["geo"], {}).setdefault(int(k["time"]), {})[k["ord_brth"]] = v
+    return out
+
+
+def h1d_firstborn(nordic, tfr):
+    """T6 (docs/naytto-rekisteri.md, kirjattu ennen laskentaa): esikoiset vs. myöhemmät lapset."""
+    bo = eurostat_birth_order()
+    first, later = {}, {}
+    for c in COUNTRIES:
+        first[c], later[c] = {}, {}
+        for y, b in bo.get(c, {}).items():
+            known = sum(v for k, v in b.items() if k not in ("TOTAL", "UNK"))
+            if y in tfr[c] and known and "1" in b:
+                f = tfr[c][y] * b["1"] / known
+                first[c][y] = f; later[c][y] = tfr[c][y] - f
+    # tarkistus: Suomen likiarvo vs. tarkka esikoisten hedelmällisyys (indicators.json)
+    ind = json.load(open(os.path.join(ROOT, "src", "data", "indicators.json")))
+    items = ind if isinstance(ind, list) else ind.get("series", ind.get("indicators", ind))
+    items = items if isinstance(items, list) else list(items.values())
+    exact = {int(y): v for y, v in next(i for i in items if i.get("key") == "statfin.synt.tfr_order_1")["values"]}
+    ca, ce = changes(first["FI"], True), changes(exact, True)
+    common = sorted(set(ca) & set(ce))
+    check = float(np.corrcoef([ca[y] for y in common], [ce[y] for y in common])[0, 1])
+    pu = {c: prewhiten(changes(nordic["uw"][c], False)) for c in COUNTRIES}
+    if check >= 0.9:
+        cs, src_first, used = COUNTRIES, first, "likiarvo, neljä maata"
+    else:
+        cs, src_first, used = ["FI"], {"FI": exact}, "Suomen tarkka sarja (likiarvo ei läpäissyt tarkistusta)"
+    pf = {c: prewhiten(changes(src_first[c], True)) for c in cs}
+    pl = {c: prewhiten(changes(later[c], True)) for c in cs}
+
+    def pooled(target):
+        best = None
+        for k in (1, 2):
+            ps = [(pu[c][t - k], target[c][t]) for c in cs for t in target[c] if t - k in pu[c] and t <= 2024]
+            r, n = corr(ps)
+            if r is not None and (best is None or abs(r) > abs(best[0])):
+                best = (r, n, k)
+        r, n, k = best
+        return {"r": round(r, 3), "n": n, "lag": k, "p": round(1 - (1 - p_two_sided(r, n)) ** 2, 4)}
+
+    f, l = pooled(pf), pooled(pl)
+    per = {c: {"first": lead_corr(pu[c], pf[c]), "later": lead_corr(pu[c], pl[c])} for c in cs}
+    if f["r"] >= 0 or (l["r"] < f["r"] and l["p"] < 0.05):
+        result = "kumoaa"
+    elif f["p"] < 0.05 and abs(f["r"]) > abs(l["r"]):
+        result = "tukee"
+    else:
+        result = "ei-ratkea"
+    if len(cs) == 1 and result == "tukee":
+        result = "ei-ratkea"
+    return {"id": "esikoiset", "design": "tasmallisyys", "result": result,
+            "summary": (f"Esikoiset r = {f['r']:.2f} (viive {f['lag']} v, p = {f['p']:.3f}), myöhemmät lapset r = {l['r']:.2f} "
+                        f"(viive {l['lag']} v, p = {l['p']:.3f}); {used}"),
+            "detail": {"first": f, "later": l, "countries": per, "check": round(check, 3), "used": used,
+                       "share": {c: sorted((y, round(first[c][y] / tfr[c][y], 3)) for y in first[c]) for c in COUNTRIES}},
+            "date": str(date.today())}
+
+
 def h1_regional():
     ids_t, tf = px("synt/12du.px", [("alue_23_20260101", "*"), ("contentscode", ["tfr"]), ("timeperiod_y", "*")])
     ids_w, pop = px("tyokay/115w.px", [("alue_28_20250101", "*"), ("timeperiod_y", "*"), ("paaasial_toimin_3_20180101", ["11+12", "12"]), ("ikaryhma_10_20180101", ["25-29", "30-34"]),
@@ -437,7 +513,7 @@ def main():
     # Suomalainen lukuasu teksteihin: desimaalipilkku ja miinusmerkki.
     fi = lambda t: re.sub(r"(?<![\w])-(?=\d)", "−", re.sub(r"(?<=\d)\.(?=\d)", ",", t))
     for h in out["hypotheses"].values():
-        for t in h["tests"] + [h[k] for k in ("expectations", "temporary") if k in h]:
+        for t in h["tests"] + [h[k] for k in ("expectations", "temporary", "firstborn") if k in h]:
             t["summary"] = fi(t["summary"])
         for p in h["predictions"]:
             p["basis"] = fi(p["basis"])
@@ -454,6 +530,8 @@ def main():
     print("  maittain", e["countries"], "pitkä", e["confidenceLong"], e["confidenceYears"])
     tm = out["hypotheses"]["h1"]["temporary"]
     print("maaraaikaisuus", tm["result"], tm["summary"]); print("  osittais", tm["detail"]["partial"], "maittain", tm["detail"]["countries"])
+    fb = out["hypotheses"]["h1"]["firstborn"]
+    print("esikoiset", fb["result"], fb["summary"], "tarkistus", fb["detail"]["check"]); print("  maittain", fb["detail"]["countries"])
     print("malli", out["hypotheses"]["h1"]["model"])
     print("toisto maittain", json.dumps(out["hypotheses"]["h1"]["tests"][0]["detail"]["countries"]))
     print("miehet maittain", json.dumps(out["hypotheses"]["h1"]["tests"][2]["detail"]["menCountries"]))
