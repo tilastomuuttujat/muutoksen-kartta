@@ -36,3 +36,21 @@ describe("erkaantumiskartta", () => {
     for (let i = 1; i < d.length; i++) expect(d[i]!.median).toBeGreaterThanOrEqual(d[i - 1]!.median);
   });
 });
+
+describe("erkaantumisten luonne", () => {
+  it("labels and numbers quoted in docs/erkaantuminen.md", async () => {
+    const { natureOf } = await import("./erkaantuminen");
+    const N = ERK.nature!;
+    expect([N.heCount, N.heYears]).toEqual([5751, [1996, 2019]]);
+    const lab = (id: string) => natureOf(id)!.label;
+    expect([lab("E20"), lab("E11")]).toEqual(["ei laukaisijaa", "ei laukaisijaa"]);
+    expect(N.cases.filter((c) => c.label === "ulkoinen isku")).toHaveLength(8);
+    expect(N.cases.filter((c) => c.decision)).toHaveLength(0);
+    expect([natureOf("E24")!.nHits, natureOf("E24")!.placeboP90]).toEqual([68, 71]);
+    const sp = natureOf("nordics.govexp_social_protection_gdp_1995_2024")!;
+    expect([sp.nHits, sp.placeboP90, sp.placeboMedian]).toEqual([95, 95, 85]);
+    expect(natureOf("E20")!.measurement).toBe(true);
+    expect(natureOf("nordics.unemployment_rate_25_34_men_1990_2024")!.measurement).toBeNull();
+    for (const c of N.cases) expect(c.nHits).toBe(c.hits.length);
+  });
+});

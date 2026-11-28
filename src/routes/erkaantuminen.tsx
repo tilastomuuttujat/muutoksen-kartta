@@ -215,7 +215,12 @@ function NatureSummary() {
           </div>
         ))}
       </div>
-      <p className="mt-3 text-xs text-muted-foreground">Iskut: {N.shocks.map((s) => `${s.name} ${s.years[0]}–${s.years[1]}`).join("; ")}. Finanssikriisiä ei käytetä, koska se osui kaikkiin Pohjoismaihin.</p>
+      <p className="mt-3 max-w-3xl text-sm">
+        Yksikään erkaantuminen ei täytä päätöksenteon ehtoa: taitetta edeltänyt lainsäädäntöaktiivisuus ei ollut missään poikkeuksellinen (lähimpänä sosiaaliturvamenot, tasan rajalla).
+        Iskuluokka on väljä: työmarkkinoilla iskujen piiriin osuisi 11 vuotta 21:stä (2006–2016), joten se kertoo vain, että ajoitus sopii iskuihin. Iskujen osuuden erottaminen vaatii
+        alue- tai toimialavertailun. Kahta erkaantumista, koulutusta 1999 ja elinajanodotetta 2009, ei selitä mikään kirjatuista laukaisijoista.
+      </p>
+      <p className="mt-2 text-xs text-muted-foreground">Iskut: {N.shocks.map((s) => `${s.name} ${s.years[0]}–${s.years[1]}`).join("; ")}. Finanssikriisiä ei käytetä, koska se osui kaikkiin Pohjoismaihin.</p>
     </section>
   );
 }

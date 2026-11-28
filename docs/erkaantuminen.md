@@ -295,3 +295,54 @@ väliä).
    nimineen ja antopäivineen.
    - Lista ei väitä yksittäisen esityksen aiheuttaneen muutosta.
    - Sanallinen arvio mekanismin suunnasta merkitään arvioksi.
+
+## Luonteen tulokset 28.11.2026
+
+- **Aineisto:** Finlex, 5 751 hallituksen esitystä vuosilta 1996–2019. Eurostatin katkosmerkinnät
+  haettiin 28.11.2026.
+
+| Taite | Sarja | Osuvia esityksiä τ−3…τ (tavallisten jaksojen mediaani / 90 %:n raja) | Isku | Mittaus | Luokka |
+|---|---|---|---|---|---|
+| 1999 | Korkea-asteen tutkinto 25–34 | 24 (19 / 28) | – | katkosmerkintä 2000 | ei laukaisijaa, mittausvaraus |
+| 2000 | Julkisen talouden rahoitusjäämä | 68 (67 / 71) | I4 IT-kupla | ei | ulkoinen isku |
+| 2002 | Sosiaaliturvamenot / BKT | 95 (85 / 95) | I4 IT-kupla | ei | ulkoinen isku |
+| 2008 | Työttömyys, miehet 25–34 | 24 (22 / 30) | I1, I2 | ei katkostietoa | ulkoinen isku |
+| 2009 | Elinajanodote | 37 (32 / 40) | – | ei | ei laukaisijaa |
+| 2010 | Työttömyys 25–29 | 29 (22 / 30) | I1, I2 | ei | ulkoinen isku |
+| 2011 | Työllisyys 25–29 | 29 (22 / 30) | I1 | ei | ulkoinen isku |
+| 2014 | Pitkäaikaistyöttömien osuus 25–29 | 17 (22 / 30) | I3 | ei | ulkoinen isku |
+| 2015 | Pitkäaikaistyöttömien osuus 30–34 | 15 (22 / 30) | I3 | ei | ulkoinen isku |
+| 2015 | Määräaikaiset 25–34 | 15 (22 / 30) | I3 | ei | ulkoinen isku |
+
+Työmarkkinasarjoilla on yhteiset hakusanat, joten niiden tavallisten jaksojen mediaani ja raja ovat samat.
+
+- **Päätöksenteko: ei yhtään tapausta.** Taitetta edeltänyt lainsäädäntöaktiivisuus ei ylittänyt
+  tavallisten jaksojen 90 %:n rajaa missään tapauksessa.
+  - Lähimmäksi tulivat sosiaaliturvamenot, joissa osuvia esityksiä oli täsmälleen rajan verran (95)
+    ja raja edellyttää ylitystä, sekä rahoitusjäämä (68, raja 71).
+- **Ulkoinen isku: 8 tapausta.** Kaikki nuorten aikuisten työmarkkinoiden erkaantumiset 2008–2015
+  sekä julkinen talous 2000–2002.
+- **Ei laukaisijaa: 2 tapausta.** Korkea-asteen tutkinnot 1999 ja elinajanodote 2009.
+  - Korkea-asteen tutkintojen sarjassa on Eurostatin katkosmerkintä vuodelle 2000, joten osa
+    taitteesta voi olla mittausta.
+
+### Huomio säännön väljyydestä (jälkikäteinen, kuvaileva)
+
+- Iskuluokka perustuu vain ajoitukseen ja elämänalueeseen.
+- Työmarkkinasarjoilla iskun piiriin osuisi 11 vuotta 21:stä (2006–2016). Satunnainen taitevuosi saisi
+  siis iskuluokan noin joka toisella kerralla.
+- Julkisessa taloudessa osuvia vuosia on 3/21 (2000–2002).
+- "Ulkoinen isku" työmarkkinoilla tarkoittaa siksi vain, että ajoitus sopii iskuihin. Se ei osoita,
+  että iskut selittävät erkaantumisen.
+- Iskujen osuuden erottaminen vaatisi alue- tai toimialatason vertailun, esimerkiksi kasvoiko
+  nuorten työttömyys eniten Nokian ja metsäteollisuuden alueilla. Tämä on seuraava testattava
+  kysymys.
+
+### Tulkinta
+
+- Ennalta kirjatuilla säännöillä yksikään erkaantuminen ei ole päätöksenteon ehdokas.
+- Tämä ei tarkoita, ettei päätöksillä ollut merkitystä. Mittari tunnistaa vain poikkeuksellisen määrän
+  lainsäädäntöä. Yksittäinen suuri uudistus tavallisen määrän seassa jää siltä huomaamatta.
+- Työmarkkinoiden erkaantumiset ajoittuvat Suomeen kohdistuneisiin iskuihin.
+- Kahta erkaantumista (koulutus 1999 ja elinajanodote 2009) ei selitä mikään kirjatuista
+  laukaisijoista.
