@@ -15,7 +15,17 @@ export type Series = {
   countries: Record<Country, Result | null>; levels: Record<Country, [number, number][]>;
 };
 export type Cluster = { n: number; K: number; window: [number, number] | null; p: number | null; nullMean?: number; null95?: number };
+export type NatureCase = {
+  id: string; tau: number; group: string; nHits: number; placeboP90: number; placeboMedian: number; decision: boolean;
+  shocks: string[]; breakYears: number[] | null; measurement: boolean | null;
+  label: "päätöksenteko" | "ulkoinen isku" | "useita" | "ei laukaisijaa"; hits: [string, string | null, string][];
+};
+export type Nature = {
+  shocks: { id: string; name: string; years: [number, number]; domains: string[] }[];
+  keywords: Record<string, string[]>; cases: NatureCase[]; heYears: [number, number]; heCount: number;
+};
 type Data = {
+  nature?: Nature;
   built: string; analysed: Record<Country, number>; dropped: { id: string; name: string; duplicateOf: string }[];
   series: Series[]; clusters: Record<Country | "FI_worse", Cluster>;
 };
@@ -41,3 +51,7 @@ export function domainMedians() {
 
 /** Eron arvo näyttöyksikössä: log-sarjoissa prosenttiero, muuten sarjan oma yksikkö. */
 export const gapShown = (s: Series, v: number) => (s.log ? (Math.exp(v) - 1) * 100 : v);
+
+/** Erkaantumisen luonne sarjalle (docs/erkaantuminen.md, luonne). */
+export const natureOf = (id: string) => ERK.nature?.cases.find((c) => c.id === id);
+export const shockName = (id: string) => ERK.nature?.shocks.find((s) => s.id === id)?.name ?? id;

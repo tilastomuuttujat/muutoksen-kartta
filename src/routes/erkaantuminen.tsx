@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { CNAME, COUNTRIES, ERK, divergences, domainMedians, gapShown, type Series } from "@/lib/erkaantuminen";
+import { CNAME, COUNTRIES, ERK, divergences, domainMedians, gapShown, natureOf, shockName, type Series } from "@/lib/erkaantuminen";
 
 export const Route = createFileRoute("/erkaantuminen")({
   head: () => ({
@@ -82,6 +82,8 @@ function DivergencePage() {
         </div>
       </section>
 
+      {ERK.nature && <NatureSummary />}
+
       <section className="mt-6 rounded-xl border bg-card p-5" aria-labelledby="muut-h">
         <h2 id="muut-h" className="font-display text-xl">Vertailu: naapurimaiden erkaantumiset</h2>
         <ul className="mt-2 space-y-1 text-sm">
@@ -116,7 +118,7 @@ function Timeline({ rows, sel, onSel }: { rows: Series[]; sel?: string | undefin
               <text x={4} y={y + 4} className={`text-[11px] ${on ? "fill-primary font-semibold" : "fill-foreground"}`}>{s.name.length > 46 ? `${s.name.slice(0, 45)}…` : s.name}</text>
               <line x1={x(r.first)} x2={x(r.last)} y1={y} y2={y} stroke="var(--foreground)" strokeOpacity={0.2} />
               <circle cx={x(r.tau)} cy={y} r={5.5} fill={col} />
-              <text x={x(r.tau) + 9} y={y + 4} className="fill-muted-foreground text-[10px]">{r.tau}{r.moved?.mover === "muut" ? " · muut muuttuivat" : ""}</text>
+              <text x={x(r.tau) + 9} y={y + 4} className="fill-muted-foreground text-[10px]">{r.tau}{r.moved?.mover === "muut" ? " · muut muuttuivat" : ""}{natureOf(s.id) ? ` · ${natureOf(s.id)!.label}` : ""}</text>
             </g>
           );
         })}
@@ -159,6 +161,61 @@ function GapChart({ s }: { s: Series }) {
         </svg>
       </div>
       <p className="text-xs text-muted-foreground">Punainen: Suomi miinus Ruotsin, Norjan ja Tanskan keskiarvo{unit ? " (prosenttiero)" : ""}. Katkoviiva: sovitettu suora, jonka suunta muuttuu erkaantumisvuonna.</p>
+      <NatureBlock id={s.id} tau={r.tau} />
     </div>
+  );
+}
+
+function NatureBlock({ id, tau }: { id: string; tau: number }) {
+  const n = natureOf(id);
+  if (!n) return null;
+  return (
+    <div className="mt-3 rounded-md bg-muted/40 p-3 text-sm">
+      <div className="font-semibold">Luonne: {n.label}</div>
+      <ul className="mt-1 space-y-1 text-muted-foreground">
+        <li>
+          Päätöksenteko: {n.nHits} osuvaa hallituksen esitystä vuosina {tau - 3}–{tau}; tavallisissa neljän vuoden jaksoissa mediaani {n.placeboMedian.toLocaleString("fi-FI")}, 90 %:n raja {n.placeboP90.toLocaleString("fi-FI")}.
+          {n.decision ? " Poikkeuksellisen paljon." : " Ei poikkeuksellisen paljon."}
+        </li>
+        <li>Ulkoinen isku: {n.shocks.length ? n.shocks.map(shockName).join(", ") : "ei osu kirjattuihin iskuihin"}.</li>
+        <li>Mittaus: {n.measurement == null ? "lähteestä ei katkostietoa" : n.measurement ? `tilastossa katkosmerkintä (${n.breakYears!.filter((b) => Math.abs(b - tau) <= 1).join(", ")}): osa muutoksesta voi olla mittausta` : "ei katkosmerkintää taitteen lähellä"}.</li>
+      </ul>
+      {n.hits.length > 0 && (
+        <details className="mt-2">
+          <summary className="cursor-pointer text-xs">Taitetta edeltäneet osuvat hallituksen esitykset ({n.hits.length})</summary>
+          <ul className="mt-1 max-h-64 space-y-0.5 overflow-y-auto text-xs">
+            {n.hits.map((h) => <li key={h[0]}><span className="tabular-nums">HE {h[0]}</span> · {h[1]} · {h[2]}</li>)}
+          </ul>
+          <p className="mt-1 text-xs text-muted-foreground">Lista näyttää, mitä samalla alueella päätettiin; se ei väitä yksittäisen esityksen aiheuttaneen muutosta.</p>
+        </details>
+      )}
+    </div>
+  );
+}
+
+function NatureSummary() {
+  const N = ERK.nature!;
+  const order = ["päätöksenteko", "ulkoinen isku", "useita", "ei laukaisijaa"] as const;
+  const byLabel = order.map((l) => ({ l, cases: N.cases.filter((c) => c.label === l) }));
+  const name = (id: string) => ERK.series.find((s) => s.id === id)?.name ?? id;
+  return (
+    <section className="mt-6 rounded-xl border bg-card p-5" aria-labelledby="luonne-h">
+      <h2 id="luonne-h" className="font-display text-xl">Mikä taittoi kehityksen: luonne ennalta kirjatuilla säännöillä</h2>
+      <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
+        Päätöksenteko edellyttää, että taitetta edeltävinä neljänä vuotena samalle alueelle osuvia hallituksen esityksiä oli enemmän kuin 90 %:ssa tavallisista jaksoista
+        ({N.heCount.toLocaleString("fi-FI")} esitystä {N.heYears[0]}–{N.heYears[1]}, Finlex). Ulkoinen isku edellyttää, että taite osuu etukäteen nimetyn, Suomeen kohdistuneen iskun vuosiin
+        ja sen alueelle. Luokka on ehdokas, ei syy.
+      </p>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {byLabel.map(({ l, cases }) => (
+          <div key={l} className="rounded-lg border p-3">
+            <div className="text-sm font-semibold">{l}</div>
+            <div className="font-display text-2xl tabular-nums">{cases.length}</div>
+            <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">{cases.map((c) => <li key={c.id}>{c.tau} · {name(c.id)}</li>)}</ul>
+          </div>
+        ))}
+      </div>
+      <p className="mt-3 text-xs text-muted-foreground">Iskut: {N.shocks.map((s) => `${s.name} ${s.years[0]}–${s.years[1]}`).join("; ")}. Finanssikriisiä ei käytetä, koska se osui kaikkiin Pohjoismaihin.</p>
+    </section>
   );
 }
