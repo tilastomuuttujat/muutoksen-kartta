@@ -243,3 +243,55 @@ Kasautumistestiin se ei vaikuta.
     työttömyysero kaventui 1990-luvun lamasta vuoteen 2010 ja kääntyi sitten loivaan kasvuun
     (−0,5 → +1,1 %-yks.).
   - Sääntö kohtelee molempia erkaantumisina, joten luonne näytetään kunkin sarjan kaaviossa.
+
+## Erkaantumisten luonne: kirjattu 28.11.2026 ennen tapausten tarkastelua
+
+**Kysymys:** kun Suomen oma kehitys taittui, mikä sen taittoi: päätöksenteko, Suomeen kohdistunut
+ulkoinen isku, tilaston mittausmuutos vai jokin, jolle ei löydy laukaisijaa? Luokittelu koskee
+Suomen kymmentä erkaantumista. Se on kuvaileva, eikä se osoita syytä.
+
+### Lähteet
+
+- **Hallituksen esitykset:** Finlexin avoin rajapinta (opendata.finlex.fi). Mukana ovat kaikkien
+  vuosien 1996–2019 suomenkielisten esitysten nimet ja antopäivät. Nimet tallennetaan otteeksi.
+- **Ulkoisten iskujen lista:** kirjattu alla ennen tapausten tarkastelua.
+- **Eurostatin tilastomerkinnät:** katkosmerkintä "b" E-sarjoille.
+
+### Hakusanat sarjoittain
+
+Hallituksen esitys osuu sarjaan, jos sen nimessä on jokin sarjan hakusanoista (kirjainkoolla ei
+väliä).
+
+| Sarja | Hakusanat |
+|---|---|
+| E20 Korkea-asteen tutkinto | yliopisto, ammattikorkeakoulu, korkeakoulu, opintotu, opiskelijavalin, tutkinto |
+| E24 Julkisen talouden rahoitusjäämä | tulovero, veroasteikko, arvonlisävero, valtionosuu, valmistevero, verotus |
+| Sosiaaliturvamenot / BKT | eläke, työttömyysturva, sairausvakuutus, toimeentulotu, asumistu, lapsilisä, vammaisetuu |
+| Työmarkkinasarjat (työttömyys, työllisyys, pitkäaikaistyöttömyys, määräaikaiset) | työttömyysturva, työsopimus, työvoimapalvelu, työmarkkinatu, palkkatu, työllisyy, työllistämi |
+| E11 Elinajanodote | alkoholi, tupakka, terveydenhuol, kansanterveys, päihde |
+
+### Luokat
+
+1. **Päätöksenteko (ehdokas):** sarjaan osuvia hallituksen esityksiä on taitevuotta τ edeltävinä
+   vuosina τ − 3 … τ enemmän kuin 90 %:ssa saman sarjan tavallisista neljän vuoden jaksoista.
+   - Tavalliset jaksot ovat kaikki neljän vuoden jaksot, jotka päättyvät vuosina 1999–2019.
+   - Pelkkä osuva esitys ei riitä, koska työ- ja sosiaaliturvalakeja muutetaan lähes vuosittain.
+     Näyttöä on vasta poikkeuksellinen lainsäädäntöaktiivisuus.
+2. **Ulkoinen isku (ehdokas):** taitevuosi osuu iskun vuosiin tai seuraavaan vuoteen, ja sarjan
+   elämänalue on iskun alueilla.
+   - **I1 Nokian matkapuhelinliiketoiminnan alamäki 2008–2012:** Työ, Talous.
+   - **I2 Metsäteollisuuden kapasiteetin supistukset 2006–2009:** Työ, Talous.
+   - **I3 Venäjän kaupan romahdus 2014–2015:** Työ, Talous.
+   - **I4 IT-kuplan puhkeaminen 2000–2001:** Talous, Julkinen talous.
+   - Finanssikriisi 2008–2009 osui kaikkiin Pohjoismaihin, joten sitä ei käytetä Suomen omien
+     erkaantumisten selityksenä.
+3. **Mittaus (mahdollinen):** sarjan lähdetiedoissa on katkosmerkintä vuosina τ − 1 … τ + 1.
+4. **Lopullinen luokka:**
+   - Jos ehdot täyttyvät yhdessä luokassa, tapaus saa sen luokan.
+   - Jos useammassa, luokka on "useita".
+   - Jos ei missään, luokka on "ei laukaisijaa".
+   - Mittausehdokas mainitaan aina.
+5. **Kuvaileva tieto** kustakin tapauksesta: taitevuotta edeltäneet osuvat hallituksen esitykset
+   nimineen ja antopäivineen.
+   - Lista ei väitä yksittäisen esityksen aiheuttaneen muutosta.
+   - Sanallinen arvio mekanismin suunnasta merkitään arvioksi.
