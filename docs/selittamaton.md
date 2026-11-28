@@ -322,3 +322,66 @@ yhteistä aukkoa ei lasketa niille.
   - COFOG-luokitus poikkeaa Naton määritelmästä, eikä vuonna 2022 alkanut menojen nousu näy vielä
     kokonaisuudessaan keskiarvossa.
 - **Ehdokkaat:** kaikki "ei yhteyttä".
+
+## Kolmas erä: Suomen sisältä, kirjattu 28.11.2026 ennen laskentaa
+
+Maiden välinen malli näytti aukot. Nämä kolme tarkastelua kysyvät aukon *muotoa* Suomen sisältä tai
+Pohjoismaiden kesken: alkoiko muutos kaikkialla yhtä aikaa, seurasiko se suhdannetta, ja onko se
+Suomen oma vai yhteinen. Jokaiselle on kirjattu luokittelusääntö ennen laskentaa.
+
+- **Aineisto:** Turso-tietokannan sarjat, poimittu tiedostoon skriptillä
+  scripts/selittamaton/fetch_turso.py.
+
+### S1. Hoitojonot tuloryhmittäin
+
+- **Sarjat:**
+  - Jonon vuoksi saamatta jäänyt lääkärinhoito (fi.eusilc.unmet08.wlist) tuloviidenneksittäin
+    QU1–QU5, sukupuolet yhteensä, 2008–2025.
+  - Toistona hammashoito (fi.eusilc.unmet09.wlist).
+- **Muutos:** keskiarvo 2019–2023 miinus keskiarvo 2008–2012, %-yks., kullekin viidennekselle.
+- **Ajankohta:** ensimmäinen vuosi vuodesta 2011 alkaen, jolloin edellisten kolmen vuoden keskiarvo
+  ylittää viidenneksen oman perustason (keskiarvo 2008–2012) yli 1 %-yksiköllä.
+- **Luokitus** (sovelletaan järjestyksessä):
+  1. **Järjestelmätaso:** kaikki viidennekset nousivat (muutos > 0), suurin nousu on enintään kaksi
+     kertaa pienin, ja nousuajankohdat osuvat enintään kahden vuoden sisään.
+  2. **Pienituloisten jonot:** QU1:n nousu on vähintään kaksi kertaa QU5:n nousu, ja QU1 nousi.
+  3. **Suurituloisten jonot:** QU5:n nousu on vähintään kaksi kertaa QU1:n nousu, ja QU5 nousi.
+  4. **Sekamuoto:** muut tapaukset.
+
+### S2. Ruoka-apu: suhdanne vai pysyvä
+
+- **Sarjat:**
+  - Elintarvikeapu kiloina yhteensä (foodaid_hist_tvy_history_food_kg_13, 2000–2011).
+  - Ruoka-apua jakaneiden seurakuntien osuus (foodaid_hist_church_share, 2000–2010).
+  - Työttömyysaste (fi.histlabour.lfs2019.unemployment_rate).
+- **Vertailu:** työttömyys laski 2000 → 2008. Jos ruoka-apu seurasi suhdannetta, sen pitäisi laskea
+  samassa suhteessa (jousto 1).
+- **Luokitus kullekin sarjalle**, kun log-muutos 2000 → 2008 = m ja työttömyyden log-muutos = u:
+  - **Pysyvä:** m > −0,10, eli ruoka-apu ei laskenut, vaikka työttömyys laski.
+  - **Suhdanne:** m ≤ u / 2, eli ruoka-apu laski vähintään puolet työttömyyden suhteellisesta
+    laskusta.
+  - **Välimuoto:** muut tapaukset.
+- **Kuvaileva:** muutos 2008 → 2010 finanssikriisissä.
+- **Rajaus:**
+  - EU:n ruoka-avun määrä riippuu myös EU:n jakamasta määrästä, eli tarjonnasta.
+  - Seurakuntien osuus mittaa toimintaa eikä asiakkaita.
+  - Vuoden 2011 jälkeisiä sarjoja ei ole tietokannassa.
+
+### S3. Mielenterveys: Suomen oma vai yhteinen
+
+- **Sarja:** masennuslääkkeiden käyttö (N06A, nordics.antidepressants_2000_2023) Suomessa, Ruotsissa,
+  Norjassa ja Tanskassa.
+- **Kasvuvauhti:** keskimääräinen vuotuinen log-kasvu jaksoilla 2000–2010 (g1), 2010–2019 (g2) ja
+  2019–2023 (g3).
+- **Kiihtyminen:** g2 > g1 + 0,01, eli vähintään 1 %-yks. nopeampaa vuosikasvua.
+- **Luokitus:**
+  - **Yhteinen:** Suomi ja vähintään kaksi muuta maata kiihtyivät.
+  - **Suomen oma:** Suomi kiihtyi, mutta enintään yksi muu maa kiihtyi.
+  - **Ei kiihtymistä Suomessa:** Suomi ei kiihtynyt.
+- **Kuvaileva:** pandemiajakso (g3 verrattuna g2:een) sekä nuorten sarjat Suomessa:
+  - Kelan mielenterveyskuntoutujat 0–24 v.
+  - Kuntoutuspsykoterapia 18–24 v.
+  - Psykiatriseen hoitoon yli 3 kk odottaneet alle 23 v.
+  - Näille raportoidaan vuosikasvu 2010–2019 ja 2019–viimeisin vuosi.
+- **Tunnettu katkos:** kuntoutuspsykoterapia siirtyi Kelan lakisääteiseksi etuudeksi vuonna 2011.
+  Psykoterapiasarjan nousua ei tulkita ilman tätä tietoa.
