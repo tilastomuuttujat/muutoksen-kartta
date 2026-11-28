@@ -24,11 +24,16 @@ export type Puzzle = {
 };
 export type PuzzleKey = "syntyvyys" | "tyottomyys" | "velka" | "ruoka" | "jonot" | "tuet" | "puolustus";
 type Pt = [number, number];
+export type FoodAidExternal = {
+  fead: { note: string; rows: { year: number; persons: number; tonnes: number; points: number | null; share: number; partial: string | null; src: string }[] };
+  survey: { note: string; rows: { year: number; respondents: number; grew: number; same: number | null; fell: number | null; encounters: number; encNote: string; src: string }[] };
+  estimates: { year: number; text: string; src: string; url: string }[];
+};
 type QueueRow = { base: number; change: number; when: number | null; series: Pt[] };
 export type Inside = {
   jonot: Record<"medical" | "dental", { rows: Record<"QU1" | "QU2" | "QU3" | "QU4" | "QU5" | "TOTAL", QueueRow>; class: string;
     no2008?: { class: string; rows: Record<"QU1" | "QU2" | "QU3" | "QU4" | "QU5" | "TOTAL", { base: number; change: number; when: number | null }> } }>;
-  ruoka: { u: number; uPct: number; u2000: number; u2008: number; u2010: number; unemployment: Pt[];
+  ruoka: { external: FoodAidExternal; u: number; uPct: number; u2000: number; u2008: number; u2010: number; unemployment: Pt[];
     series: { label: string; m: number; pct: number; class: string; crisisPct: number | null; series: Pt[] }[] };
   mieli: { countries: Record<"FI" | "SE" | "NO" | "DK", { g1: number; g2: number; g3: number; accel: boolean; series: Pt[] }>;
     othersAccelerating: number; class: string;

@@ -13,6 +13,7 @@ import {
   sortedRows,
   unitLabel,
   type Candidate,
+  type FoodAidExternal,
   type Puzzle,
   type PuzzleKey,
 } from "@/lib/selittamaton";
@@ -315,13 +316,15 @@ function InsideSection() {
       <p className="mt-1 max-w-3xl text-sm">
         Työttömyys laski 2000–2008 {fiNum(I.ruoka.u2000)} %:sta {fiNum(I.ruoka.u2008)} %:iin, mutta ruoka-apu ei seurannut: elintarvikeavun määrä ei laskenut (vuodesta 2001 {"−3"} %; vuoden 2000 arvo on ohjelman käynnistysvuoden poikkeuksellisen pieni luku),
         ja ruoka-apua jakaneiden seurakuntien osuus laski vain {fiNum(-sh.pct, 0)} %. Finanssikriisissä 2008–2010 molemmat kasvoivat ({signed(kg.crisisPct ?? 0, 0)} % ja {signed(sh.crisisPct ?? 0, 0)} %).
-        Ruoka-apu kasvoi laskusuhdanteessa mutta ei palannut noususuhdanteessa: se kasvoi vaiheittain. Tietokannassa ei ole sarjoja vuoden 2011 jälkeen.
+        Ruoka-apu kasvoi laskusuhdanteessa mutta ei palannut noususuhdanteessa: se kasvoi vaiheittain. Tietokannassa ei ole sarjoja vuoden 2011 jälkeen; niitä täydennetään alla ulkoisilla lähteillä.
       </p>
       <div className="mt-2 grid gap-4 md:grid-cols-3">
         <MiniLines from={2000} to={2011} unit="tuhatta kg" small lines={[{ label: "kg", s: kg.series.map(([y, v]) => [y, v / 1000] as [number, number]), main: true }]} caption="Elintarvikeapu, tuhatta kg" />
         <MiniLines from={2000} to={2011} unit="%" small lines={[{ label: "osuus", s: sh.series, main: true }]} caption="Ruoka-apua jakaneet seurakunnat, % seurakunnista" />
         <MiniLines from={2000} to={2011} unit="%" small lines={[{ label: "työttömyys", s: I.ruoka.unemployment.filter(([y]) => y >= 2000 && y <= 2011), main: false }]} caption="Työttömyysaste, %" />
       </div>
+
+      <FoodAidAfter2011 x={I.ruoka.external} />
 
       <h3 className="mt-6 text-base font-semibold">Mielenterveys: <span className="text-primary">{mi.class}</span></h3>
       <p className="mt-1 max-w-3xl text-sm">
@@ -373,6 +376,55 @@ function MiniLines({ lines, from, to, unit, caption, marks = [], small = false }
         {[from, to].map((t) => <text key={t} x={x(t)} y={H - 8} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
       </svg>
       <p className="text-xs text-muted-foreground">{caption}{small ? "" : ` (${unit})`}</p>
+    </div>
+  );
+}
+
+function FoodAidAfter2011({ x }: { x: FoodAidExternal }) {
+  const rows = x.fead.rows;
+  const W = 620, H = 230, L = 46, R = 600, TOP = 24, BOT = 170;
+  const max = Math.max(...rows.map((r) => r.persons)) * 1.12;
+  const bw = (R - L) / rows.length;
+  const xb = (i: number) => L + i * bw + bw * 0.18;
+  const y = (v: number) => BOT - (v / max) * (BOT - TOP);
+  const k = (v: number) => Math.round(v / 1000).toLocaleString("fi-FI");
+  return (
+    <div className="mt-5">
+      <h4 className="text-sm font-semibold">Vuoden 2011 jälkeen: ulkoiset lähteet</h4>
+      <p className="mt-1 max-w-3xl text-sm">
+        Yhtenäistä tilastoa ei ole, koska ruoka-avussa asioidaan nimettömänä. Kolme lähdettä näytetään erikseen eikä niitä yhdistetä yhdeksi sarjaksi.
+        EU:n ruoka-apuohjelma tavoitti vuosittain noin 300 000 avunsaajaa ja jakoi noin 1 900 tonnia ruokaa, mutta sen osuus kaikesta ruoka-avusta laski 45 prosentista 11 prosenttiin:
+        ruoka-apu kasvoi lahjoitusruoan varassa. Ruoka-apu.fi:n kyselyissä 70–73 % toimijoista kertoi asiakasmääränsä kasvaneen joka vuosi 2023–2025.
+      </p>
+      <div className="mt-2 overflow-x-auto">
+        <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full min-w-[460px] max-w-2xl" role="img" aria-label={`EU-ruoka-avun saajat ${rows.map((r) => `${r.year}: ${r.persons}`).join(", ")}`}>
+          <text x={L} y={14} fontSize="11.5" className="fill-muted-foreground">avunsaajia, tuhatta</text>
+          {[0, 100000, 200000, 300000].map((t) => <g key={t}><line x1={L} x2={R} y1={y(t)} y2={y(t)} stroke="var(--foreground)" strokeOpacity={0.08} /><text x={L - 6} y={y(t) + 4} textAnchor="end" fontSize="10" className="fill-muted-foreground">{k(t)}</text></g>)}
+          {rows.map((r, i) => (
+            <g key={r.year}>
+              <rect x={xb(i)} y={y(r.persons)} width={bw * 0.64} height={BOT - y(r.persons)} fill="var(--muted-foreground)" fillOpacity={r.partial ? 0.25 : 0.6} stroke={r.partial ? "var(--muted-foreground)" : "none"} strokeDasharray={r.partial ? "3 2" : undefined}>
+                <title>{`${r.year}: ${r.persons.toLocaleString("fi-FI")} avunsaajaa, ${Math.round(r.tonnes).toLocaleString("fi-FI")} t${r.partial ? ` (${r.partial})` : ""}`}</title>
+              </rect>
+              <text x={xb(i) + bw * 0.32} y={y(r.persons) - 5} textAnchor="middle" fontSize="10.5" className="fill-foreground">{k(r.persons)}</text>
+              <text x={xb(i) + bw * 0.32} y={BOT + 15} textAnchor="middle" fontSize="10.5" className="fill-muted-foreground">{r.year}{r.partial ? "*" : ""}</text>
+              <text x={xb(i) + bw * 0.32} y={BOT + 32} textAnchor="middle" fontSize="10.5" className="fill-primary">{r.share} %</text>
+            </g>
+          ))}
+          <text x={L} y={BOT + 50} fontSize="10.5" className="fill-muted-foreground">punainen luku: EU-avun osuus kaikesta kumppanijärjestöjen jakamasta ruoka-avusta · * vajaa vuosi (ohjelman alku ja loppu)</text>
+        </svg>
+      </div>
+      <p className="text-xs text-muted-foreground">EU:n vähävaraisten avun rahasto (FEAD), Ruokaviraston täytäntöönpanoraportit 2015–2022. Avunsaajat ovat kumppanijärjestöjen ilmoituksia; sama henkilö voi olla mukana useamman järjestön kautta.</p>
+      <table className="mt-3 w-full max-w-2xl text-sm">
+        <thead><tr className="text-left text-xs text-muted-foreground"><th className="font-medium">Ruoka-apu.fi</th><th className="font-medium">vastaajia</th><th className="font-medium">asiakasmäärä kasvoi</th><th className="font-medium">väheni</th></tr></thead>
+        <tbody>{x.survey.rows.map((r) => (
+          <tr key={r.year} className="border-t"><td className="py-1"><a href={r.src} className="underline underline-offset-4">{r.year}</a></td><td className="tabular-nums">{r.respondents}</td><td className="tabular-nums">{r.grew} %</td><td className="tabular-nums">{r.fell == null ? "–" : `${r.fell} %`}</td></tr>
+        ))}</tbody>
+      </table>
+      <p className="text-xs text-muted-foreground">Kysely rekisteröityneille ruoka-aputoimijoille (kattaa arviolta 30–50 % toimijoista). Kohtaamisluvut on laskettu eri vuosina eri tavoin, joten niitä ei verrata vuodesta toiseen.</p>
+      <h4 className="mt-3 text-sm font-semibold">Arviot ruoka-avun laajuudesta</h4>
+      <ul className="mt-1 space-y-1 text-sm">
+        {x.estimates.map((e, i) => <li key={i}><span className="tabular-nums">{e.year}</span>: {e.text} <span className="text-xs text-muted-foreground">(<a href={e.url} className="underline underline-offset-4">{e.src}</a>)</span></li>)}
+      </ul>
     </div>
   );
 }

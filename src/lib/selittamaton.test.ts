@@ -74,6 +74,16 @@ describe("selittämätön", () => {
     expect([gp(mi.youth["youth.mh_rehab_total_0_24"]!.g1019!), gp(mi.youth["youth.psychotherapy_18_24"]!.g1019!), gp(mi.youth["youth.psychiatric_wait_u23"]!.g19last!)]).toEqual([11.6, 11, 13.5]);
     expect([mi.youth["youth.mh_rehab_total_0_24"]!.g1019, mi.youth["youth.psychotherapy_18_24"]!.g1019, mi.youth["youth.psychiatric_wait_u23"]!.g19last]).toEqual([0.11, 0.1043, 0.1262]);
   });
+  it("food aid after 2011: external sources as recorded", () => {
+    const x = SELITTAMATON.inside.ruoka.external;
+    expect(x.fead.rows.map((r) => [r.year, r.persons, Math.round(r.tonnes), r.share])).toEqual([
+      [2015, 113191, 598, 40], [2016, 289824, 1918, 45], [2017, 284352, 1843, 23], [2018, 281330, 1903, 45],
+      [2019, 315559, 1877, 19], [2020, 317490, 1984, 16], [2021, 294644, 1826, 16], [2022, 105377, 389, 11],
+    ]);
+    expect(x.fead.rows.filter((r) => r.partial).map((r) => r.year)).toEqual([2015, 2022]);
+    expect(x.survey.rows.map((r) => [r.year, r.respondents, r.grew])).toEqual([[2023, 299, 70], [2024, 286, 73], [2025, 330, 71]]);
+    for (const r of [...x.fead.rows, ...x.survey.rows]) expect(r.src).toMatch(/^https:\/\//);
+  });
   it("finland is the largest fertility decline among included countries", () => {
     const s = P.syntyvyys;
     expect([...s.rows].sort((a, b) => a.y - b.y)[0]!.geo).toBe("FI");

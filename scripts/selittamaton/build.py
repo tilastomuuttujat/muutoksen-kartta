@@ -376,6 +376,38 @@ def defence():
     r["series"] = {g: sorted((y, round(v, 2)) for y, v in de[g].items()) for g in ("FI", "SE", "EE", "PL", "DE") if g in de}
     return r
 
+# Ruoka-apu 2011 jälkeen, ulkoiset lähteet (docs/selittamaton.md, lisäys 28.11.2026). Poimittu käsin alkuperäisistä PDF:istä.
+RV = "https://www.ruokavirasto.fi/globalassets/"
+FOODAID_EXTERNAL = {
+    "fead": {
+        "note": "EU:n vähävaraisten avun rahasto (FEAD). Avunsaajat = kumppanijärjestöjen ilmoittamat vähintään kerran avun piirissä olleet (sama henkilö voi olla useaan kertaan). Osuus = rahaston arvioitu osuus kaikesta kumppanijärjestöjen jakamasta ruoka-avusta.",
+        "rows": [
+            {"year": 2015, "persons": 113191, "tonnes": 598, "points": 524, "share": 40, "partial": "ohjelma alkoi loppuvuodesta", "src": RV + "tietoa-meista/asiointi/oppaat-ja-lomakkeet/yhteisot/tuet-ja-kehittaminen/tiivistelma-taytantoonpanoraportista-2015.pdf"},
+            {"year": 2016, "persons": 289824, "tonnes": 1918, "points": 621, "share": 45, "partial": None, "src": RV + "tietoa-meista/asiointi/oppaat-ja-lomakkeet/yhteisot/tuet-ja-kehittaminen/tiivistelma_taytantoonpanoraportti_2016_fead.pdf"},
+            {"year": 2017, "persons": 284352, "tonnes": 1843, "points": 650, "share": 23, "partial": None, "src": RV + "tietoa-meista/asiointi/oppaat-ja-lomakkeet/yhteisot/tuet-ja-kehittaminen/tiivistelma_taytantoonpanoraportti_2017_fead.pdf"},
+            {"year": 2018, "persons": 281330, "tonnes": 1903.22, "points": None, "share": 45, "partial": None, "src": RV + "tietoa-meista/asiointi/oppaat-ja-lomakkeet/yhteisot/tuet-ja-kehittaminen/fead-taytantoonpanoraportti2018.pdf"},
+            {"year": 2019, "persons": 315559, "tonnes": 1877.21, "points": None, "share": 19, "partial": None, "src": RV + "yhteisot/tuet-ja-kehittaminen/fead-taytantoonpanoraportti-2019.pdf"},
+            {"year": 2020, "persons": 317490, "tonnes": 1984.13, "points": None, "share": 16, "partial": None, "src": RV + "yhteisot/tuet-ja-kehittaminen/1438636-v1-fead_taytantoonpanoraportti_2020.pdf"},
+            {"year": 2021, "persons": 294644, "tonnes": 1825.63, "points": None, "share": 16, "partial": None, "src": RV + "yhteisot/tuet-ja-kehittaminen/ruokavirasto-1534922-v3-fead_taytantoonpanoraportti_2021_julkaisu.pdf"},
+            {"year": 2022, "persons": 105377, "tonnes": 389.45, "points": None, "share": 11, "partial": "ohjelma päättyi, osavuosi", "src": RV + "yhteisot/tuet-ja-kehittaminen/1594677-v1-fead_lopullinen_taytantoonpanoraportti.pdf"},
+        ],
+    },
+    "survey": {
+        "note": "Ruoka-apu.fi:n tilannekatsaukset: kysely rekisteröityneille ruoka-aputoimijoille. Kohtaamiset on laskettu eri vuosina eri tavoin, joten niitä ei verrata vuodesta toiseen.",
+        "rows": [
+            {"year": 2023, "respondents": 299, "grew": 70, "same": None, "fell": 6, "encounters": 2429434, "encNote": "276 vastaajan ilmoittamat", "src": "https://ruoka-apu.fi/wp-content/uploads/2024/08/Tilannekatsaus-5_Ruoka-apufi.pdf"},
+            {"year": 2024, "respondents": 286, "grew": 73, "same": 19, "fell": 4, "encounters": 375926, "encNote": "palvelussa raportoidut tapahtumat", "src": "https://ruoka-apu.fi/wp-content/uploads/2025/09/Tilannekatsaus-nro-6_2025-Ruoka-apu.fi_.pdf"},
+            {"year": 2025, "respondents": 330, "grew": 71, "same": None, "fell": None, "encounters": 813746, "encNote": "palvelussa raportoidut tapahtumat; kokonaisarvio 2–3 miljoonaa", "src": "https://ruoka-apu.fi/wp-content/uploads/2026/09/Ruoka-avun-tilannekatsaus-7_2026.pdf"},
+        ],
+    },
+    "estimates": [
+        {"year": 2013, "text": "2,3 % väestökyselyn vastaajista oli käyttänyt ruoka-apua viimeisen 12 kuukauden aikana (THL HYPA), noin 80 000 henkeä", "src": "Lehtelä & Kestilä 2014, lainattu: Laihiala & Nick 2020", "url": "https://ruoka-apu.fi/wp-content/uploads/2021/12/Koronakriisin-vaikutukset-ruoka-apuun_Laihiala-ja-Nick-2020.pdf"},
+        {"year": 2013, "text": "noin 20 000 säännöllistä ruoka-avun asiakasta (karkea arvio toimijahaastatteluista)", "src": "Ohisalo ym. 2013, lainattu: Laihiala & Nick 2020", "url": "https://ruoka-apu.fi/wp-content/uploads/2021/12/Koronakriisin-vaikutukset-ruoka-apuun_Laihiala-ja-Nick-2020.pdf"},
+        {"year": 2020, "text": "ruoka-apua jaetaan 18–22 miljoonaa kiloa vuodessa, siitä 85–90 % hävikkiruokaa; ruoka-apuun turvautuu 100 000–200 000 henkeä vuodessa", "src": "Luke 2020; Laihiala & Nick 2020", "url": "https://ruoka-apu.fi/wp-content/uploads/2021/12/Koronakriisin-vaikutukset-ruoka-apuun_Laihiala-ja-Nick-2020.pdf"},
+        {"year": 2025, "text": "ruoka-apua tarvitsee arviolta 200 000 ihmistä vuodessa; ruoka-aputoimijoita 700–1 000, ruoka-apua tarjolla 236 kunnassa; 59 % vastaajista kertoi jaettavan ruoan vähentyneen", "src": "Ruoka-apu.fi, tilannekatsaus 7", "url": "https://ruoka-apu.fi/wp-content/uploads/2026/09/Ruoka-avun-tilannekatsaus-7_2026.pdf"},
+    ],
+}
+
 
 def inside():
     """Kolmas erä (docs/selittamaton.md): S1 hoitojonot tuloryhmittäin, S2 ruoka-apu, S3 mielenterveys. Lähde: Turso-ote."""
@@ -430,7 +462,7 @@ def inside():
         return {"label": label, "m": round(m, 4), "pct": round((math.exp(m) - 1) * 100, 1), "class": cls,
                 "crisisPct": None if crisis is None else round((math.exp(crisis) - 1) * 100, 1),
                 "series": sorted((y, round(v, 2)) for y, v in s_.items())}
-    s2 = {"u": round(u, 4), "uPct": round((math.exp(u) - 1) * 100, 1), "u2000": U[2000], "u2008": U[2008], "u2010": U[2010],
+    s2 = {"external": FOODAID_EXTERNAL, "u": round(u, 4), "uPct": round((math.exp(u) - 1) * 100, 1), "u2000": U[2000], "u2008": U[2008], "u2010": U[2010],
           "unemployment": sorted((y, round(v, 2)) for y, v in U.items() if 1995 <= y <= 2012),
           "series": [aid("foodaid_hist_tvy_history_food_kg_13", "Elintarvikeapu, kg"), aid("foodaid_hist_church_share", "Ruoka-apua jakaneiden seurakuntien osuus")]}
 
