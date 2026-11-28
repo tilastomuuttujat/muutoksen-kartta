@@ -183,3 +183,93 @@ huomioon, ja missä maissa aukko on suurin. Selittämätön osa on aineisto uusi
     - Tämä on uusi hypoteesi, ei testattu syy. Se pitää testata muulla aineistolla, esimerkiksi
       vuosien 1995–2008 jaksolla tai maiden alueilla.
   - C1 omistusasuminen ja C3 säästämisaste: "ei yhteyttä".
+
+## Toinen erä: kirjattu 28.11.2026 ennen laskentaa
+
+Menetelmä on sama kuin yllä. Arvoitukset A4–A7 käyttävät maiden tasoja eivätkä muutoksia, joten
+yhteistä aukkoa ei lasketa niille.
+
+### A4. Ruoka-avun tarve ("leipäjonot")
+
+- **Y:** köyhyysrajan (60 % mediaanista) alapuolella elävistä niiden osuus, joilla ei ole varaa
+  liha-, kana- tai kalaruokaan (tai kasvisvastineeseen) joka toinen päivä.
+  - Keskiarvo 2019–2023. Lähde: ilc_mdes03, hhcomp TOTAL, rskpovth B_60.
+  - Leipäjonoista ei ole vertailukelpoista kansainvälistä tilastoa. Tämä on lähin mittari ruoan
+    puutteesta köyhien keskuudessa.
+
+| K | Selitys | Mittari (keskiarvo 2019–2023) |
+|---|---|---|
+| K1 | Tulotaso | Ekvivalentin nettotulon mediaani, PPS (ilc_di03, MED_EI) |
+| K2 | Köyhyyden syvyys | Köyhyysvaje, B_60 (ilc_li11, MED_EI, TOTAL) |
+| K3 | Asumismenot | Asumismenorasite köyhillä, B_60 (ilc_lvho07a) |
+| K4 | Tulonsiirtojen teho | Köyhyysaste ennen tulonsiirtoja (pl. eläkkeet) miinus sen jälkeen (ilc_li10 − ilc_li02, B_60, %-yks.) |
+
+| C | Ehdokas | Mittari (keskiarvo 2019–2023) | Ennuste |
+|---|---|---|---|
+| C1 | Yksin asuminen | Yhden aikuisen kotitalouksien osuus kaikista kotitalouksista (lfst_hhnhtych, A1 / TOTAL) | + |
+| C2 | Työttömyys | Työttömyysaste 15–74 (une_rt_a) | + |
+| C3 | Velkaantuminen | Kotitalouksien velkaantumisaste (nasa_10_ki, DIR_S14_S15) | + |
+
+### A5. Terveydenhuollon jonot
+
+- **Y:** niiden 16 vuotta täyttäneiden osuus, jotka jättivät tarvitsemansa lääkärinhoidon saamatta
+  jonon vuoksi.
+  - Keskiarvo 2019–2023 miinus keskiarvo 2008–2012, %-yks.
+  - Lähde: hlth_silc_08, reason WLIST, quant_inc TOTAL.
+
+| K | Selitys | Mittari |
+|---|---|---|
+| K1 | Terveysmenot | Terveydenhuollon menot asukasta kohden kiintein hinnoin, log-muutos 2012 → 2022 (hlth_sha11_hf, TOT_HF, EUR_HAB_KP15) |
+| K2 | Lääkärit | Toimivia lääkäreitä / 100 000, muutos 2010 → 2021 (hlth_rs_prs2, PRACT, PHYS) |
+| K3 | Ikääntyminen | Vanhushuoltosuhde, muutos 2010 → 2023 (demo_pjanind, OLDDEP1) |
+| K4 | Talous | BKT asukasta kohden, log-muutos 2010 → 2019 |
+
+| C | Ehdokas | Mittari | Ennuste |
+|---|---|---|---|
+| C1 | Hoitajat | Toimivia sairaanhoitajia / 100 000, muutos 2010 → 2021 (hlth_rs_prs2, PRACT, NRS) | − |
+| C2 | Julkisen rahoituksen osuus | HF1 / TOT_HF, muutos 2012 → 2022, %-yks. | − |
+| C3 | Vapaaehtoiset vakuutukset ja omamaksut | HF2 / TOT_HF, muutos 2012 → 2022, %-yks. | + |
+
+### A6. Tukiriippuvuus
+
+- **Y:** 18–59-vuotiaista niiden osuus, jotka asuvat kotitaloudessa, jossa kukaan ei käy töissä.
+  - Keskiarvo 2015–2019, ennen pandemiaa.
+  - Lähde: lfsi_jhh_a, SC072.
+
+| K | Selitys | Mittari (keskiarvo 2015–2019) |
+|---|---|---|
+| K1 | Työttömyys | Työttömyysaste 15–74 (une_rt_a) |
+| K2 | Matala koulutus | Enintään perusasteen koulutuksen suorittaneiden osuus 25–64-vuotiaista (edat_lfse_03, ED0-2) |
+| K3 | Yksinhuoltajuus | Yksinhuoltajakotitalouksien osuus kaikista kotitalouksista (lfst_hhnhtych, A1_CH / TOTAL) |
+
+| C | Ehdokas | Mittari (keskiarvo 2015–2019) | Ennuste |
+|---|---|---|---|
+| C1 | Sosiaaliturvan taso | Sosiaaliturvamenot pl. vanhuus / BKT (gov_10a_exp, GF10 − GF1002) | + |
+| C2 | Asumismenot | Asumismenorasite koko väestössä (ilc_lvho07a, TOTAL) | + |
+
+### A7. Puolustusmenot
+
+- **Y:** julkiset puolustusmenot / BKT, keskiarvo 2015–2023.
+  - Lähde: gov_10a_exp, GF02 (COFOG-luokitus, joka poikkeaa Naton määritelmästä).
+- **Maat:** Eurostat-maat, joilta Y löytyy.
+
+| K | Selitys | Mittari |
+|---|---|---|
+| K1 | Uhka | Pääkaupungin etäisyys Moskovaan, log km (isoympyrä; pääkaupunkien koordinaatit kirjattu laskentaskriptiin) |
+| K2 | Liittouma | Nato-jäsenyys (osuus vuosista 2015–2023, jolloin maa oli jäsen) |
+| K3 | Polkuriippuvuus | Puolustusmenot / BKT, keskiarvo 2001–2005 |
+
+| C | Ehdokas | Mittari | Ennuste |
+|---|---|---|---|
+| C1 | Asevelvollisuus | Asevelvollisuus voimassa 2019: Itävalta, Kypros, Tanska, Viro, Suomi, Kreikka, Liettua, Norja, Ruotsi, Sveitsi (0/1) | + |
+| C2 | Yhteinen maaraja Venäjän kanssa | Suomi, Viro, Latvia, Liettua, Puola, Norja (0/1) | + |
+| C3 | Julkisen sektorin koko | Julkiset menot / BKT, keskiarvo 2015–2023 (gov_10a_main, TE) | + |
+
+### Ei tähän menetelmään
+
+| Ilmiö | Syy | Mihin |
+|---|---|---|
+| Mielenterveysongelmien nousu | Eurostatin EHIS mittaa masennusoireita vain vuosina 2014 ja 2019. Kansalliset mittarit (työkyvyttömyys, kouluterveyskysely) eivät ole vertailukelpoisia maiden välillä | Suomen sisäinen analyysi (alueet, ikäryhmät, kohortit) |
+| PISA-tulosten heikkeneminen | OECD:n ja Our World in Datan rajapinnat eivät ole tämän ympäristön verkkorajauksen sisällä | Lisätään, kun aineisto saadaan |
+| Menoleikkauskierre ja veroalet | Kyse on syyväitteistä (leikkaus → kasvu → velka) eikä selittämättömästä ilmiöstä | Näyttöverkon hypoteeseiksi |
+| Valtion rooli työmarkkinoilla | Sopimuskattavuus ja järjestäytymisaste (OECD/ICTWSS) eivät ole saatavilla | Lisätään, kun aineisto saadaan |
