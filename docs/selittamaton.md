@@ -457,3 +457,25 @@ Suomen oma vai yhteinen. Jokaiselle on kirjattu luokittelusääntö ennen lasken
     nuorten palveluiden käytössä.
   - Nuorten palveluiden käytön kasvu voi kertoa tarpeen kasvusta, palvelujen laajenemisesta tai
     kummastakin. Tämä aineisto ei erota niitä toisistaan.
+
+## Lisäys 28.11.2026: ruoka-apu 2011 jälkeen ulkoisista lähteistä (kirjattu ennen näkymään viemistä)
+
+Tursossa ei ole yhtenäistä ruoka-apusarjaa vuoden 2011 jälkeen. Siksi S2:ta täydennetään ulkoisilla
+lähteillä, joiden luvut on poimittu käsin alkuperäisistä PDF-raporteista ja kirjattu lähdeviitteineen
+tiedostoon scripts/selittamaton/build.py (`FOODAID_EXTERNAL`).
+
+**Esittämissäännöt:**
+
+1. **Lähteitä ei yhdistetä yhdeksi sarjaksi.** Kukin näytetään omana sarjanaan:
+   - Ruokaviraston EU-ruoka-avun (FEAD) raportit 2015–2022: avunsaajat, jaetut tonnit ja
+     jakelupisteet.
+   - Ruoka-apu.fi:n tilannekatsaukset 2023–2025.
+   - Yksittäiset arviot 2012–2014 ja 2020.
+2. **Katkokset näkyvät.** Vuosi 2015 on FEAD-ohjelman käynnistysvuosi (vain loppuvuosi), ja vuosi 2022
+   on sen päättymisvuosi (osavuosi). Molemmat merkitään eikä niitä tulkita muutokseksi.
+3. **FEAD-luvut kuvaavat EU-rahoitteista ruoka-apua, eivät koko ruoka-apua.** Rahaston arvioitu osuus
+   kaikesta jaetusta ruoka-avusta näytetään joka vuodelta lukujen rinnalla.
+4. **Ruoka-apu.fi:n kohtaamisluvut on laskettu eri vuosina eri tavoin.** Niitä ei verrata vuodesta
+   toiseen. Vuodesta toiseen vertailukelpoinen mittari on niiden vastaajien osuus, joiden asiakasmäärä
+   kasvoi.
+5. **Ei uutta luokitusta tai testiä.** Lisäys on kuvaileva eikä muuta S2:n kirjattua luokitusta.
