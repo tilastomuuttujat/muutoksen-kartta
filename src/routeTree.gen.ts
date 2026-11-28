@@ -16,6 +16,7 @@ import { Route as MitajosRouteImport } from './routes/mitajos'
 import { Route as NayttoRouteImport } from './routes/naytto'
 import { Route as PalloRouteImport } from './routes/pallo'
 import { Route as PoikkeamatRouteImport } from './routes/poikkeamat'
+import { Route as SelittamatonRouteImport } from './routes/selittamaton'
 import { Route as SelityksetRouteImport } from './routes/selitykset'
 import { Route as SeulaRouteImport } from './routes/seula'
 import { Route as SkanneriRouteImport } from './routes/skanneri'
@@ -57,6 +58,11 @@ const PalloRoute = PalloRouteImport.update({
 const PoikkeamatRoute = PoikkeamatRouteImport.update({
   id: '/poikkeamat',
   path: '/poikkeamat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SelittamatonRoute = SelittamatonRouteImport.update({
+  id: '/selittamaton',
+  path: '/selittamaton',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SelityksetRoute = SelityksetRouteImport.update({
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/naytto': typeof NayttoRoute
   '/pallo': typeof PalloRoute
   '/poikkeamat': typeof PoikkeamatRoute
+  '/selittamaton': typeof SelittamatonRoute
   '/selitykset': typeof SelityksetRoute
   '/seula': typeof SeulaRoute
   '/skanneri': typeof SkanneriRoute
@@ -119,6 +126,7 @@ export interface FileRoutesByTo {
   '/naytto': typeof NayttoRoute
   '/pallo': typeof PalloRoute
   '/poikkeamat': typeof PoikkeamatRoute
+  '/selittamaton': typeof SelittamatonRoute
   '/selitykset': typeof SelityksetRoute
   '/seula': typeof SeulaRoute
   '/skanneri': typeof SkanneriRoute
@@ -136,6 +144,7 @@ export interface FileRoutesById {
   '/naytto': typeof NayttoRoute
   '/pallo': typeof PalloRoute
   '/poikkeamat': typeof PoikkeamatRoute
+  '/selittamaton': typeof SelittamatonRoute
   '/selitykset': typeof SelityksetRoute
   '/seula': typeof SeulaRoute
   '/skanneri': typeof SkanneriRoute
@@ -154,6 +163,7 @@ export interface FileRouteTypes {
     | '/naytto'
     | '/pallo'
     | '/poikkeamat'
+    | '/selittamaton'
     | '/selitykset'
     | '/seula'
     | '/skanneri'
@@ -170,6 +180,7 @@ export interface FileRouteTypes {
     | '/naytto'
     | '/pallo'
     | '/poikkeamat'
+    | '/selittamaton'
     | '/selitykset'
     | '/seula'
     | '/skanneri'
@@ -186,6 +197,7 @@ export interface FileRouteTypes {
     | '/naytto'
     | '/pallo'
     | '/poikkeamat'
+    | '/selittamaton'
     | '/selitykset'
     | '/seula'
     | '/skanneri'
@@ -203,6 +215,7 @@ export interface RootRouteChildren {
   NayttoRoute: typeof NayttoRoute
   PalloRoute: typeof PalloRoute
   PoikkeamatRoute: typeof PoikkeamatRoute
+  SelittamatonRoute: typeof SelittamatonRoute
   SelityksetRoute: typeof SelityksetRoute
   SeulaRoute: typeof SeulaRoute
   SkanneriRoute: typeof SkanneriRoute
@@ -261,6 +274,13 @@ declare module '@tanstack/react-router' {
       path: '/poikkeamat'
       fullPath: '/poikkeamat'
       preLoaderRoute: typeof PoikkeamatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/selittamaton': {
+      id: '/selittamaton'
+      path: '/selittamaton'
+      fullPath: '/selittamaton'
+      preLoaderRoute: typeof SelittamatonRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/selitykset': {
@@ -323,6 +343,7 @@ const rootRouteChildren: RootRouteChildren = {
   NayttoRoute: NayttoRoute,
   PalloRoute: PalloRoute,
   PoikkeamatRoute: PoikkeamatRoute,
+  SelittamatonRoute: SelittamatonRoute,
   SelityksetRoute: SelityksetRoute,
   SeulaRoute: SeulaRoute,
   SkanneriRoute: SkanneriRoute,

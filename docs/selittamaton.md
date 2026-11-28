@@ -120,3 +120,66 @@ huomioon, ja missä maissa aukko on suurin. Selittämätön osa on aineisto uusi
   riittävät ennustamaan maiden eroja.
 - Maiden määrä (noin 25–35) rajaa, kuinka monta selittäjää malli kestää. Siksi selittäjät on
   rajattu ennalta, eikä niitä lisätä tulosten nähtyä.
+
+## Tulokset 28.11.2026
+
+### Laskennan tarkennukset (eivät muuta menetelmää)
+
+- **A3 C1:** taulukon ilc_lvho02 tulotasoulottuvuuden nimi on rskpovth eikä incgrp. Käytetään arvoa
+  TOTAL.
+- **A3 K3:** taulukon nasa_10_ki tulosarjan B7G_R_HAB_2010 yksikkökoodi on PC.
+  - Sarja on indeksi 2010 = 100.
+  - Muutosta laskettaessa käytetään log-suhdetta, joten yksikön nimi ei vaikuta tulokseen.
+
+### A1 Syntyvyys
+
+- **Aineisto:** 16 maata.
+  - Pois jäi 14 maata. Niistä 12 karsiutui K6:n (kuluttajien luottamus) vertailujakson 2000–2009
+    vuoksi.
+  - Muut pois jääneet: Tanska ja Ranska (K4), Kreikka ja Sveitsi (K3).
+- **Selittämätön osuus:** LOO-R² = −1,15 ja sovitteen R² = 0,54.
+  - Tunnetut selitykset sopivat aineistoon jälkikäteen, mutta ne ennustavat pois jätettyä maata
+    huonommin kuin pelkkä keskiarvo.
+- **Yhteinen aukko:** −13 % (90 %:n väli −45 … +39 %). Väli on niin leveä, ettei aukon kokoa voida
+  määrittää.
+- **Suomi:**
+  - Havaittu muutos −33 % oli 16 maan suurin; TFR laski 1,87:stä 1,26:een.
+  - LOO-ennuste oli −18 %, ja jäännös −0,20 oli neljänneksi alhaisin.
+  - z = −0,85. Suomen poikkeama ei siis erotu, koska malli epäonnistuu kaikissa maissa.
+- **Ehdokkaat:** kaikki "ei yhteyttä".
+  - C1 vanhempien luona asuminen: rho −0,35 (q = 0,33).
+  - C2 internet: rho +0,26.
+  - C3 koulutusero: rho +0,32.
+- **Jälkikäteinen herkkyystarkistus** (ei rekisteröity, ei korvaa päätulosta): ilman K6:ta mukana on
+  24 maata.
+  - LOO-R² = −0,09, eli tunnetut selitykset eivät edelleenkään ennusta.
+  - Suomen jäännös on −0,22, kolmanneksi alhaisin 24 maasta (z = −1,37).
+  - C2 (internetin käytön kasvu) on "väärä suunta" (rho +0,48, q = 0,056): mitä enemmän käyttö
+    kasvoi, sitä *vähemmän* syntyvyys laski selitettyä enemmän. Tämä on vastoin älypuhelinselitystä.
+
+### A2 Työttömyys
+
+- **Aineisto:** 36 korkean tulotason maata.
+  - Joukossa on myös muita kuin Euroopan ja OECD:n maita, esimerkiksi Barbados ja Panama, koska
+    rajaus tehtiin GMD:n tuloluokan mukaan.
+- **Selittämätön osuus:** LOO-R² = −0,18 ja sovitteen R² = 0,18.
+- **Suomi:** työttömyys nousi 2,9 %-yks., ja ennuste oli 2,8 %-yks. Jäännös on +0,10 (z = 0,02),
+  sija 19/36.
+  - Suomen pysyvä työttömyys ei ole poikkeama korkean tulotason maiden joukossa.
+  - Tunnetut selitykset eivät myöskään selitä maiden välisiä eroja.
+- **Ehdokkaat:** kaikki "ei yhteyttä".
+
+### A3 Velkaantuminen
+
+- **Aineisto:** 19 maata, 9 jäi pois puuttuvien tietojen vuoksi.
+- **Selittämätön osuus:** LOO-R² = 0,16, eli 84 % jää selittämättä. Sovitteen R² = 0,60.
+- **Suomi:** velkaantumisaste nousi 2008–2023 +15,9 %-yks., ja ennuste oli −20,9 %-yks.
+  - Jäännös +36,8 %-yks. oli kolmanneksi suurin Maltan (+74) ja Luxemburgin (+41) jälkeen.
+  - z = 0,99.
+- **Ehdokkaat:**
+  - **C2 kotitalouksien investoinnit / BKT: "jäljellä"** (rho +0,52, p = 0,024, q = 0,072, n = 19).
+    - Maissa, joissa kotitaloudet investoivat paljon (lähinnä uusiin asuntoihin), velka kasvoi
+      enemmän kuin korot, hinnat ja tulot selittävät.
+    - Tämä on uusi hypoteesi, ei testattu syy. Se pitää testata muulla aineistolla, esimerkiksi
+      vuosien 1995–2008 jaksolla tai maiden alueilla.
+  - C1 omistusasuminen ja C3 säästämisaste: "ei yhteyttä".
