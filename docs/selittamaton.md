@@ -273,3 +273,52 @@ yhteistä aukkoa ei lasketa niille.
 | PISA-tulosten heikkeneminen | OECD:n ja Our World in Datan rajapinnat eivät ole tämän ympäristön verkkorajauksen sisällä | Lisätään, kun aineisto saadaan |
 | Menoleikkauskierre ja veroalet | Kyse on syyväitteistä (leikkaus → kasvu → velka) eikä selittämättömästä ilmiöstä | Näyttöverkon hypoteeseiksi |
 | Valtion rooli työmarkkinoilla | Sopimuskattavuus ja järjestäytymisaste (OECD/ICTWSS) eivät ole saatavilla | Lisätään, kun aineisto saadaan |
+
+## Toisen erän tulokset 28.11.2026
+
+### A4 Ruoka-avun tarve
+
+- **Aineisto:** 28 maata. Ranska jäi pois.
+- **Selitysaste:** LOO-R² = 0,49. Tunnetut selitykset ennustavat noin puolet maiden eroista.
+  - Tulotaso on vahvin selittäjä (standardoitu kerroin −0,60).
+- **Suomi:**
+  - Köyhistä 8,0 %:lla ei ollut varaa riittävään ruokaan; ennuste oli 6,0 %.
+  - Jäännös +2,1 %-yks. (z = 0,24), sija 18/28.
+  - Suomi ei ole poikkeama. Leipäjonojen olemassaolo ei siis näy köyhien ruoan puutteena
+    tavallista enemmän tällä mittarilla.
+- **Ehdokkaat:** kaikki "ei yhteyttä".
+
+### A5 Terveydenhuollon jonot
+
+- **Aineisto:** 18 maata, 9 jäi pois.
+- **Selitysaste:** LOO-R² = −1,0. Terveysmenot, lääkärimäärä, ikääntyminen ja talous eivät ennusta
+  jonojen muutosta lainkaan.
+- **Suomi:**
+  - Jonon vuoksi saamatta jäänyt hoito lisääntyi +2,4 %-yks. Tämä oli toiseksi suurin nousu Viron
+    (+6,3) jälkeen.
+  - Ennuste oli +0,6 %-yks.
+  - Jäännös +1,8 %-yks. oli kolmanneksi suurin (Viro +6,3, Kypros +4,9), z = 0,77.
+- **Ehdokkaat:** kaikki "ei yhteyttä".
+
+### A6 Tukiriippuvuus
+
+- **Aineisto:** 27 maata.
+- **Selitysaste:** LOO-R² = 0,44. Työttömyys selittää valtaosan (kerroin +0,82).
+- **Suomi:**
+  - Työttömissä kotitalouksissa asui 9,8 % 18–59-vuotiaista; ennuste oli 8,7 %.
+  - Jäännös +1,1 %-yks. (z = 0,64), sija 20/27.
+  - Hieman ennustettua korkeampi, mutta ei poikkeama.
+- **Ehdokkaat:** "ei yhteyttä".
+  - Asumismenorasite oli lähimpänä rajaa (rho +0,38, q = 0,11).
+
+### A7 Puolustusmenot
+
+- **Aineisto:** 29 maata.
+- **Selitysaste:** LOO-R² = 0,62. Etäisyys Moskovaan ja aiempi menotaso selittävät suurimman osan.
+- **Suomi:**
+  - Puolustusmenot 2015–2023 olivat COFOG-luokituksella 1,27 % BKT:sta; ennuste oli 1,54 %.
+  - Jäännös −0,27 %-yks. oli neljänneksi alhaisin (z = −0,80).
+  - Suomi käytti siis puolustukseen *vähemmän* kuin uhka ja historia ennustavat.
+  - COFOG-luokitus poikkeaa Naton määritelmästä, eikä vuonna 2022 alkanut menojen nousu näy vielä
+    kokonaisuudessaan keskiarvossa.
+- **Ehdokkaat:** kaikki "ei yhteyttä".

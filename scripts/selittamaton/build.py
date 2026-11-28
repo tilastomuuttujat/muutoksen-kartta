@@ -261,9 +261,126 @@ def debt():
     r["series"] = {g: sorted((y, round(v, 1)) for y, v in dti[g].items() if y >= 1995) for g in ("FI", "SE", "DK", "NL", "DE", "ES", "IE") if g in dti}
     return r
 
+CAPITALS = {"AT": (48.21, 16.37), "BE": (50.85, 4.35), "BG": (42.70, 23.32), "HR": (45.81, 15.98), "CY": (35.17, 33.36), "CZ": (50.08, 14.44),
+            "DK": (55.68, 12.57), "EE": (59.44, 24.75), "FI": (60.17, 24.94), "FR": (48.86, 2.35), "DE": (52.52, 13.40), "EL": (37.98, 23.73),
+            "HU": (47.50, 19.04), "IE": (53.35, -6.26), "IT": (41.90, 12.50), "LV": (56.95, 24.11), "LT": (54.69, 25.28), "LU": (49.61, 6.13),
+            "MT": (35.90, 14.51), "NL": (52.37, 4.90), "PL": (52.23, 21.01), "PT": (38.72, -9.14), "RO": (44.43, 26.10), "SK": (48.15, 17.11),
+            "SI": (46.06, 14.51), "ES": (40.42, -3.70), "SE": (59.33, 18.07), "NO": (59.91, 10.75), "IS": (64.15, -21.94), "CH": (46.95, 7.45),
+            "UK": (51.51, -0.13)}
+MOSCOW = (55.76, 37.62)
+NATO_BEFORE_2015 = {"BE", "BG", "HR", "CZ", "DK", "EE", "FR", "DE", "EL", "HU", "IT", "LV", "LT", "LU", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "NO", "IS", "UK"}
+CONSCRIPTION_2019 = {"AT", "CY", "DK", "EE", "FI", "EL", "LT", "NO", "SE", "CH"}
+RUSSIA_BORDER = {"FI", "EE", "LV", "LT", "PL", "NO"}
+
+
+def km(a, b):
+    la1, lo1, la2, lo2 = map(math.radians, (*a, *b))
+    h = math.sin((la2 - la1) / 2) ** 2 + math.cos(la1) * math.cos(la2) * math.sin((lo2 - lo1) / 2) ** 2
+    return 2 * 6371 * math.asin(math.sqrt(h))
+
+
+def diff_or_none(a, b):
+    return None if a is None or b is None else a - b
+
+
+def ratio_mean(num, den, ys):
+    """Kahden sarjan suhteen keskiarvo vuosilta ys (%)."""
+    if num is None or den is None or not all(y in num and y in den and den[y] for y in ys):
+        return None
+    return float(np.mean([num[y] / den[y] * 100 for y in ys]))
+
+
+def food():
+    Y5 = range(2019, 2024)
+    meal = eurostat("ilc_mdes03", "hhcomp=TOTAL&rskpovth=B_60&unit=PC")
+    med = eurostat("ilc_di03", "age=TOTAL&sex=T&statinfo=MED_EI&unit=PPS")
+    gap = eurostat("ilc_li11", "statinfo=MED_EI&rskpovth=B_60&sex=T&age=TOTAL&unit=PC")
+    hco = eurostat("ilc_lvho07a", "rskpovth=B_60&age=TOTAL&sex=T&unit=PC")
+    before = eurostat("ilc_li10", "statinfo=MED_EI&rskpovth=B_60&sex=T&age=TOTAL&unit=PC")
+    after = eurostat("ilc_li02", "statinfo=MED_EI&rskpovth=B_60&sex=T&age=TOTAL&unit=PC")
+    a1 = eurostat("lfst_hhnhtych", "agechild=TOTAL&n_child=TOTAL&phhcomp=A1&unit=THS_HH")
+    tot = eurostat("lfst_hhnhtych", "agechild=TOTAL&n_child=TOTAL&phhcomp=TOTAL&unit=THS_HH")
+    une = eurostat("une_rt_a", "age=Y15-74&sex=T&unit=PC_ACT")
+    dti = eurostat("nasa_10_ki", "sector=S14_S15&na_item=DIR_S14_S15&unit=PC")
+    Y = {g: mean_of(meal.get(g), Y5) for g in EU}
+    Y = {g: v for g, v in Y.items() if v is not None}
+    K = [("K1", "Tulotaso: mediaanitulo (PPS)", {g: mean_of(med.get(g), Y5) for g in EU}),
+         ("K2", "Köyhyyden syvyys: köyhyysvaje", {g: mean_of(gap.get(g), Y5) for g in EU}),
+         ("K3", "Asumismenorasite köyhillä", {g: mean_of(hco.get(g), Y5) for g in EU}),
+         ("K4", "Tulonsiirtojen teho (köyhyysasteen lasku)", {g: diff_or_none(mean_of(before.get(g), Y5), mean_of(after.get(g), Y5)) for g in EU})]
+    C = [("C1", "Yhden aikuisen kotitalouksien osuus", {g: ratio_mean(a1.get(g), tot.get(g), Y5) for g in EU}, 1),
+         ("C2", "Työttömyysaste 15–74", {g: mean_of(une.get(g), Y5) for g in EU}, 1),
+         ("C3", "Kotitalouksien velkaantumisaste", {g: mean_of(dti.get(g), Y5) for g in EU}, 1)]
+    return analyze(Y, K, C, NAMES, common_gap=False)
+
+
+def queues():
+    wl = eurostat("hlth_silc_08", "reason=WLIST&quant_inc=TOTAL&age=Y_GE16&sex=T&unit=PC")
+    he = eurostat("hlth_sha11_hf", "icha11_hf=TOT_HF&unit=EUR_HAB_KP15")
+    phys = eurostat("hlth_rs_prs2", "unit=P_HTHAB&wstatus=PRACT&med_spec=PHYS")
+    nrs = eurostat("hlth_rs_prs2", "unit=P_HTHAB&wstatus=PRACT&med_spec=NRS")
+    old = eurostat("demo_pjanind", "indic_de=OLDDEP1")
+    gdp = eurostat("nama_10_pc", "unit=CLV10_EUR_HAB&na_item=B1GQ")
+    tot = eurostat("hlth_sha11_hf", "icha11_hf=TOT_HF&unit=MIO_EUR")
+    hf1 = eurostat("hlth_sha11_hf", "icha11_hf=HF1&unit=MIO_EUR")
+    hf2 = eurostat("hlth_sha11_hf", "icha11_hf=HF2&unit=MIO_EUR")
+    share = lambda part, g, y: part[g][y] / tot[g][y] * 100 if g in part and g in tot and y in part[g] and y in tot[g] and tot[g][y] else None
+    Y = {g: diff_or_none(mean_of(wl.get(g), range(2019, 2024)), mean_of(wl.get(g), range(2008, 2013))) for g in EU}
+    Y = {g: v for g, v in Y.items() if v is not None}
+    K = [("K1", "Terveysmenot asukasta kohden 2012 → 2022", {g: change(he.get(g), 2012, 2022, True) for g in EU}),
+         ("K2", "Lääkärit / 100 000, 2010 → 2021", {g: change(phys.get(g), 2010, 2021) for g in EU}),
+         ("K3", "Vanhushuoltosuhde 2010 → 2023", {g: change(old.get(g), 2010, 2023) for g in EU}),
+         ("K4", "BKT asukasta kohden 2010 → 2019", {g: change(gdp.get(g), 2010, 2019, True) for g in EU})]
+    C = [("C1", "Sairaanhoitajat / 100 000, 2010 → 2021", {g: change(nrs.get(g), 2010, 2021) for g in EU}, -1),
+         ("C2", "Julkisen rahoituksen osuus 2012 → 2022", {g: diff_or_none(share(hf1, g, 2022), share(hf1, g, 2012)) for g in EU}, -1),
+         ("C3", "Vapaaehtoisten vakuutusten ja omamaksujen osuus 2012 → 2022", {g: diff_or_none(share(hf2, g, 2022), share(hf2, g, 2012)) for g in EU}, 1)]
+    r = analyze(Y, K, C, NAMES, common_gap=False)
+    r["series"] = {g: sorted((y, round(v, 1)) for y, v in wl[g].items()) for g in ("FI", "SE", "DK", "EE", "DE") if g in wl}
+    return r
+
+
+def jobless():
+    Y5 = range(2015, 2020)
+    jh = eurostat("lfsi_jhh_a", "indic_em=SC072&unit=PC")
+    une = eurostat("une_rt_a", "age=Y15-74&sex=T&unit=PC_ACT")
+    low = eurostat("edat_lfse_03", "isced11=ED0-2&age=Y25-64&sex=T&unit=PC")
+    a1ch = eurostat("lfst_hhnhtych", "agechild=TOTAL&n_child=TOTAL&phhcomp=A1_CH&unit=THS_HH")
+    tot = eurostat("lfst_hhnhtych", "agechild=TOTAL&n_child=TOTAL&phhcomp=TOTAL&unit=THS_HH")
+    sp = eurostat("gov_10a_exp", "sector=S13&na_item=TE&unit=PC_GDP&cofog99=GF10")
+    spo = eurostat("gov_10a_exp", "sector=S13&na_item=TE&unit=PC_GDP&cofog99=GF1002")
+    hco = eurostat("ilc_lvho07a", "rskpovth=TOTAL&age=TOTAL&sex=T&unit=PC")
+    Y = {g: mean_of(jh.get(g), Y5) for g in EU}
+    Y = {g: v for g, v in Y.items() if v is not None}
+    K = [("K1", "Työttömyysaste 15–74", {g: mean_of(une.get(g), Y5) for g in EU}),
+         ("K2", "Matala koulutus (25–64, enintään perusaste)", {g: mean_of(low.get(g), Y5) for g in EU}),
+         ("K3", "Yksinhuoltajakotitalouksien osuus", {g: ratio_mean(a1ch.get(g), tot.get(g), Y5) for g in EU})]
+    C = [("C1", "Sosiaaliturvamenot pl. vanhuus / BKT", {g: diff_or_none(mean_of(sp.get(g), Y5), mean_of(spo.get(g), Y5)) for g in EU}, 1),
+         ("C2", "Asumismenorasite", {g: mean_of(hco.get(g), Y5) for g in EU}, 1)]
+    return analyze(Y, K, C, NAMES, common_gap=False)
+
+
+def defence():
+    YS = range(2015, 2024)
+    de = eurostat("gov_10a_exp", "sector=S13&na_item=TE&unit=PC_GDP&cofog99=GF02")
+    te = eurostat("gov_10a_main", "sector=S13&na_item=TE&unit=PC_GDP")
+    Y = {g: mean_of(de.get(g), YS) for g in EU}
+    Y = {g: v for g, v in Y.items() if v is not None}
+    nato = {g: (1.0 if g in NATO_BEFORE_2015 else 1 / 9 if g == "FI" else 0.0) for g in EU}
+    K = [("K1", "Uhka: pääkaupungin etäisyys Moskovaan (log km)", {g: math.log(km(CAPITALS[g], MOSCOW)) for g in EU}),
+         ("K2", "Nato-jäsenyys 2015–2023", nato),
+         ("K3", "Polkuriippuvuus: puolustusmenot 2001–2005", {g: mean_of(de.get(g), range(2001, 2006)) for g in EU})]
+    C = [("C1", "Asevelvollisuus (2019)", {g: float(g in CONSCRIPTION_2019) for g in EU}, 1),
+         ("C2", "Yhteinen maaraja Venäjän kanssa", {g: float(g in RUSSIA_BORDER) for g in EU}, 1),
+         ("C3", "Julkiset menot / BKT 2015–2023", {g: mean_of(te.get(g), YS) for g in EU}, 1)]
+    r = analyze(Y, K, C, NAMES, common_gap=False)
+    r["series"] = {g: sorted((y, round(v, 2)) for y, v in de[g].items()) for g in ("FI", "SE", "EE", "PL", "DE") if g in de}
+    return r
+
+
 
 def main():
-    out = {"built": str(date.today()), "puzzles": {"syntyvyys": fertility(), "tyottomyys": unemployment(), "velka": debt()}}
+    out = {"built": str(date.today()), "puzzles": {"syntyvyys": fertility(), "tyottomyys": unemployment(), "velka": debt(),
+                                                   "ruoka": food(), "jonot": queues(), "tuet": jobless(), "puolustus": defence()}}
     json.dump(out, open(OUT, "w"), ensure_ascii=False, separators=(",", ":"))
     for k, r in out["puzzles"].items():
         print(f"== {k}: n={r['n']} pudotettu={len(r['dropped'])} LOO-R2={r['looR2']} sovite-R2={r['fitR2']} selittämätön={r['unexplained']}")

@@ -22,14 +22,14 @@ export type Puzzle = {
   };
   series: Record<string, [number, number][]>;
 };
-export type PuzzleKey = "syntyvyys" | "tyottomyys" | "velka";
+export type PuzzleKey = "syntyvyys" | "tyottomyys" | "velka" | "ruoka" | "jonot" | "tuet" | "puolustus";
 type Data = { built: string; puzzles: Record<PuzzleKey, Puzzle> };
 
 export const SELITTAMATON = raw as unknown as Data;
-export const PUZZLE_KEYS: PuzzleKey[] = ["syntyvyys", "tyottomyys", "velka"];
+export const PUZZLE_KEYS: PuzzleKey[] = ["syntyvyys", "tyottomyys", "velka", "jonot", "ruoka", "tuet", "puolustus"];
 
 /** Ilmiön yksikkö: syntyvyys on log-muutos (näytetään prosentteina), muut prosenttiyksikköinä. */
-export const UNIT: Record<PuzzleKey, "log" | "pp"> = { syntyvyys: "log", tyottomyys: "pp", velka: "pp" };
+export const UNIT: Record<PuzzleKey, "log" | "pp" | "pc" | "gdp"> = { syntyvyys: "log", tyottomyys: "pp", velka: "pp", ruoka: "pc", jonot: "pp", tuet: "pc", puolustus: "gdp" };
 
 export const fiNum = (v: number, d = 1) => {
   const t = Math.abs(v).toLocaleString("fi-FI", { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -40,6 +40,16 @@ export const signed = (v: number, d = 1) => (v > 0 ? `+${fiNum(v, d)}` : fiNum(v
 /** Arvo näyttöyksikössä: log-muutos prosentteina, muuten sellaisenaan. */
 export const shown = (key: PuzzleKey, v: number) => (UNIT[key] === "log" ? (Math.exp(v) - 1) * 100 : v);
 export const unitLabel = (key: PuzzleKey) => (UNIT[key] === "log" ? "%" : "%-yks.");
+/** Tason yksikkö (havaittu ja ennuste): prosenttiosuus, BKT-osuus tai muutos. */
+export const levelLabel = (key: PuzzleKey) => ({ log: "%", pp: "%-yks.", pc: "%", gdp: "% BKT:sta" })[UNIT[key]];
+
+/** Suomen jäännöksen sija suurimmasta: 1 = suurin positiivinen jäännös. */
+export function finlandRank(p: Puzzle): { fromTop: number; fromBottom: number; of: number } | null {
+  if (!p.finland) return null;
+  const sorted = [...p.rows].sort((a, b) => b.res - a.res);
+  const i = sorted.findIndex((r) => r.geo === "FI" || r.geo === "FIN");
+  return { fromTop: i + 1, fromBottom: sorted.length - i, of: sorted.length };
+}
 
 /** LOO-R²:n sanallinen tulkinta. */
 export function predictive(looR2: number): string {

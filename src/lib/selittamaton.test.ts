@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PUZZLE_KEYS, SELITTAMATON, predictive, remaining, shown, sortedRows } from "./selittamaton";
+import { PUZZLE_KEYS, SELITTAMATON, finlandRank, predictive, remaining, shown, sortedRows } from "./selittamaton";
 
 const P = SELITTAMATON.puzzles;
 
@@ -33,6 +33,22 @@ describe("selittämätön", () => {
     expect(sortedRows(v).slice(-3).map((r) => r.geo)).toEqual(["FI", "LU", "MT"]);
     expect(remaining(v).map((c) => c.id)).toEqual(["C2"]);
     expect(remaining(v)[0]).toMatchObject({ rho: 0.523, p: 0.024, q: 0.072, n: 19 });
+  });
+  it("second batch numbers quoted in docs/selittamaton.md", () => {
+    const r = P.ruoka, j = P.jonot, t = P.tuet, d = P.puolustus;
+    expect([r.n, r.looR2]).toEqual([28, 0.491]);
+    expect([Math.round(r.finland!.y * 10) / 10, Math.round(r.finland!.pred * 10) / 10, r.finland!.z]).toEqual([8, 6, 0.24]);
+    expect(finlandRank(r)!.fromBottom).toBe(18);
+    expect([j.n, j.dropped.length, j.looR2]).toEqual([18, 9, -1]);
+    expect([j.finland!.y, Math.round(j.finland!.pred * 10) / 10, j.finland!.z]).toEqual([2.36, 0.6, 0.77]);
+    expect(finlandRank(j)!.fromTop).toBe(3);
+    expect([...j.rows].sort((a, b) => b.y - a.y).slice(0, 2).map((x) => x.geo)).toEqual(["EE", "FI"]);
+    expect([t.n, t.looR2, t.finland!.y, t.finland!.z]).toEqual([27, 0.438, 9.78, 0.64]);
+    expect(t.candidates[1]).toMatchObject({ id: "C2", rho: 0.382, verdict: "ei yhteyttä" });
+    expect([d.n, d.looR2, d.finland!.z]).toEqual([29, 0.619, -0.8]);
+    expect([Math.round(d.finland!.y * 100) / 100, Math.round(d.finland!.pred * 100) / 100]).toEqual([1.27, 1.54]);
+    expect(finlandRank(d)!.fromBottom).toBe(4);
+    for (const k of ["ruoka", "jonot", "tuet", "puolustus"] as const) expect(remaining(P[k])).toHaveLength(0);
   });
   it("finland is the largest fertility decline among included countries", () => {
     const s = P.syntyvyys;
