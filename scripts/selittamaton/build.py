@@ -377,11 +377,96 @@ def defence():
     return r
 
 
+def inside():
+    """Kolmas erä (docs/selittamaton.md): S1 hoitojonot tuloryhmittäin, S2 ruoka-apu, S3 mielenterveys. Lähde: Turso-ote."""
+    path = os.environ.get("TURSO_EXTRACT", "scan-data/selittamaton-turso.json")
+    X = json.load(open(path))
+    ind = lambda k: X["indicators"][k]["values"]
+    fin = lambda k: {y: v for y, v, _ in X["finance"][k]["values"]}
+
+    # S1
+    def queue(key, base_years=range(2008, 2013)):
+        Q = {}
+        for y, g, v, _ in ind(key):
+            q, sex = g.split("|")
+            if sex == "T":
+                Q.setdefault(q, {})[y] = v
+        rows = {}
+        for q in ("QU1", "QU2", "QU3", "QU4", "QU5", "TOTAL"):
+            s_ = Q[q]
+            base = float(np.mean([s_[y] for y in base_years]))
+            ch = float(np.mean([s_[y] for y in range(2019, 2024)])) - base
+            when = None
+            for y in range(2011, max(s_) + 1):
+                if all(z in s_ for z in (y - 2, y - 1, y)) and np.mean([s_[y - 2], s_[y - 1], s_[y]]) > base + 1:
+                    when = y; break
+            rows[q] = {"base": round(base, 2), "change": round(ch, 2), "when": when, "series": sorted((y, round(v, 1)) for y, v in s_.items())}
+        qs = ["QU1", "QU2", "QU3", "QU4", "QU5"]
+        chs = [rows[q]["change"] for q in qs]
+        whens = [rows[q]["when"] for q in qs]
+        if all(c > 0 for c in chs) and max(chs) <= 2 * min(chs) and all(w is not None for w in whens) and max(whens) - min(whens) <= 2:
+            cls = "järjestelmätaso"
+        elif rows["QU1"]["change"] > 0 and rows["QU1"]["change"] >= 2 * rows["QU5"]["change"]:
+            cls = "pienituloisten jonot"
+        elif rows["QU5"]["change"] > 0 and rows["QU5"]["change"] >= 2 * rows["QU1"]["change"]:
+            cls = "suurituloisten jonot"
+        else:
+            cls = "sekamuoto"
+        return {"rows": rows, "class": cls}
+    s1 = {"medical": queue("fi.eusilc.unmet08.wlist"), "dental": queue("fi.eusilc.unmet09.wlist")}
+    # Jälkikäteinen herkkyystarkistus (ei rekisteröity): vuoden 2008 arvo (0,2–0,5 %) on mittauskatko, perustaso 2009–2012.
+    for k_, key in (("medical", "fi.eusilc.unmet08.wlist"), ("dental", "fi.eusilc.unmet09.wlist")):
+        alt = queue(key, range(2009, 2013))
+        s1[k_]["no2008"] = {"class": alt["class"], "rows": {q: {kk: v[kk] for kk in ("base", "change", "when")} for q, v in alt["rows"].items()}}
+
+    # S2
+    U = {y: v for y, g, v, _ in ind("fi.histlabour.lfs2019.unemployment_rate")}
+    u = math.log(U[2008] / U[2000])
+    def aid(key, label):
+        s_ = fin(key)
+        m = math.log(s_[2008] / s_[2000])
+        cls = "pysyvä" if m > -0.10 else "suhdanne" if m <= u / 2 else "välimuoto"
+        crisis = math.log(s_[2010] / s_[2008]) if 2010 in s_ else None
+        return {"label": label, "m": round(m, 4), "pct": round((math.exp(m) - 1) * 100, 1), "class": cls,
+                "crisisPct": None if crisis is None else round((math.exp(crisis) - 1) * 100, 1),
+                "series": sorted((y, round(v, 2)) for y, v in s_.items())}
+    s2 = {"u": round(u, 4), "uPct": round((math.exp(u) - 1) * 100, 1), "u2000": U[2000], "u2008": U[2008], "u2010": U[2010],
+          "unemployment": sorted((y, round(v, 2)) for y, v in U.items() if 1995 <= y <= 2012),
+          "series": [aid("foodaid_hist_tvy_history_food_kg_13", "Elintarvikeapu, kg"), aid("foodaid_hist_church_share", "Ruoka-apua jakaneiden seurakuntien osuus")]}
+
+    # S3
+    A = {}
+    for y, g, v, _ in ind("nordics.antidepressants_2000_2023"):
+        A.setdefault(g, {})[y] = v
+    g_ = lambda s_, a, b: math.log(s_[b] / s_[a]) / (b - a)
+    countries = {}
+    for c in ("FI", "SE", "NO", "DK"):
+        s_ = A[c]
+        g1, g2, g3 = g_(s_, 2000, 2010), g_(s_, 2010, 2019), g_(s_, 2019, 2023)
+        countries[c] = {"g1": round(g1, 4), "g2": round(g2, 4), "g3": round(g3, 4), "accel": g2 > g1 + 0.01,
+                        "series": sorted((y, round(v, 1)) for y, v in s_.items())}
+    others = sum(1 for c in ("SE", "NO", "DK") if countries[c]["accel"])
+    cls = "ei kiihtymistä Suomessa" if not countries["FI"]["accel"] else "yhteinen" if others >= 2 else "Suomen oma"
+    youth = {}
+    for k in ("youth.mh_rehab_total_0_24", "youth.psychotherapy_18_24", "youth.psychiatric_wait_u23"):
+        s_ = {y: v for y, g, v, _ in ind(k)}
+        last = max(s_)
+        a = g_(s_, 2010, 2019) if 2010 in s_ and 2019 in s_ else None
+        b = g_(s_, 2019, last) if 2019 in s_ and last > 2019 else None
+        youth[k] = {"title": X["indicators"][k]["meta"].get("title"), "unit": X["indicators"][k]["meta"].get("unit"), "last": last,
+                    "g1019": None if a is None else round(a, 4), "g19last": None if b is None else round(b, 4),
+                    "series": sorted((y, round(v, 2)) for y, v in s_.items())}
+    s3 = {"countries": countries, "othersAccelerating": others, "class": cls, "youth": youth}
+    return {"jonot": s1, "ruoka": s2, "mieli": s3}
+
+
 
 def main():
     out = {"built": str(date.today()), "puzzles": {"syntyvyys": fertility(), "tyottomyys": unemployment(), "velka": debt(),
-                                                   "ruoka": food(), "jonot": queues(), "tuet": jobless(), "puolustus": defence()}}
+                                                   "ruoka": food(), "jonot": queues(), "tuet": jobless(), "puolustus": defence()},
+           "inside": inside()}
     json.dump(out, open(OUT, "w"), ensure_ascii=False, separators=(",", ":"))
+    print("== sisältä:", json.dumps({k: v.get("class") or {kk: vv.get("class") for kk, vv in v.items() if isinstance(vv, dict)} for k, v in out["inside"].items()}, ensure_ascii=False))
     for k, r in out["puzzles"].items():
         print(f"== {k}: n={r['n']} pudotettu={len(r['dropped'])} LOO-R2={r['looR2']} sovite-R2={r['fitR2']} selittämätön={r['unexplained']}")
         print("   K:", [(x['id'], x['beta']) for x in r["known"]])

@@ -385,3 +385,75 @@ Suomen oma vai yhteinen. Jokaiselle on kirjattu luokittelusääntö ennen lasken
   - Näille raportoidaan vuosikasvu 2010–2019 ja 2019–viimeisin vuosi.
 - **Tunnettu katkos:** kuntoutuspsykoterapia siirtyi Kelan lakisääteiseksi etuudeksi vuonna 2011.
   Psykoterapiasarjan nousua ei tulkita ilman tätä tietoa.
+
+## Kolmannen erän tulokset 28.11.2026
+
+### S1 Hoitojonot tuloryhmittäin
+
+- **Luokka: pienituloisten jonot.** Sama luokka sekä lääkärin- että hammashoidossa.
+
+  | Tuloviidennes | Lääkärinhoito: muutos | Lääkärinhoito: nousu alkoi | Hammashoito: muutos | Hammashoito: nousu alkoi |
+  |---|---|---|---|---|
+  | QU1 (pienituloisin) | +3,0 %-yks. | 2012 | +2,8 %-yks. | 2011 |
+  | QU2 | +3,5 | 2016 | +3,1 | 2017 |
+  | QU3 | +2,8 | 2016 | +2,9 | 2016 |
+  | QU4 | +1,2 | 2012 | +1,2 | 2019 |
+  | QU5 (suurituloisin) | +1,4 | 2022 | +0,9 | 2023 |
+
+- **Kuvio rekisteröidyllä perustasolla:** nousu näytti alkavan pienituloisimmista 2012, levinneen
+  keskituloisiin 2016 ja suurituloisimpiin vasta 2020-luvulla.
+- **Jälkikäteinen herkkyystarkistus (ei rekisteröity, muuttaa tulkintaa):**
+  - Vuoden 2008 arvo (0,2–0,5 % kaikissa ryhmissä, vuonna 2009 3,4 %) on mittauskatko. Se painaa
+    rekisteröityä perustasoa 2008–2012 alas.
+  - Perustasolla 2009–2012 luokka säilyy niukasti: lääkärinhoidossa QU1 +2,0 ja QU5 +1,0 %-yks.
+    (raja 2 × 0,97 = 1,94). Hammashoidossa QU1 +1,9 ja QU5 +0,2.
+  - Ajoituskuvio kuitenkin katoaa. Nousu alkoi vasta 2019–2020 keskituloisissa (QU2 2020, QU3 2019)
+    ja muualla 2022–2024 (QU1 2022, QU5 2023, QU4 2024).
+- **Tulkinta:**
+  - Jonojen kasvu on 2020-luvun ilmiö, joka painottuu alempiin ja keskituloisiin viidenneksiin.
+  - Neljäs ja suurituloisin viidennes säästyivät eniten.
+  - Väite, että nousu olisi alkanut pienituloisista jo 2010-luvun alussa, johtui mittauskatkosta.
+  - Mahdollinen selitys (ei testattu): suurituloisilla on enemmän vaihtoehtoja julkiselle hoidolle,
+    esimerkiksi työterveyshuolto ja yksityinen hoito.
+
+### S2 Ruoka-apu
+
+- **Työttömyys** laski 2000 → 2008 9,8 %:sta 6,4 %:iin (−35 %).
+- **Elintarvikeapu kiloina: pysyvä.** Määrä kasvoi 2000 → 2008 +135 %.
+  - Vuoden 2000 arvo (189 000 kg) on alle puolet vuoden 2001 arvosta, joten ohjelma oli
+    todennäköisesti vasta käynnistymässä.
+  - Jälkikäteinen tarkistus vuodesta 2001: −3 % (log −0,03), mikä on edelleen luokassa "pysyvä".
+- **Seurakuntien osuus: välimuoto.** Osuus laski −19 % (log −0,210). Suhdanneraja oli −0,213, joten
+  tulos jäi niukasti suhdanneluokan ulkopuolelle.
+- **Finanssikriisi 2008 → 2010:** työttömyys nousi 8,4 %:iin, elintarvikeapu kasvoi +36 % ja
+  seurakuntien osuus +46 %.
+- **Kuvio (kuvaileva):** ruoka-apu kasvoi laskusuhdanteessa mutta ei palannut ennalleen
+  noususuhdanteessa. Se kasvoi siis vaiheittain, räikän tavoin.
+
+### S3 Mielenterveys
+
+- Kasvuluvut ovat todellisia vuosikasvuja (exp(g) − 1); luokitus käyttää kirjattua log-kasvua g.
+
+- **Luokka: ei kiihtymistä Suomessa.**
+  - Masennuslääkkeiden käytön vuosikasvu Suomessa oli 6,9 % vuosina 2000–2010 ja 1,4 % vuosina
+    2010–2019, eli kasvu hidastui.
+  - Yksikään Pohjoismaa ei kiihtynyt 2010–2019. Ruotsi 5,4 → 3,4 %, Norja 3,3 → 0,2 %, Tanska
+    9,1 → −0,8 %.
+- **Pandemiajakso 2019–2023:** kasvu kiihtyi kaikissa neljässä maassa. Suomi 4,3 %, Tanska 4,2 %,
+  Ruotsi 3,5 % ja Norja 2,6 % vuodessa.
+- **Nuoret Suomessa:**
+
+  | Sarja | Vuosikasvu 2010–2019 | Vuosikasvu 2019–2025 |
+  |---|---|---|
+  | Kelan mielenterveyskuntoutujat 0–24 v | 11,6 % | 7,0 % |
+  | Kuntoutuspsykoterapia 18–24 v | 11,0 % | 6,0 % |
+  | Yli 3 kk psykiatrista hoitoa odottaneet alle 23 v | — | 13,5 % |
+
+  - Psykoterapian kasvussa on mukana vuoden 2011 lakimuutos, jolla kuntoutuspsykoterapia siirtyi
+    Kelan lakisääteiseksi etuudeksi.
+  - Odottaneiden osuus oli 6,6 % vuonna 2014, 31,3 % vuonna 2023 ja 17,7 % vuonna 2025.
+- **Tulkinta:**
+  - 2010-luvulla mielenterveysongelmien nousu ei näy koko väestön masennuslääkkeiden käytössä vaan
+    nuorten palveluiden käytössä.
+  - Nuorten palveluiden käytön kasvu voi kertoa tarpeen kasvusta, palvelujen laajenemisesta tai
+    kummastakin. Tämä aineisto ei erota niitä toisistaan.

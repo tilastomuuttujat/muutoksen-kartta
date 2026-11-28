@@ -5,6 +5,7 @@ import {
   VERDICT_INFO,
   finlandRank,
   fiNum,
+  growthPct,
   predictive,
   remaining,
   shown,
@@ -122,6 +123,8 @@ function UnexplainedPage() {
       </section>
 
       {PUZZLE_KEYS.map((k) => <PuzzleSection key={k} k={k} />)}
+
+      <InsideSection />
 
       <section className="mt-6 rounded-xl border bg-card p-5" aria-labelledby="ei-h">
         <h2 id="ei-h" className="font-display text-xl">Ilmiöt, joita tällä menetelmällä ei voi vielä tutkia</h2>
@@ -263,6 +266,113 @@ function CandidateScatter({ c, p, k }: { c: Candidate; p: Puzzle; k: PuzzleKey }
         </svg>
       </div>
       <p className="text-xs text-muted-foreground">rho {signed(c.rho ?? 0, 2)}, p {fiNum(c.p ?? 1, 3)}, q {fiNum(c.q, 3)}. Uusi hypoteesi: testattava muulla aineistolla (esim. 1995–2008 tai alueittain), ei syy.</p>
+    </div>
+  );
+}
+
+const QLABEL: Record<string, string> = { QU1: "pienituloisin viidennes", QU2: "2. viidennes", QU3: "3. viidennes", QU4: "4. viidennes", QU5: "suurituloisin viidennes" };
+
+function InsideSection() {
+  const I = SELITTAMATON.inside;
+  const m = I.jonot.medical, d = I.jonot.dental;
+  const qs = ["QU1", "QU2", "QU3", "QU4", "QU5"] as const;
+  const kg = I.ruoka.series[0]!, sh = I.ruoka.series[1]!;
+  const mi = I.mieli;
+  const NORD: Record<string, string> = { FI: "Suomi", SE: "Ruotsi", NO: "Norja", DK: "Tanska" };
+  const pc = (g: number) => `${fiNum(growthPct(g), 1)} %`;
+  return (
+    <section id="sisalta" className="mt-6 rounded-xl border bg-card p-5" aria-labelledby="sis-h">
+      <h2 id="sis-h" className="font-display text-xl">Suomen sisältä: minkä muotoisia aukot ovat</h2>
+      <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
+        Maiden välinen malli näyttää, missä aukko on. Nämä kolme tarkastelua kysyvät sen muotoa Suomen sisältä Turson sarjoilla:
+        alkoiko muutos kaikkialla yhtä aikaa, seurasiko se suhdannetta, ja onko se Suomen oma vai yhteinen. Luokittelusäännöt kirjattiin ennen laskentaa.
+      </p>
+
+      <h3 className="mt-5 text-base font-semibold">Hoitojonot tuloryhmittäin: <span className="text-primary">{m.class}</span></h3>
+      <p className="mt-1 max-w-3xl text-sm">
+        Jonon vuoksi saamatta jäänyt lääkärinhoito kasvoi eniten alemmissa ja keskimmäisissä tuloviidenneksissä; suurituloisimpien nousu jäi noin puoleen pienituloisimpien noususta. Hammashoito toisti saman kuvion.
+      </p>
+      <div className="mt-2 rounded-lg border border-dashed p-3 text-sm">
+        <div className="font-semibold">Mittauskatko muuttaa ajoituksen (jälkikäteinen tarkistus)</div>
+        <p className="mt-1 text-muted-foreground">
+          Vuoden 2008 arvo (0,2–0,5 % kaikissa ryhmissä, seuraavana vuonna 3,4 %) on mittauskatko, joka painaa kirjattua perustasoa 2008–2012 alas. Perustasolla 2009–2012 luokka säilyy niukasti
+          (pienituloisin {signed(m.no2008!.rows.QU1.change)}, suurituloisin {signed(m.no2008!.rows.QU5.change)} %-yks.), mutta ajoitus muuttuu: nousu alkoi vasta {m.no2008!.rows.QU3.when}–{m.no2008!.rows.QU2.when} keskituloisissa
+          ja {m.no2008!.rows.QU1.when}–{m.no2008!.rows.QU4.when} muissa ryhmissä. Jonojen kasvu on 2020-luvun ilmiö. Kirjatulla perustasolla näkynyt "alkoi pienituloisista jo 2012" johtui katkosta.
+        </p>
+      </div>
+      <MiniLines from={2008} to={2025} unit="%" lines={qs.map((q) => ({ label: QLABEL[q]!, s: m.rows[q].series, main: q === "QU1", muted: q !== "QU1" && q !== "QU5" }))}
+        marks={[{ x: 2008.5, label: "katko" }]}
+        caption="Jonon vuoksi saamatta jäänyt lääkärinhoito tuloviidenneksittäin, % (EU-SILC hlth_silc_08). Vuoden 2008 arvo on mittauskatko." />
+      <table className="mt-2 w-full max-w-2xl text-sm">
+        <thead><tr className="text-left text-xs text-muted-foreground"><th className="font-medium">Tuloviidennes</th><th className="font-medium">Lääkärinhoito (kirjattu)</th><th className="font-medium">ilman 2008 · nousu alkoi</th><th className="font-medium">Hammashoito (kirjattu)</th><th className="font-medium">ilman 2008 · nousu alkoi</th></tr></thead>
+        <tbody>{qs.map((q) => (
+          <tr key={q} className="border-t"><td className="py-1">{QLABEL[q]}</td><td className="tabular-nums">{signed(m.rows[q].change)}</td><td className="tabular-nums">{signed(m.no2008!.rows[q].change)} · {m.no2008!.rows[q].when ?? "–"}</td><td className="tabular-nums">{signed(d.rows[q].change)}</td><td className="tabular-nums">{signed(d.no2008!.rows[q].change)} · {d.no2008!.rows[q].when ?? "–"}</td></tr>
+        ))}</tbody>
+      </table>
+      <p className="text-xs text-muted-foreground">Muutos: keskiarvo 2019–2023 miinus perustaso (kirjattu 2008–2012; tarkistus 2009–2012), %-yks. Nousu alkoi: ensimmäinen vuosi, jolloin kolmen vuoden keskiarvo ylitti perustason yli 1 %-yksiköllä.</p>
+
+      <h3 className="mt-6 text-base font-semibold">Ruoka-apu: <span className="text-primary">{kg.class}</span> (elintarvikeapu), {sh.class} (seurakunnat)</h3>
+      <p className="mt-1 max-w-3xl text-sm">
+        Työttömyys laski 2000–2008 {fiNum(I.ruoka.u2000)} %:sta {fiNum(I.ruoka.u2008)} %:iin, mutta ruoka-apu ei seurannut: elintarvikeavun määrä ei laskenut (vuodesta 2001 {"−3"} %; vuoden 2000 arvo on ohjelman käynnistysvuoden poikkeuksellisen pieni luku),
+        ja ruoka-apua jakaneiden seurakuntien osuus laski vain {fiNum(-sh.pct, 0)} %. Finanssikriisissä 2008–2010 molemmat kasvoivat ({signed(kg.crisisPct ?? 0, 0)} % ja {signed(sh.crisisPct ?? 0, 0)} %).
+        Ruoka-apu kasvoi laskusuhdanteessa mutta ei palannut noususuhdanteessa: se kasvoi vaiheittain. Tietokannassa ei ole sarjoja vuoden 2011 jälkeen.
+      </p>
+      <div className="mt-2 grid gap-4 md:grid-cols-3">
+        <MiniLines from={2000} to={2011} unit="tuhatta kg" small lines={[{ label: "kg", s: kg.series.map(([y, v]) => [y, v / 1000] as [number, number]), main: true }]} caption="Elintarvikeapu, tuhatta kg" />
+        <MiniLines from={2000} to={2011} unit="%" small lines={[{ label: "osuus", s: sh.series, main: true }]} caption="Ruoka-apua jakaneet seurakunnat, % seurakunnista" />
+        <MiniLines from={2000} to={2011} unit="%" small lines={[{ label: "työttömyys", s: I.ruoka.unemployment.filter(([y]) => y >= 2000 && y <= 2011), main: false }]} caption="Työttömyysaste, %" />
+      </div>
+
+      <h3 className="mt-6 text-base font-semibold">Mielenterveys: <span className="text-primary">{mi.class}</span></h3>
+      <p className="mt-1 max-w-3xl text-sm">
+        Masennuslääkkeiden käytön kasvu ei kiihtynyt 2010-luvulla missään Pohjoismaassa; Suomessa se hidastui ({pc(mi.countries.FI.g1)} vuodessa 2000–2010, {pc(mi.countries.FI.g2)} 2010–2019).
+        Pandemian jälkeen kasvu kiihtyi kaikissa neljässä maassa (Suomi {pc(mi.countries.FI.g3)} vuodessa). Samaan aikaan nuorten palveluiden käyttö kasvoi Suomessa moninkertaisesti nopeammin:
+        Kelan mielenterveyskuntoutujia (0–24 v) oli 2010-luvulla {pc(mi.youth["youth.mh_rehab_total_0_24"]!.g1019!)} enemmän joka vuosi. 2010-luvun nousu näkyy siis nuorten palveluissa, ei koko väestön lääkekäytössä.
+        Kasvu voi kertoa tarpeesta, palveluiden laajenemisesta tai molemmista; kuntoutuspsykoterapia siirtyi Kelan lakisääteiseksi 2011.
+      </p>
+      <div className="mt-2 grid gap-4 md:grid-cols-2">
+        <MiniLines from={2000} to={2023} unit="DDD/1000/pv" lines={(["FI", "SE", "NO", "DK"] as const).map((c) => ({ label: NORD[c]!, s: mi.countries[c].series, main: c === "FI" }))}
+          marks={[{ x: 2010, label: "" }, { x: 2019, label: "" }]} caption="Masennuslääkkeiden käyttö (N06A), vuorokausiannoksia / 1000 asukasta / päivä (NOMESCO)" />
+        <MiniLines from={2007} to={2025} unit="tuhatta" lines={[{ label: "kuntoutujat 0–24 v", s: mi.youth["youth.mh_rehab_total_0_24"]!.series.map(([y, v]) => [y, v / 1000] as [number, number]), main: true }]}
+          caption="Kelan mielenterveyskuntoutujat 0–24 v, tuhatta" />
+      </div>
+      <table className="mt-3 w-full max-w-2xl text-sm">
+        <thead><tr className="text-left text-xs text-muted-foreground"><th className="font-medium">Nuorten sarja</th><th className="font-medium">vuosikasvu 2010–2019</th><th className="font-medium">2019–viimeisin</th></tr></thead>
+        <tbody>{Object.entries(mi.youth).map(([k, y]) => (
+          <tr key={k} className="border-t"><td className="py-1">{y.title}</td><td className="tabular-nums">{y.g1019 == null ? "–" : pc(y.g1019)}</td><td className="tabular-nums">{y.g19last == null ? "–" : `${pc(y.g19last)} (${y.last})`}</td></tr>
+        ))}</tbody>
+      </table>
+    </section>
+  );
+}
+
+function MiniLines({ lines, from, to, unit, caption, marks = [], small = false }: {
+  lines: { label: string; s: [number, number][]; main: boolean; muted?: boolean }[]; from: number; to: number; unit: string; caption: string;
+  marks?: { x: number; label: string }[]; small?: boolean;
+}) {
+  const W = small ? 300 : 620, H = small ? 150 : 200, L = small ? 36 : 40, R = small ? W - 10 : W - 120, TOP = 12, BOT = H - 26;
+  const cut = lines.map((l) => ({ ...l, s: l.s.filter(([y]) => y >= from && y <= to) }));
+  const hi = Math.max(...cut.flatMap((l) => l.s.map((p) => p[1]))) * 1.08;
+  const x = (y: number) => L + ((y - from) / (to - from)) * (R - L);
+  const y = (v: number) => BOT - (v / hi) * (BOT - TOP);
+  const step = [0.5, 1, 2, 5, 10, 20, 50, 100, 200].find((st) => hi / st <= 5) ?? 500;
+  const ticks = Array.from({ length: Math.floor(hi / step) + 1 }, (_, i) => i * step);
+  const ends = cut.filter((l) => !small).map((l) => ({ ...l, ly: y(l.s.at(-1)![1]) })).sort((a, b) => a.ly - b.ly);
+  for (let i = 1; i < ends.length; i++) if (ends[i]!.ly - ends[i - 1]!.ly < 12) ends[i]!.ly = ends[i - 1]!.ly + 12;
+  return (
+    <div className="mt-2 overflow-x-auto">
+      <svg viewBox={`0 0 ${W} ${H}`} className={`h-auto w-full ${small ? "max-w-sm" : "min-w-[460px] max-w-2xl"}`} role="img" aria-label={caption}>
+        {ticks.map((t) => <text key={t} x={L - 5} y={y(t) + 4} textAnchor="end" className="fill-muted-foreground text-[10px]">{t.toLocaleString("fi-FI")}</text>)}
+        {marks.map((m, i) => <g key={`${m.x}-${i}`}><line x1={x(m.x)} x2={x(m.x)} y1={TOP} y2={BOT} stroke="var(--primary)" strokeOpacity={0.35} strokeDasharray="3 3" />
+          {m.label && <text x={x(m.x) + 3} y={TOP + 8} className="fill-primary text-[9px]">{m.label}</text>}</g>)}
+        {cut.filter((l) => !l.main).concat(cut.filter((l) => l.main)).map((l) => (
+          <path key={l.label} d={l.s.map(([a, v], i) => `${i ? "L" : "M"}${x(a).toFixed(1)},${y(v).toFixed(1)}`).join(" ")} fill="none"
+            stroke={l.main ? "var(--primary)" : "var(--muted-foreground)"} strokeWidth={l.main ? 2.2 : 1.4} strokeOpacity={l.muted ? 0.45 : 0.9} />
+        ))}
+        {ends.map((l) => <text key={l.label} x={R + 6} y={l.ly + 4} className={l.main ? "fill-primary text-[11px] font-semibold" : "fill-muted-foreground text-[11px]"}>{l.label}</text>)}
+        {[from, to].map((t) => <text key={t} x={x(t)} y={H - 8} textAnchor="middle" className="fill-muted-foreground text-[10px]">{t}</text>)}
+      </svg>
+      <p className="text-xs text-muted-foreground">{caption}{small ? "" : ` (${unit})`}</p>
     </div>
   );
 }

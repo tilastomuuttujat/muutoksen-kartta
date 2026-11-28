@@ -50,6 +50,30 @@ describe("selittämätön", () => {
     expect(finlandRank(d)!.fromBottom).toBe(4);
     for (const k of ["ruoka", "jonot", "tuet", "puolustus"] as const) expect(remaining(P[k])).toHaveLength(0);
   });
+  it("third batch (inside Finland) numbers quoted in docs/selittamaton.md", () => {
+    const I = SELITTAMATON.inside;
+    const m = I.jonot.medical, d = I.jonot.dental;
+    expect([m.class, d.class]).toEqual(["pienituloisten jonot", "pienituloisten jonot"]);
+    expect((["QU1", "QU2", "QU3", "QU4", "QU5"] as const).map((q) => [m.rows[q].change, m.rows[q].when])).toEqual([[3, 2012], [3.5, 2016], [2.8, 2016], [1.18, 2012], [1.4, 2022]]);
+    expect((["QU1", "QU2", "QU3", "QU4", "QU5"] as const).map((q) => d.rows[q].when)).toEqual([2011, 2017, 2016, 2019, 2023]);
+    expect(m.rows.QU1.change).toBeGreaterThanOrEqual(2 * m.rows.QU5.change);
+    const n = m.no2008!;
+    expect(n.class).toBe("pienituloisten jonot");
+    expect((["QU1", "QU2", "QU3", "QU4", "QU5"] as const).map((q) => [n.rows[q].change, n.rows[q].when])).toEqual([[1.98, 2022], [2.65, 2020], [2.12, 2019], [0.48, 2024], [0.97, 2023]]);
+    expect([d.no2008!.rows.QU1.change, d.no2008!.rows.QU5.change]).toEqual([1.93, 0.15]);
+    const r = I.ruoka;
+    expect([r.u2000, r.u2008, r.u2010, r.uPct]).toEqual([9.8, 6.4, 8.4, -34.7]);
+    expect(r.series.map((x) => [x.class, x.pct, x.crisisPct])).toEqual([["pysyvä", 135, 35.5], ["välimuoto", -18.9, 46.4]]);
+    expect(r.series[1]!.m).toBeGreaterThan(r.u / 2);
+    const mi = I.mieli;
+    expect([mi.class, mi.othersAccelerating]).toEqual(["ei kiihtymistä Suomessa", 0]);
+    expect([mi.countries.FI.g1, mi.countries.FI.g2, mi.countries.FI.g3]).toEqual([0.0667, 0.0137, 0.0419]);
+    for (const c of ["FI", "SE", "NO", "DK"] as const) expect(mi.countries[c].g3).toBeGreaterThan(mi.countries[c].g2);
+    const gp = (g: number) => Math.round((Math.exp(g) - 1) * 1000) / 10;
+    expect([gp(mi.countries.FI.g1), gp(mi.countries.FI.g2), gp(mi.countries.FI.g3), gp(mi.countries.DK.g1)]).toEqual([6.9, 1.4, 4.3, 9.1]);
+    expect([gp(mi.youth["youth.mh_rehab_total_0_24"]!.g1019!), gp(mi.youth["youth.psychotherapy_18_24"]!.g1019!), gp(mi.youth["youth.psychiatric_wait_u23"]!.g19last!)]).toEqual([11.6, 11, 13.5]);
+    expect([mi.youth["youth.mh_rehab_total_0_24"]!.g1019, mi.youth["youth.psychotherapy_18_24"]!.g1019, mi.youth["youth.psychiatric_wait_u23"]!.g19last]).toEqual([0.11, 0.1043, 0.1262]);
+  });
   it("finland is the largest fertility decline among included countries", () => {
     const s = P.syntyvyys;
     expect([...s.rows].sort((a, b) => a.y - b.y)[0]!.geo).toBe("FI");
