@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ErkaantuminenRouteImport } from './routes/erkaantuminen'
 import { Route as HeijastuksetRouteImport } from './routes/heijastukset'
 import { Route as LampokarttaRouteImport } from './routes/lampokartta'
 import { Route as MitajosRouteImport } from './routes/mitajos'
@@ -28,6 +29,11 @@ import { Route as VertailuRouteImport } from './routes/vertailu'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ErkaantuminenRoute = ErkaantuminenRouteImport.update({
+  id: '/erkaantuminen',
+  path: '/erkaantuminen',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HeijastuksetRoute = HeijastuksetRouteImport.update({
@@ -103,6 +109,7 @@ const VertailuRoute = VertailuRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/erkaantuminen': typeof ErkaantuminenRoute
   '/heijastukset': typeof HeijastuksetRoute
   '/lampokartta': typeof LampokarttaRoute
   '/mitajos': typeof MitajosRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/erkaantuminen': typeof ErkaantuminenRoute
   '/heijastukset': typeof HeijastuksetRoute
   '/lampokartta': typeof LampokarttaRoute
   '/mitajos': typeof MitajosRoute
@@ -138,6 +146,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/erkaantuminen': typeof ErkaantuminenRoute
   '/heijastukset': typeof HeijastuksetRoute
   '/lampokartta': typeof LampokarttaRoute
   '/mitajos': typeof MitajosRoute
@@ -157,6 +166,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/erkaantuminen'
     | '/heijastukset'
     | '/lampokartta'
     | '/mitajos'
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/erkaantuminen'
     | '/heijastukset'
     | '/lampokartta'
     | '/mitajos'
@@ -191,6 +202,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/erkaantuminen'
     | '/heijastukset'
     | '/lampokartta'
     | '/mitajos'
@@ -209,6 +221,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ErkaantuminenRoute: typeof ErkaantuminenRoute
   HeijastuksetRoute: typeof HeijastuksetRoute
   LampokarttaRoute: typeof LampokarttaRoute
   MitajosRoute: typeof MitajosRoute
@@ -232,6 +245,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/erkaantuminen': {
+      id: '/erkaantuminen'
+      path: '/erkaantuminen'
+      fullPath: '/erkaantuminen'
+      preLoaderRoute: typeof ErkaantuminenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/heijastukset': {
@@ -337,6 +357,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ErkaantuminenRoute: ErkaantuminenRoute,
   HeijastuksetRoute: HeijastuksetRoute,
   LampokarttaRoute: LampokarttaRoute,
   MitajosRoute: MitajosRoute,

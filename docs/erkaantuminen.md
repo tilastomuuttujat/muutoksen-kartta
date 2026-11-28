@@ -178,3 +178,68 @@ Kasautumistestiin se ei vaikuta.
   Suomi vai muut: Suomen oma kulmakertoimen muutos samana vuonna verrattuna muiden keskiarvon
   muutokseen (kuvaileva).
 - Lyhyissä sarjoissa (15–20 vuotta) katkoksen ajoitus on epätarkka.
+
+## Tulokset 28.11.2026
+
+### Aineisto
+
+- 75 sarjaa. Kaksoiskappaleina pudotettiin 6:
+  - Turson TFR (= E7)
+  - Turson julkinen velka (= G8)
+  - kaksi Turson työllisyysastetta ja kaksi työttömyysastetta 25–34-vuotiaista (= Eurostat-versiot).
+- Jäljelle jäi 69 sarjaa.
+- Suomelle analysoitiin 66. PISA-sarjoissa on vain neljä mittauskertaa, joten niissä ei ole 15
+  vuotta.
+
+### Erkaantumiset maittain
+
+| Maa | Erkaantumisia | Sarjoja |
+|---|---|---|
+| Suomi | 10 | 66 |
+| Tanska | 7 | 66 |
+| Ruotsi | 2 | 66 |
+| Norja | 1 | 51 |
+
+- Suomen erkaantumisista 9 oli huonompaan suuntaan ja 1 neutraali (sosiaaliturvamenot).
+
+### Kasautuminen
+
+- **Suomi: ei kasaudu** (p = 0,83). Ruuhkaisin ikkuna oli 2011–2015 (4 erkaantumista), mutta
+  nollamallin keskiarvo oli 4,3.
+- **Huonompaan suuntaan erkaantuneet: ei kasaudu** (p = 0,67).
+- **Muut maat:** ei kasautumista. Tanska p = 0,94, Ruotsi ja Norja p = 1.
+
+### Suomen erkaantumiset aikajärjestyksessä
+
+| Vuosi | Sarja | Muutos (ero muihin) | Kuka muuttui (kuvaileva) |
+|---|---|---|---|
+| 1999 | Korkea-asteen tutkinto 25–34 | +5,0 → −13,2 %-yks. | Suomi |
+| 2000 | Julkisen talouden rahoitusjäämä | +3,2 → −5,1 %-yks. BKT:sta | Suomi |
+| 2002 | Sosiaaliturvamenot / BKT (neutraali) | −1,9 → +7,1 | Suomi |
+| 2008 | Työttömyys, miehet 25–34 | +0,6 → +3,0 | Suomi |
+| 2009 | Elinajanodote | −0,3 → −0,9 vuotta | Suomi |
+| 2010 | Työttömyys 25–29 | −0,5 → +1,1 | Suomi |
+| 2011 | Työllisyys 25–29 | +0,5 → −3,5 | Suomi |
+| 2014 | Pitkäaikaistyöttömien osuus 25–29 | −3,5 → +5,9 | Suomi |
+| 2015 | Pitkäaikaistyöttömien osuus 30–34 | −2,5 → +4,4 | Suomi |
+| 2015 | Määräaikaiset 25–34 | +2,8 → +4,6 | muut (vähensivät) |
+
+### Tulkinta
+
+- **Ei yhtä juurta:** erkaantumiset eivät kasaudu yhdelle jaksolle.
+- **Suomi erkani eniten:** Suomi erkani muista Pohjoismaista useammin kuin yksikään vertailumaa
+  (10 vs. 7, 2 ja 1), ja lähes aina huonompaan suuntaan. Muutos lähti 9 tapauksessa 10:stä Suomesta.
+- **Kaksi kerrosta:**
+  1. 1999–2002: nuorten aikuisten koulutustaso ja julkinen talous.
+  2. 2008–2015: nuorten aikuisten työmarkkinat ketjuna: työttömyys → työllisyys →
+     pitkäaikaistyöttömyys.
+- **Uusi hypoteesi Näyttöverkkoon** (ei testattu, muotoiltu tästä aineistosta):
+  - Nuorten aikuisten koulutustason jääminen jälkeen (1999–) edelsi heidän työmarkkina-asemansa
+    erkaantumista (2008–).
+  - Testi muulla aineistolla: ikäluokittain tai alueittain Suomessa.
+- **Huomio luonteesta:** kaikki erkaantumiset eivät ole yhtä jyrkkiä.
+  - Jyrkkiä: korkea-asteen tutkinnot, julkinen talous ja pitkäaikaistyöttömyys.
+  - Osa on aiemman lähentymisen pysähtymistä ja loivaa erkanemista. Esimerkiksi 25–29-vuotiaiden
+    työttömyysero kaventui 1990-luvun lamasta vuoteen 2010 ja kääntyi sitten loivaan kasvuun
+    (−0,5 → +1,1 %-yks.).
+  - Sääntö kohtelee molempia erkaantumisina, joten luonne näytetään kunkin sarjan kaaviossa.
